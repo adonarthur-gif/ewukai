@@ -24,3 +24,163 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+.input-style {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(203 213 225);
+  background: white;
+  padding: 0.75rem 1rem;
+  outline: none;
+  transition: 0.2s;
+}
+
+.input-style:focus {
+  border-color: rgb(5 150 105);
+  box-shadow: 0 0 0 2px rgb(209 250 229);
+}
+
+.textarea-style {
+  margin-top: 0.5rem;
+  width: 100%;
+  resize: vertical;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(203 213 225);
+  background: white;
+  padding: 0.75rem 1rem;
+  line-height: 1.7;
+  outline: none;
+  transition: 0.2s;
+}
+
+.textarea-style:focus {
+  border-color: rgb(5 150 105);
+  box-shadow: 0 0 0 2px rgb(209 250 229);
+}
+
+/* =========================================================
+   AFRI CLUB - ANIMATIONS VITRINE
+   ========================================================= */
+
+@keyframes afriHistogramGrow {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.afri-histogram-bar {
+  transform-origin: bottom;
+  animation: afriHistogramGrow 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes afriProgressGrow {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.afri-progress-bar {
+  transform-origin: left;
+  animation: afriProgressGrow 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes afriDashboardFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+.afri-dashboard-float {
+  animation: afriDashboardFloat 6s ease-in-out infinite;
+}
+
+@keyframes afriSoftFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.afri-soft-float {
+  animation: afriSoftFloat 7s ease-in-out infinite;
+}
+
+@keyframes afriGlowOne {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(45px, -20px, 0) scale(1.08);
+  }
+}
+
+.afri-glow-one {
+  animation: afriGlowOne 10s ease-in-out infinite;
+}
+
+@keyframes afriGlowTwo {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(-35px, 30px, 0) scale(1.1);
+  }
+}
+
+.afri-glow-two {
+  animation: afriGlowTwo 12s ease-in-out infinite;
+}
+
+.afri-card-rise {
+  transition:
+    transform 280ms ease,
+    box-shadow 280ms ease,
+    border-color 280ms ease;
+}
+
+.afri-card-rise:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 20px 45px rgba(15, 23, 42, 0.09);
+}
+
+/* Respecter les utilisateurs qui désactivent les animations */
+
+@media (prefers-reduced-motion: reduce) {
+  .afri-histogram-bar,
+  .afri-progress-bar,
+  .afri-dashboard-float,
+  .afri-soft-float,
+  .afri-glow-one,
+  .afri-glow-two {
+    animation: none !important;
+  }
+
+  .afri-card-rise {
+    transition: none !important;
+  }
+}
