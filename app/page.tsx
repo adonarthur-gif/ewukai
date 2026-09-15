@@ -10,7 +10,6 @@ import {
   Building2,
   CheckCircle2,
   CircleDollarSign,
-  CreditCard,
   Globe2,
   HandCoins,
   HeartHandshake,
@@ -23,6 +22,14 @@ import {
   Users,
   Wallet,
 } from 'lucide-react'
+
+const PAYMENT_LOGOS = {
+  orangeMoney: '/payment-logos/orange-money.png',
+  wave: '/payment-logos/wave.png',
+  mtnMomo: '/payment-logos/mtn-mobile-money.png',
+  moovMoney: '/payment-logos/moov-money.png',
+  mastercard: '/payment-logos/mastercard.png',
+} as const
 
 // ============================================================
 // PAGE D'ACCUEIL EWUKAI - PREMIUM BILINGUE
@@ -652,9 +659,8 @@ export default async function HomePage({
                 icon={<Smartphone className="h-6 w-6" />}
                 visual={
                   <PaymentProviderCloud
-                    virtualCardLabel={t('Carte virtuelle', 'Virtual card')}
                     secureLabel={t('Paiement sécurisé', 'Secure payment')}
-                    ariaLabel={t('Mobile Money et cartes', 'Mobile Money and cards')}
+                    ariaLabel={t('Mobile Money et cartes bancaires', 'Mobile Money and bank cards')}
                   />
                 }
                 eyebrow={t('Étape 2', 'Step 2')}
@@ -721,12 +727,35 @@ export default async function HomePage({
                   {t('Canaux selon votre prestataire', 'Channels available through your provider')}
                 </p>
                 <div className="grid grid-cols-2 gap-2 text-xs font-black text-slate-700 sm:grid-cols-3">
-                  <PaymentMethodBadge icon={<Smartphone className="h-4 w-4" />} label="Wave" />
-                  <PaymentMethodBadge icon={<Smartphone className="h-4 w-4" />} label="Orange Money" />
-                  <PaymentMethodBadge icon={<Smartphone className="h-4 w-4" />} label="MTN MoMo" />
-                  <PaymentMethodBadge icon={<Smartphone className="h-4 w-4" />} label="Moov Money" />
-                  <PaymentMethodBadge icon={<CreditCard className="h-4 w-4" />} label={t('Carte bancaire', 'Bank card')} />
-                  <PaymentMethodBadge icon={<Landmark className="h-4 w-4" />} label={t('Virement bancaire', 'Bank transfer')} />
+                  <PaymentMethodBadge
+                    imageSrc={PAYMENT_LOGOS.wave}
+                    imageAlt="Wave"
+                    label="Wave"
+                  />
+                  <PaymentMethodBadge
+                    imageSrc={PAYMENT_LOGOS.orangeMoney}
+                    imageAlt="Orange Money"
+                    label="Orange Money"
+                  />
+                  <PaymentMethodBadge
+                    imageSrc={PAYMENT_LOGOS.mtnMomo}
+                    imageAlt="MTN Mobile Money"
+                    label="MTN MoMo"
+                  />
+                  <PaymentMethodBadge
+                    imageSrc={PAYMENT_LOGOS.moovMoney}
+                    imageAlt="Moov Money"
+                    label="Moov Money"
+                  />
+                  <PaymentMethodBadge
+                    imageSrc={PAYMENT_LOGOS.mastercard}
+                    imageAlt="Mastercard"
+                    label="Mastercard"
+                  />
+                  <PaymentMethodBadge
+                    icon={<Landmark className="h-4 w-4" />}
+                    label={t('Virement bancaire', 'Bank transfer')}
+                  />
                 </div>
                 <p className="mt-2 max-w-sm text-[10px] font-semibold leading-4 text-emerald-700">
                   {t(
@@ -1121,54 +1150,161 @@ export default async function HomePage({
       {/* ==================================================== */}
 
       <footer className="border-t border-slate-200 bg-[#F8FAFC]">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+            <div className="max-w-xl">
+              <div className="flex items-center gap-3">
+                <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-slate-200">
+                  <Image
+                    src="/branding/ewukai-mark.png"
+                    alt="Symbole EWUKAI"
+                    width={44}
+                    height={44}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
 
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center lg:px-8">
+                <div>
+                  <p className="font-black text-slate-950">
+                    EWUKAI
+                  </p>
 
-          <div className="flex items-center gap-3">
+                  <p className="text-sm text-slate-500">
+                    {t(
+                      'La plateforme de gestion des organisations',
+                      'The organization management platform'
+                    )}
+                  </p>
+                </div>
+              </div>
 
-            <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-slate-200">
-              <Image
-                src="/branding/ewukai-mark.png"
-                alt="Symbole EWUKAI"
-                width={44}
-                height={44}
-                className="h-full w-full object-contain"
-              />
-            </div>
-
-            <div>
-              <p className="font-black text-slate-950">
-                EWUKAI
-              </p>
-
-              <p className="text-sm text-slate-500">
+              <p className="mt-4 max-w-lg text-sm leading-6 text-slate-500">
                 {t(
-                  'Un espace pour chaque organisation. Une plateforme pour les réunir.',
-                  'A space for every organization. One platform to bring them together.'
+                  'Un espace pour chaque organisation. Une plateforme pour mieux gérer les membres, les cotisations, les paiements, la trésorerie et les rapports.',
+                  'A space for every organization. One platform to manage members, contributions, payments, treasury and reports.'
                 )}
               </p>
             </div>
+
+            <div className="grid grid-cols-2 gap-6 text-sm sm:grid-cols-3">
+              <div>
+                <p className="font-black text-slate-950">
+                  EWUKAI
+                </p>
+
+                <div className="mt-3 flex flex-col gap-2.5 font-semibold text-slate-500">
+                  <Link
+                    href="/about"
+                    className="transition hover:text-emerald-700"
+                  >
+                    {t('À propos', 'About')}
+                  </Link>
+
+                  <Link
+                    href="/contact"
+                    className="transition hover:text-emerald-700"
+                  >
+                    Contact
+                  </Link>
+
+                  <Link
+                    href="/privacy"
+                    className="transition hover:text-emerald-700"
+                  >
+                    {t(
+                      'Confidentialité',
+                      'Privacy'
+                    )}
+                  </Link>
+                </div>
+              </div>
+
+              <div>
+                <p className="font-black text-slate-950">
+                  {t('Accès', 'Access')}
+                </p>
+
+                <div className="mt-3 flex flex-col gap-2.5 font-semibold text-slate-500">
+                  <Link
+                    href="/login"
+                    className="transition hover:text-emerald-700"
+                  >
+                    {t('Connexion', 'Sign in')}
+                  </Link>
+
+                  <Link
+                    href="/login/dirigeant"
+                    className="transition hover:text-emerald-700"
+                  >
+                    {t(
+                      'Espace dirigeant',
+                      'Manager portal'
+                    )}
+                  </Link>
+
+                  <Link
+                    href="/register"
+                    className="transition hover:text-emerald-700"
+                  >
+                    {t(
+                      'Créer une organisation',
+                      'Create an organization'
+                    )}
+                  </Link>
+                </div>
+              </div>
+
+              <div className="col-span-2 sm:col-span-1">
+                <p className="font-black text-slate-950">
+                  {t('Plateforme', 'Platform')}
+                </p>
+
+                <div className="mt-3 flex flex-col gap-2.5 font-semibold text-slate-500">
+                  <a
+                    href="#organisations"
+                    className="transition hover:text-emerald-700"
+                  >
+                    {t(
+                      'Organisations',
+                      'Organizations'
+                    )}
+                  </a>
+
+                  <a
+                    href="#solutions"
+                    className="transition hover:text-emerald-700"
+                  >
+                    {t(
+                      'Fonctionnalités',
+                      'Features'
+                    )}
+                  </a>
+
+                  <a
+                    href="#paiements"
+                    className="transition hover:text-emerald-700"
+                  >
+                    {t('Paiements', 'Payments')}
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-slate-500">
+          <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-6 text-xs font-semibold text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              © 2026 EWUKAI. {t(
+                'Tous droits réservés.',
+                'All rights reserved.'
+              )}
+            </p>
 
-            <Link
-              href="/login"
-              className="hover:text-emerald-700"
-            >
-              {t('Connexion', 'Sign in')}
-            </Link>
-
-            <Link
-              href="/register"
-              className="hover:text-emerald-700"
-            >
-              {t('Créer une organisation', 'Create an organization')}
-            </Link>
-
-            <span>
-              {t('Plateforme internationale', 'International platform')}
-            </span>
+            <p>
+              {t(
+                'Plateforme internationale de gestion des organisations',
+                'International organization management platform'
+              )}
+            </p>
           </div>
         </div>
       </footer>
@@ -1413,16 +1549,32 @@ function ActivityCard({
 
 function PaymentMethodBadge({
   icon,
+  imageSrc,
+  imageAlt = '',
   label,
 }: {
-  icon: ReactNode
+  icon?: ReactNode
+  imageSrc?: string
+  imageAlt?: string
   label: string
 }) {
   return (
-    <span className="flex items-center gap-2 rounded-xl border border-white bg-white px-3 py-2 shadow-sm">
-      <span className="text-emerald-700">
-        {icon}
-      </span>
+    <span className="flex min-h-11 items-center gap-2 rounded-xl border border-white bg-white px-3 py-2 shadow-sm">
+      {imageSrc ? (
+        <span className="flex h-7 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            width={48}
+            height={32}
+            className="max-h-7 w-auto max-w-9 object-contain"
+          />
+        </span>
+      ) : (
+        <span className="text-emerald-700">
+          {icon}
+        </span>
+      )}
       <span>{label}</span>
     </span>
   )
@@ -1755,98 +1907,68 @@ function PaymentNode({
 }
 
 function PaymentProviderCloud({
-  virtualCardLabel,
   secureLabel,
   ariaLabel,
 }: {
-  virtualCardLabel: string
   secureLabel: string
   ariaLabel: string
 }) {
+  const providers = [
+    {
+      title: 'Orange Money',
+      src: PAYMENT_LOGOS.orangeMoney,
+      tone: 'orange' as const,
+      imageClass: 'max-h-7 max-w-[92px]',
+    },
+    {
+      title: 'Wave',
+      src: PAYMENT_LOGOS.wave,
+      tone: 'cyan' as const,
+      imageClass: 'max-h-8 max-w-[76px]',
+    },
+    {
+      title: 'MTN Mobile Money',
+      src: PAYMENT_LOGOS.mtnMomo,
+      tone: 'yellow' as const,
+      imageClass: 'max-h-8 max-w-[96px]',
+    },
+    {
+      title: 'Moov Money',
+      src: PAYMENT_LOGOS.moovMoney,
+      tone: 'emerald' as const,
+      imageClass: 'max-h-8 max-w-[92px]',
+    },
+    {
+      title: 'Mastercard',
+      src: PAYMENT_LOGOS.mastercard,
+      tone: 'violet' as const,
+      imageClass: 'max-h-7 max-w-[100px]',
+    },
+  ]
+
   return (
     <div
-      className="w-full max-w-[250px]"
+      className="w-full max-w-[270px]"
       aria-label={ariaLabel}
     >
       <div className="rounded-[1.65rem] border border-emerald-100 bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FFFC_100%)] p-3 shadow-sm shadow-emerald-100/60">
-        <div className="flex flex-wrap items-center gap-2">
-          <ProviderMiniBadge
-            title="Orange Money"
-            tone="orange"
-            className="rotate-[-4deg]"
-          >
-            <Image
-              src="/payment-logos/orange-money.png"
-              alt="Orange Money"
-              width={30}
-              height={30}
-              className="h-5 w-auto object-contain"
-            />
-            <span className="text-[10px] font-black text-slate-700">
-              Orange
-            </span>
-          </ProviderMiniBadge>
-
-          <ProviderMiniBadge
-            title="Wave"
-            tone="cyan"
-            className="translate-y-1"
-          >
-            <Image
-              src="/payment-logos/wave.png"
-              alt="Wave"
-              width={24}
-              height={24}
-              className="h-5 w-5 object-contain"
-            />
-            <span className="text-[10px] font-black text-slate-700">
-              Wave
-            </span>
-          </ProviderMiniBadge>
-
-          <ProviderMiniBadge
-            title="MTN MoMo"
-            tone="yellow"
-            className="rotate-[3deg]"
-          >
-            <Smartphone className="h-3.5 w-3.5 text-yellow-700" />
-            <span className="text-[10px] font-black text-yellow-900">
-              MoMo
-            </span>
-          </ProviderMiniBadge>
-
-          <ProviderMiniBadge
-            title="Moov Money"
-            tone="emerald"
-            className="-translate-y-1"
-          >
-            <Wallet className="h-3.5 w-3.5 text-emerald-700" />
-            <span className="text-[10px] font-black text-emerald-900">
-              Moov
-            </span>
-          </ProviderMiniBadge>
-
-          <ProviderMiniBadge
-            title="Carte bancaire"
-            tone="blue"
-            className="ml-2"
-          >
-            <CreditCard className="h-3.5 w-3.5 text-blue-700" />
-            <span className="text-[10px] font-black text-blue-900">
-              Carte
-            </span>
-          </ProviderMiniBadge>
-
-          <ProviderMiniBadge
-            title={virtualCardLabel}
-            tone="violet"
-            className="translate-y-1"
-          >
-            <BadgeCheck className="h-3.5 w-3.5 text-violet-700" />
-            <span className="text-[10px] font-black text-violet-900">
-              Virtuelle
-            </span>
-          </ProviderMiniBadge>
+        <div className="grid grid-cols-2 gap-2">
+          {providers.map((provider) => (
+            <ProviderMiniBadge
+              key={provider.title}
+              title={provider.title}
+              tone={provider.tone}
+              className="justify-center"
+            >
+              <Image
+                src={provider.src}
+                alt={provider.title}
+                width={110}
+                height={44}
+                className={`h-auto w-auto object-contain ${provider.imageClass}`}
+              />
+            </ProviderMiniBadge>
+          ))}
         </div>
 
         <div className="mt-3 flex items-center justify-between gap-2 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-3 py-2">
@@ -1888,7 +2010,7 @@ function ProviderMiniBadge({
   return (
     <span
       title={title}
-      className={`inline-flex h-10 items-center gap-1.5 rounded-2xl border px-2.5 shadow-sm ${tones[tone]} ${className}`}
+      className={`inline-flex h-12 min-w-0 items-center gap-1.5 overflow-hidden rounded-2xl border px-2.5 shadow-sm ${tones[tone]} ${className}`}
     >
       {children}
     </span>

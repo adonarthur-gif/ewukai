@@ -210,6 +210,37 @@ export default function AppNavigation({
     pathname ===
       '/' ||
 
+    // ========================================================
+    // PAGES PUBLIQUES EWUKAI
+    // Elles ne doivent jamais afficher la navigation
+    // d'une organisation, même si l'utilisateur est connecté.
+    // ========================================================
+
+    pathname ===
+      '/about' ||
+
+    pathname.startsWith(
+      '/about/'
+    ) ||
+
+    pathname ===
+      '/contact' ||
+
+    pathname.startsWith(
+      '/contact/'
+    ) ||
+
+    pathname ===
+      '/privacy' ||
+
+    pathname.startsWith(
+      '/privacy/'
+    ) ||
+
+    // ========================================================
+    // AUTHENTIFICATION / INSCRIPTION
+    // ========================================================
+
     pathname ===
       '/login' ||
 
@@ -240,6 +271,10 @@ export default function AppNavigation({
 
     pathname ===
       '/signout' ||
+
+    // ========================================================
+    // ESPACE MEMBRE ET PAGES PUBLIQUES DES ORGANISATIONS
+    // ========================================================
 
     pathname.startsWith(
       '/my-space'
