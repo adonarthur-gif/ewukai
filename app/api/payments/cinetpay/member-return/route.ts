@@ -8,7 +8,7 @@ import {
 } from '@/lib/supabase/admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // RETOUR NAVIGATEUR CINETPAY - COTISATION MEMBRE
 //
 // IMPORTANT :
@@ -151,7 +151,7 @@ async function handleReturn(
   ) {
     if (error) {
       console.error(
-        'AFRI CLUB - MEMBER CINETPAY RETURN:',
+        'EWUKAI - MEMBER CINETPAY RETURN:',
         {
           code:
             error.code,

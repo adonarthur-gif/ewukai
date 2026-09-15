@@ -67,7 +67,7 @@ export async function POST(
     error
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY HMAC CONFIG:',
+      'EWUKAI - CINETPAY HMAC CONFIG:',
       error
     )
 
@@ -85,7 +85,7 @@ export async function POST(
 
   if (!validHmac) {
     console.warn(
-      'AFRI CLUB - CINETPAY INVALID HMAC'
+      'EWUKAI - CINETPAY INVALID HMAC'
     )
 
     return NextResponse.json(
@@ -137,7 +137,7 @@ export async function POST(
     error
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY SITE CONFIG:',
+      'EWUKAI - CINETPAY SITE CONFIG:',
       error
     )
 
@@ -207,7 +207,7 @@ export async function POST(
     attemptError
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY ATTEMPT LOOKUP:',
+      'EWUKAI - CINETPAY ATTEMPT LOOKUP:',
       attemptError
     )
 
@@ -265,7 +265,7 @@ export async function POST(
     error
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY VERIFY:',
+      'EWUKAI - CINETPAY VERIFY:',
       error
     )
 
@@ -386,7 +386,7 @@ export async function POST(
       confirmationError
     ) {
       console.error(
-        'AFRI CLUB - CINETPAY CONFIRM:',
+        'EWUKAI - CINETPAY CONFIRM:',
         confirmationError
       )
 
@@ -450,7 +450,7 @@ export async function POST(
       failedUpdateError
     ) {
       console.error(
-        'AFRI CLUB - CINETPAY FAILED UPDATE:',
+        'EWUKAI - CINETPAY FAILED UPDATE:',
         failedUpdateError
       )
 
@@ -506,7 +506,7 @@ export async function POST(
     pendingUpdateError
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY PENDING UPDATE:',
+      'EWUKAI - CINETPAY PENDING UPDATE:',
       pendingUpdateError
     )
 
@@ -631,7 +631,7 @@ async function markAttemptAnomaly(
 
   if (error) {
     console.error(
-      'AFRI CLUB - CINETPAY ANOMALY UPDATE:',
+      'EWUKAI - CINETPAY ANOMALY UPDATE:',
       error
     )
   }

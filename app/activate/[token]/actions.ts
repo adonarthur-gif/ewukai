@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 import { hashMemberAccessToken } from '@/lib/security/member-access-token'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ACTIVATION DE L'ESPACE MEMBRE
 // ============================================================
 
@@ -71,7 +71,7 @@ async function claimAccess(
 
   if (error) {
     console.error(
-      'AFRI CLUB - claim member access:',
+      'EWUKAI - claim member access:',
       error
     )
 
@@ -157,7 +157,7 @@ export async function signInAndActivate(
 
   if (signInError) {
     console.error(
-      'AFRI CLUB - member sign in:',
+      'EWUKAI - member sign in:',
       signInError
     )
 
@@ -278,7 +278,7 @@ export async function registerAndActivate(
 
   if (signUpError) {
     console.error(
-      'AFRI CLUB - register member:',
+      'EWUKAI - register member:',
       signUpError
     )
 

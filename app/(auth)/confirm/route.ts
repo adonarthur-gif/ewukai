@@ -12,7 +12,7 @@ import {
 } from '@/lib/supabase/server'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // CONFIRMATION EMAIL
 // ============================================================
 
@@ -99,7 +99,7 @@ export async function GET(
     }
 
     console.error(
-      'AFRI CLUB - CONFIRM EMAIL:',
+      'EWUKAI - CONFIRM EMAIL:',
       {
         message:
           error.message,

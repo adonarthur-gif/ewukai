@@ -8,12 +8,12 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // SUPER ADMIN
 // ABONNEMENTS DES ORGANISATIONS
 // ============================================================
 //
-// Grille Afri Club :
+// Grille EWUKAI :
 //
 // Gratuit
 //   0 à 20 membres
@@ -308,7 +308,7 @@ export default async function AdminSubscriptionsPage({
     subscriptionsResult.error
   ) {
     console.error(
-      'AFRI CLUB - admin subscriptions:',
+      'EWUKAI - admin subscriptions:',
       subscriptionsResult.error
     )
   }
@@ -317,7 +317,7 @@ export default async function AdminSubscriptionsPage({
     statsResult.error
   ) {
     console.error(
-      'AFRI CLUB - subscription stats:',
+      'EWUKAI - subscription stats:',
       statsResult.error
     )
   }
@@ -326,7 +326,7 @@ export default async function AdminSubscriptionsPage({
     collectionResult.error
   ) {
     console.error(
-      'AFRI CLUB - subscription collection:',
+      'EWUKAI - subscription collection:',
       collectionResult.error
     )
   }
@@ -459,7 +459,7 @@ export default async function AdminSubscriptionsPage({
             <div>
 
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-                Monétisation Afri Club
+                Monétisation EWUKAI
               </p>
 
               <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
@@ -603,7 +603,7 @@ export default async function AdminSubscriptionsPage({
             value={formatInvoiceMoney(
               amountToCollect
             )}
-            note="Factures ouvertes Afri Club"
+            note="Factures ouvertes EWUKAI"
             warning={
               amountToCollect >
               0
@@ -1675,7 +1675,7 @@ function MobileCollection({
           Recouvrement à jour
         </p>
         <p className="mt-1 text-xs font-semibold text-emerald-800">
-          Aucune facture Afri Club ouverte.
+          Aucune facture EWUKAI ouverte.
         </p>
       </div>
     )

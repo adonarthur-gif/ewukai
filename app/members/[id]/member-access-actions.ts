@@ -158,7 +158,7 @@ export async function generateMemberAccessLink(
 
   if (error) {
     console.error(
-      'AFRI CLUB - create member invitation:',
+      'EWUKAI - create member invitation:',
       error
     )
 

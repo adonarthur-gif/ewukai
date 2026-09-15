@@ -9,7 +9,7 @@ import { createContributionCall } from './actions'
 import SubmitButton from './submit-button'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // NOUVEL APPEL DE COTISATION
 // ============================================================
 
@@ -92,7 +92,7 @@ export default async function NewContributionCallPage({
 
   if (membersError) {
     console.error(
-      'AFRI CLUB - contribution call members:',
+      'EWUKAI - contribution call members:',
       membersError
     )
 

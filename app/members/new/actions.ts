@@ -167,7 +167,7 @@ export async function createMember(
 
   if (error || !createdMember) {
     console.error(
-      'AFRI CLUB - createMember:',
+      'EWUKAI - createMember:',
       error
     )
 

@@ -7,7 +7,7 @@ export default function LoginPage() {
 
         <div className="text-center">
           <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">
-            AFRI CLUB
+            EWUKAI
           </p>
 
           <h1 className="mt-3 text-3xl font-black text-slate-950 sm:text-4xl">

@@ -12,7 +12,7 @@ import {
 } from './actions'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // PARAMETRES DES MOYENS DE PAIEMENT
 //
 // Cette page gère deux choses distinctes :
@@ -166,7 +166,7 @@ export default async function PaymentMethodsPage({
 
   if (error) {
     console.error(
-      'AFRI CLUB - payment methods:',
+      'EWUKAI - payment methods:',
       {
         code:
           error.code,
@@ -201,7 +201,7 @@ export default async function PaymentMethodsPage({
 
   if (cinetPayError) {
     console.error(
-      'AFRI CLUB - CinetPay status:',
+      'EWUKAI - CinetPay status:',
       {
         code:
           cinetPayError.code,

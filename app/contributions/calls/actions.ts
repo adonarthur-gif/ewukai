@@ -91,7 +91,7 @@ export async function activateContributionCall(
 
   if (error) {
     console.error(
-      'AFRI CLUB - activate contribution call:',
+      'EWUKAI - activate contribution call:',
       error
     )
 

@@ -14,7 +14,7 @@ import {
 } from './actions'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // PARAMETRES CINETPAY
 // ============================================================
 
@@ -143,7 +143,7 @@ export default async function CinetPaySettingsPage({
     statusError
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY STATUS:',
+      'EWUKAI - CINETPAY STATUS:',
       {
         code:
           statusError.code,

@@ -1461,7 +1461,7 @@ function MemberSpaceSelector({
           <div>
 
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-              AFRI CLUB
+              EWUKAI
             </p>
 
             <p className="mt-1 text-lg font-black text-slate-950">
@@ -1499,7 +1499,7 @@ function MemberSpaceSelector({
           </h1>
 
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-            Votre compte Afri Club
+            Votre compte EWUKAI
             est rattaché à plusieurs
             organisations.
             Sélectionnez celle dont
@@ -1580,7 +1580,7 @@ function MemberSpaceSelector({
         <div className="mt-7 rounded-2xl border border-blue-200 bg-blue-50 p-5">
 
           <p className="font-black text-blue-950">
-            Un seul compte Afri Club
+            Un seul compte EWUKAI
           </p>
 
           <p className="mt-2 text-sm leading-6 text-blue-800">

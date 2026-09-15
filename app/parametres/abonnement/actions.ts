@@ -104,7 +104,7 @@ export async function requestSubscriptionCheckout(
 
   if (error) {
     console.error(
-      'AFRI CLUB - SUBSCRIPTION CHECKOUT:',
+      'EWUKAI - SUBSCRIPTION CHECKOUT:',
       {
         code: error.code,
         message: error.message,
@@ -207,7 +207,7 @@ export async function startCinetPayPayment(
     !data
   ) {
     console.error(
-      'AFRI CLUB - PREPARE CINETPAY PAYMENT:',
+      'EWUKAI - PREPARE CINETPAY PAYMENT:',
       error
     )
 
@@ -287,7 +287,7 @@ export async function startCinetPayPayment(
     configurationError
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY PUBLIC URL:',
+      'EWUKAI - CINETPAY PUBLIC URL:',
       configurationError
     )
 
@@ -318,7 +318,7 @@ export async function startCinetPayPayment(
         amountXof,
 
         description:
-          `Abonnement Afri Club ${planCode} 30 jours`,
+          `Abonnement EWUKAI ${planCode} 30 jours`,
 
         notifyUrl,
 
@@ -338,7 +338,7 @@ export async function startCinetPayPayment(
             `${amountXof} FCFA`,
 
           Produit:
-            'Afri Club',
+            'EWUKAI',
         },
       })
 
@@ -384,7 +384,7 @@ export async function startCinetPayPayment(
       updateAttemptError
     ) {
       console.error(
-        'AFRI CLUB - SAVE CINETPAY CHECKOUT:',
+        'EWUKAI - SAVE CINETPAY CHECKOUT:',
         updateAttemptError
       )
 
@@ -399,7 +399,7 @@ export async function startCinetPayPayment(
     paymentError
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY INITIALIZATION:',
+      'EWUKAI - CINETPAY INITIALIZATION:',
       paymentError
     )
 

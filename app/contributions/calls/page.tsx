@@ -73,7 +73,7 @@ export default async function ContributionCallsPage({
 
   if (error) {
     console.error(
-      'AFRI CLUB - calls:',
+      'EWUKAI - calls:',
       error
     )
 

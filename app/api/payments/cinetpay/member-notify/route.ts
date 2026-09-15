@@ -16,13 +16,13 @@ import {
 } from '@/lib/supabase/admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // WEBHOOK CINETPAY - COTISATIONS DES MEMBRES
 //
 // IMPORTANT :
 //
 // Ce webhook est distinct du webhook utilisé pour
-// les abonnements SaaS Afri Club.
+// les abonnements SaaS EWUKAI.
 //
 // Le paiement n'est JAMAIS confirmé sur la seule base
 // des données POST reçues.
@@ -161,7 +161,7 @@ export async function POST(
 
   if (attemptError) {
     console.error(
-      'AFRI CLUB - MEMBER CINETPAY ATTEMPT LOOKUP:',
+      'EWUKAI - MEMBER CINETPAY ATTEMPT LOOKUP:',
       {
         code:
           attemptError.code,
@@ -234,7 +234,7 @@ export async function POST(
       )
   } catch (error) {
     console.error(
-      'AFRI CLUB - MEMBER CINETPAY ORGANIZATION CONFIG:',
+      'EWUKAI - MEMBER CINETPAY ORGANIZATION CONFIG:',
       safeError(
         error
       )
@@ -258,7 +258,7 @@ export async function POST(
     credentials.siteId
   ) {
     console.warn(
-      'AFRI CLUB - MEMBER CINETPAY INVALID SITE'
+      'EWUKAI - MEMBER CINETPAY INVALID SITE'
     )
 
     return jsonError(
@@ -289,7 +289,7 @@ export async function POST(
       })
   } catch (error) {
     console.error(
-      'AFRI CLUB - MEMBER CINETPAY HMAC:',
+      'EWUKAI - MEMBER CINETPAY HMAC:',
       safeError(
         error
       )
@@ -303,7 +303,7 @@ export async function POST(
 
   if (!validHmac) {
     console.warn(
-      'AFRI CLUB - MEMBER CINETPAY INVALID HMAC'
+      'EWUKAI - MEMBER CINETPAY INVALID HMAC'
     )
 
     return jsonError(
@@ -333,7 +333,7 @@ export async function POST(
       )
   } catch (error) {
     console.error(
-      'AFRI CLUB - MEMBER CINETPAY VERIFY:',
+      'EWUKAI - MEMBER CINETPAY VERIFY:',
       safeError(
         error
       )
@@ -528,7 +528,7 @@ export async function POST(
       confirmationError
     ) {
       console.error(
-        'AFRI CLUB - MEMBER CINETPAY CONFIRM:',
+        'EWUKAI - MEMBER CINETPAY CONFIRM:',
         {
           code:
             confirmationError.code,
@@ -611,7 +611,7 @@ export async function POST(
       failedUpdateError
     ) {
       console.error(
-        'AFRI CLUB - MEMBER CINETPAY FAILED UPDATE:',
+        'EWUKAI - MEMBER CINETPAY FAILED UPDATE:',
         {
           code:
             failedUpdateError.code,
@@ -683,7 +683,7 @@ export async function POST(
     pendingUpdateError
   ) {
     console.error(
-      'AFRI CLUB - MEMBER CINETPAY PENDING UPDATE:',
+      'EWUKAI - MEMBER CINETPAY PENDING UPDATE:',
       {
         code:
           pendingUpdateError.code,
@@ -777,7 +777,7 @@ async function markAttemptAnomaly(
 
   if (error) {
     console.error(
-      'AFRI CLUB - MEMBER CINETPAY ANOMALY:',
+      'EWUKAI - MEMBER CINETPAY ANOMALY:',
       {
         code:
           error.code,

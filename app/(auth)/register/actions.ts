@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // INSCRIPTION RESPONSABLE
 // ============================================================
 

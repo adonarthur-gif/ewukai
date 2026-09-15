@@ -11,7 +11,7 @@ import {
 } from 'next/navigation'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ETAT D'UN PAIEMENT MEMBRE APRES RETOUR CINETPAY
 // ============================================================
 
@@ -162,7 +162,7 @@ export default function PaymentStatusClient({
       >
         <p>
           Votre paiement a été vérifié
-          et enregistré par Afri Club.
+          et enregistré par EWUKAI.
         </p>
 
         {selectedPaymentMethod && (
@@ -236,7 +236,7 @@ export default function PaymentStatusClient({
         title="Paiement à vérifier"
       >
         <p>
-          Afri Club a détecté une
+          EWUKAI a détecté une
           incohérence lors de la
           vérification de cette
           transaction.
@@ -273,7 +273,7 @@ export default function PaymentStatusClient({
           </p>
 
           <p className="mt-2">
-            Afri Club attend ou vérifie
+            EWUKAI attend ou vérifie
             actuellement la confirmation
             du prestataire.
           </p>

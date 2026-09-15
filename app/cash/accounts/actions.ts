@@ -203,7 +203,7 @@ export async function createTreasuryAccount(
 
   if (error) {
     console.error(
-      'AFRI CLUB - treasury account:',
+      'EWUKAI - treasury account:',
       error
     )
 
@@ -308,7 +308,7 @@ export async function archiveTreasuryAccount(
 
   if (error) {
     console.error(
-      'AFRI CLUB - archive treasury account:',
+      'EWUKAI - archive treasury account:',
       error
     )
 

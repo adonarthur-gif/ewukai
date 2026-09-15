@@ -222,7 +222,7 @@ export default async function AdminSubscriptionDetailPage({
     error
   ) {
     console.error(
-      'AFRI CLUB - subscription detail:',
+      'EWUKAI - subscription detail:',
       error
     )
 

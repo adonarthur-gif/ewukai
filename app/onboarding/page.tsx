@@ -25,7 +25,7 @@ import {
 } from './actions'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ONBOARDING
 // CREATION D'UNE ORGANISATION
 // ============================================================
@@ -128,7 +128,7 @@ export default async function OnboardingPage({
     existingOrganizationError
   ) {
     console.error(
-      'AFRI CLUB - ONBOARDING PAGE:',
+      'EWUKAI - ONBOARDING PAGE:',
       existingOrganizationError
     )
 
@@ -190,7 +190,7 @@ export default async function OnboardingPage({
           </div>
 
           <p className="mt-6 text-sm font-black uppercase tracking-[0.2em] text-emerald-400">
-            AFRI CLUB
+            EWUKAI
           </p>
 
           <h1 className="mx-auto mt-3 max-w-3xl text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
@@ -636,7 +636,7 @@ export default async function OnboardingPage({
                 <SectionTitle
                   eyebrow="Étape 4"
                   title="Votre profil de responsable"
-                  description="Votre compte Afri Club deviendra automatiquement le compte Responsable de cette organisation."
+                  description="Votre compte EWUKAI deviendra automatiquement le compte Responsable de cette organisation."
                 />
 
                 <div className="mt-7 grid gap-5 sm:grid-cols-2">
@@ -685,7 +685,7 @@ export default async function OnboardingPage({
                   <div className="mt-5 rounded-xl bg-slate-50 p-4">
 
                     <p className="text-xs font-black uppercase tracking-wide text-slate-500">
-                      Compte Afri Club connecté
+                      Compte EWUKAI connecté
                     </p>
 
                     <p className="mt-1 font-bold text-slate-900">
@@ -880,7 +880,7 @@ export default async function OnboardingPage({
 
             <SectionTitle
               eyebrow="Prêt à commencer"
-              title="Afri Club prépare votre espace"
+              title="EWUKAI prépare votre espace"
               description="La création de l'organisation et de votre accès initial se fera automatiquement."
             />
 

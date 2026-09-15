@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ONBOARDING - CREATION D'UNE ORGANISATION
 // ============================================================
 
@@ -399,7 +399,7 @@ export async function createOrganization(
   // IMPORTANT :
   // Une personne peut être membre de plusieurs mutuelles sans
   // être dirigeant. Cela ne doit jamais l'empêcher de créer sa
-  // propre organisation dans Afri Club.
+  // propre organisation dans EWUKAI.
   //
   // Seuls les rôles de gestion actifs ci-dessous bloquent la
   // création d'une nouvelle organisation depuis cet onboarding.
@@ -448,7 +448,7 @@ export async function createOrganization(
   ) {
 
     console.error(
-      'AFRI CLUB - ONBOARDING - existing organization:',
+      'EWUKAI - ONBOARDING - existing organization:',
       existingOrganizationError
     )
 
@@ -622,7 +622,7 @@ export async function createOrganization(
   if (error) {
 
     console.error(
-      'AFRI CLUB - ONBOARDING - create organization:',
+      'EWUKAI - ONBOARDING - create organization:',
       {
         code:
           error.code,

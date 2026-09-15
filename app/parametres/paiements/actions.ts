@@ -206,7 +206,7 @@ export async function createPaymentMethod(
 
   if (error) {
     console.error(
-      'AFRI CLUB - create payment method:',
+      'EWUKAI - create payment method:',
       error
     )
 
@@ -286,7 +286,7 @@ export async function togglePaymentMethod(
 
   if (error) {
     console.error(
-      'AFRI CLUB - toggle payment method:',
+      'EWUKAI - toggle payment method:',
       error
     )
 
@@ -359,7 +359,7 @@ export async function deletePaymentMethod(
 
   if (error) {
     console.error(
-      'AFRI CLUB - delete payment method:',
+      'EWUKAI - delete payment method:',
       error
     )
 

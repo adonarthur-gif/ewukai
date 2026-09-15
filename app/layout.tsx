@@ -35,10 +35,10 @@ export const metadata:
   Metadata = {
     title: {
       default:
-        'Afri Club',
+        'EWUKAI',
 
       template:
-        '%s | Afri Club',
+        '%s | EWUKAI',
     },
 
     description:

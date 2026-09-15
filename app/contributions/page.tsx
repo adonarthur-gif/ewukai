@@ -56,7 +56,7 @@ export default async function ContributionsPage({
 
   if (error) {
     console.error(
-      'AFRI CLUB - contributions:',
+      'EWUKAI - contributions:',
       error
     )
 

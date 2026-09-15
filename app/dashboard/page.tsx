@@ -1522,7 +1522,7 @@ export default async function DashboardPage() {
                   Ce solde correspond
                   uniquement aux
                   opérations enregistrées
-                  dans Afri Club. Les
+                  dans EWUKAI. Les
                   fonds restent détenus
                   sur les comptes
                   externes de

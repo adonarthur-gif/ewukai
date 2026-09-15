@@ -5,7 +5,7 @@ import { requireCurrentOrganization } from '@/lib/auth/current-organization'
 import MemberAccessCard from './member-access-card'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // FICHE D'UN MEMBRE
 // ============================================================
 
@@ -109,7 +109,7 @@ export default async function MemberDetailPage({
   ) {
     if (error) {
       console.error(
-        'AFRI CLUB - member detail:',
+        'EWUKAI - member detail:',
         error
       )
     }
@@ -512,7 +512,7 @@ export default async function MemberDetailPage({
           <div className="space-y-7">
 
             {/* =============================================== */}
-            {/* ACCES AFRI CLUB */}
+            {/* ACCES EWUKAI */}
             {/* =============================================== */}
 
             <MemberAccessCard

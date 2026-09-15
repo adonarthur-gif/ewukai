@@ -8,7 +8,7 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ADMINISTRATION PLATEFORME
 // FICHE UTILISATEUR
 // ============================================================
@@ -175,7 +175,7 @@ export default async function AdminUserDetailPage({
     error
   ) {
     console.error(
-      'AFRI CLUB - admin user detail:',
+      'EWUKAI - admin user detail:',
       error
     )
 
@@ -421,7 +421,7 @@ export default async function AdminUserDetailPage({
 
           <CardHeader
             title="Compte utilisateur"
-            description="Informations liées au compte Afri Club."
+            description="Informations liées au compte EWUKAI."
           />
 
           <div className="grid gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">

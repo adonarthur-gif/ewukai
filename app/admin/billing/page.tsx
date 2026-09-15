@@ -8,13 +8,13 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // SUPER ADMIN
 // FACTURATION DES ABONNEMENTS
 // ============================================================
 //
 // Cette page concerne uniquement les revenus commerciaux
-// d'Afri Club.
+// d'EWUKAI.
 //
 // Elle reste séparée :
 // - des cotisations des membres ;
@@ -207,7 +207,7 @@ export default async function AdminBillingPage({
     invoicesResult.error
   ) {
     console.error(
-      'AFRI CLUB - billing invoices:',
+      'EWUKAI - billing invoices:',
       invoicesResult.error
     )
   }
@@ -216,7 +216,7 @@ export default async function AdminBillingPage({
     statsResult.error
   ) {
     console.error(
-      'AFRI CLUB - billing stats:',
+      'EWUKAI - billing stats:',
       statsResult.error
     )
   }
@@ -308,7 +308,7 @@ export default async function AdminBillingPage({
             <div>
 
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-                Revenus Afri Club
+                Revenus EWUKAI
               </p>
 
               <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
@@ -632,7 +632,7 @@ export default async function AdminBillingPage({
 
               <p className="mt-1 text-sm text-slate-500">
                 Facturation commerciale de la
-                plateforme Afri Club.
+                plateforme EWUKAI.
               </p>
 
             </div>
@@ -1166,7 +1166,7 @@ export default async function AdminBillingPage({
         <section className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
 
           <p className="font-black text-blue-950">
-            Facturation Afri Club ≠ trésorerie des mutuelles
+            Facturation EWUKAI ≠ trésorerie des mutuelles
           </p>
 
           <p className="mt-1 text-sm leading-6 text-blue-800">

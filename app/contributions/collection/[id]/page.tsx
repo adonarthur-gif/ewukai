@@ -11,7 +11,7 @@ import {
 import PaymentForm from './payment-form'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // PAGE D'ENCAISSEMENT D'UNE COTISATION
 //
 // Cette page prend désormais en charge :
@@ -157,7 +157,7 @@ export default async function PaymentPage({
     !obligation
   ) {
     console.error(
-      'AFRI CLUB - payment obligation:',
+      'EWUKAI - payment obligation:',
       obligationError
     )
 
@@ -243,7 +243,7 @@ export default async function PaymentPage({
     !member
   ) {
     console.error(
-      'AFRI CLUB - payment member:',
+      'EWUKAI - payment member:',
       memberError
     )
 
@@ -303,7 +303,7 @@ export default async function PaymentPage({
 
     if (periodError) {
       console.error(
-        'AFRI CLUB - exceptional obligation:',
+        'EWUKAI - exceptional obligation:',
         periodError
       )
 
@@ -403,7 +403,7 @@ export default async function PaymentPage({
       !obligation.contribution_type_id
     ) {
       console.error(
-        'AFRI CLUB - regular obligation without contribution type:',
+        'EWUKAI - regular obligation without contribution type:',
         obligation.id
       )
 
@@ -447,7 +447,7 @@ export default async function PaymentPage({
       !contribution
     ) {
       console.error(
-        'AFRI CLUB - payment contribution:',
+        'EWUKAI - payment contribution:',
         contributionError
       )
 
@@ -494,7 +494,7 @@ export default async function PaymentPage({
 
     if (planError) {
       console.error(
-        'AFRI CLUB - payment plan:',
+        'EWUKAI - payment plan:',
         planError
       )
 

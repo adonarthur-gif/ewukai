@@ -63,7 +63,7 @@ export default async function PublicMutualPage({
 
   if (error) {
     console.error(
-      'AFRI CLUB - public mutual:',
+      'EWUKAI - public mutual:',
       error
     )
 

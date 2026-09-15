@@ -186,7 +186,7 @@ export async function createCashExpense(
 
   if (error) {
     console.error(
-      'AFRI CLUB - create expense:',
+      'EWUKAI - create expense:',
       error
     )
 
@@ -312,7 +312,7 @@ export async function reverseCashExpense(
 
   if (error) {
     console.error(
-      'AFRI CLUB - reverse expense:',
+      'EWUKAI - reverse expense:',
       error
     )
 

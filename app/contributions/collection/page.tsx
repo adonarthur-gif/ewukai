@@ -10,7 +10,7 @@ import {
 } from './actions'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // RECOUVREMENT DES COTISATIONS
 // ============================================================
 
@@ -191,7 +191,7 @@ export default async function CollectionPage({
     error
   ) {
     console.error(
-      'AFRI CLUB - list obligations:',
+      'EWUKAI - list obligations:',
       error
     )
 
@@ -654,7 +654,7 @@ export default async function CollectionPage({
       allocationError
     ) {
       console.error(
-        'AFRI CLUB - collection receipt allocations:',
+        'EWUKAI - collection receipt allocations:',
         allocationError
       )
     } else {
@@ -714,7 +714,7 @@ export default async function CollectionPage({
           paymentError
         ) {
           console.error(
-            'AFRI CLUB - collection receipt payments:',
+            'EWUKAI - collection receipt payments:',
             paymentError
           )
         } else {

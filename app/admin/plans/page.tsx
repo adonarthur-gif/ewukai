@@ -5,12 +5,12 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ADMINISTRATION PLATEFORME
 // PLANS & ABONNEMENTS
 // ============================================================
 //
-// Cette page affiche le catalogue commercial Afri Club.
+// Cette page affiche le catalogue commercial EWUKAI.
 //
 // Grille actuelle :
 //
@@ -125,7 +125,7 @@ export default async function AdminPlansPage() {
     error
   ) {
     console.error(
-      'AFRI CLUB - platform plans:',
+      'EWUKAI - platform plans:',
       error
     )
   }
@@ -239,7 +239,7 @@ export default async function AdminPlansPage() {
             <div>
 
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-                Monétisation Afri Club
+                Monétisation EWUKAI
               </p>
 
               <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
@@ -248,7 +248,7 @@ export default async function AdminPlansPage() {
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500 sm:text-base">
                 Consultez les formules commerciales
-                d&apos;Afri Club, leurs limites de
+                d&apos;EWUKAI, leurs limites de
                 membres, leurs fonctionnalités et
                 le nombre d&apos;organisations
                 actuellement rattachées à chaque
@@ -399,7 +399,7 @@ export default async function AdminPlansPage() {
           <div className="border-b border-slate-100 px-6 py-5">
 
             <h2 className="text-lg font-black text-slate-950">
-              Grille tarifaire Afri Club
+              Grille tarifaire EWUKAI
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
@@ -524,7 +524,7 @@ export default async function AdminPlansPage() {
 
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
               Toute nouvelle organisation
-              démarre sur Gratuit. Afri Club peut
+              démarre sur Gratuit. EWUKAI peut
               ensuite recommander une formule
               adaptée au nombre de membres, sans
               déclencher automatiquement une
@@ -571,7 +571,7 @@ export default async function AdminPlansPage() {
             Le dépassement d&apos;une limite de
             membres pourra déclencher une alerte
             ou une recommandation de changement
-            de formule. Afri Club ne doit pas
+            de formule. EWUKAI ne doit pas
             facturer automatiquement une
             organisation sans processus
             d&apos;abonnement explicite.

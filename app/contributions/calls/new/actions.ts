@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // CREATION D'UN APPEL DE COTISATION
 // ============================================================
 
@@ -304,7 +304,7 @@ export async function createContributionCall(
     !newCallId
   ) {
     console.error(
-      'AFRI CLUB - create contribution call:',
+      'EWUKAI - create contribution call:',
       error
     )
 

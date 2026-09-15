@@ -21,7 +21,7 @@ import {
 } from '@/lib/supabase/admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // CONFIGURATION CINETPAY D'UNE ORGANISATION
 // ============================================================
 
@@ -172,7 +172,7 @@ export async function saveCinetPayConfiguration(
     existingError
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY CONFIG LOOKUP:',
+      'EWUKAI - CINETPAY CONFIG LOOKUP:',
       {
         code:
           existingError.code,
@@ -258,7 +258,7 @@ export async function saveCinetPayConfiguration(
       insertError
     ) {
       console.error(
-        'AFRI CLUB - CINETPAY CONFIG CREATE:',
+        'EWUKAI - CINETPAY CONFIG CREATE:',
         {
           code:
             insertError.code,
@@ -357,7 +357,7 @@ export async function saveCinetPayConfiguration(
     updateError
   ) {
     console.error(
-      'AFRI CLUB - CINETPAY CONFIG UPDATE:',
+      'EWUKAI - CINETPAY CONFIG UPDATE:',
       {
         code:
           updateError.code,
@@ -430,7 +430,7 @@ export async function disableCinetPayConfiguration() {
 
   if (error) {
     console.error(
-      'AFRI CLUB - CINETPAY DISABLE:',
+      'EWUKAI - CINETPAY DISABLE:',
       {
         code:
           error.code,
@@ -503,7 +503,7 @@ export async function enableCinetPayConfiguration() {
 
   if (error) {
     console.error(
-      'AFRI CLUB - CINETPAY ENABLE:',
+      'EWUKAI - CINETPAY ENABLE:',
       {
         code:
           error.code,

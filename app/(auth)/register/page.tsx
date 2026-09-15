@@ -10,7 +10,7 @@ import {
 } from './actions'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // PAGE INSCRIPTION RESPONSABLE
 // ============================================================
 
@@ -45,7 +45,7 @@ const plans:
       '0 FCFA',
 
     description:
-      'Pour commencer simplement avec Afri Club.',
+      'Pour commencer simplement avec EWUKAI.',
 
     memberLimit:
       "Jusqu'à 20 membres",
@@ -241,7 +241,7 @@ export default async function RegisterPage({
 
                 <p className="mt-2 text-xs leading-5 text-slate-300">
                   Après la création de votre
-                  organisation, Afri Club pourra
+                  organisation, EWUKAI pourra
                   préparer une offre adaptée à
                   vos besoins.
                 </p>
@@ -269,7 +269,7 @@ export default async function RegisterPage({
           <div className="mb-8">
 
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-              AFRI CLUB
+              EWUKAI
             </p>
 
             <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">

@@ -5,7 +5,7 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ADMINISTRATION PLATEFORME
 // LISTE DES ORGANISATIONS
 //
@@ -129,7 +129,7 @@ export default async function AdminOrganizationsPage({
     error
   ) {
     console.error(
-      'AFRI CLUB - admin organizations:',
+      'EWUKAI - admin organizations:',
       error
     )
   }
@@ -218,7 +218,7 @@ export default async function AdminOrganizationsPage({
             <div>
 
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-                Administration Afri Club
+                Administration EWUKAI
               </p>
 
               <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
@@ -867,7 +867,7 @@ export default async function AdminOrganizationsPage({
           </p>
 
           <p className="mt-1 text-sm leading-6 text-blue-800">
-            L&apos;administration Afri Club
+            L&apos;administration EWUKAI
             dispose ici d&apos;une vue de
             supervision. Les opérations propres
             aux organisations restent séparées

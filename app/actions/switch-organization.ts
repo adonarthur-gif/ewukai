@@ -125,7 +125,7 @@ export async function switchOrganization(
     membershipError
   ) {
     console.error(
-      'AFRI CLUB - switch organization:',
+      'EWUKAI - switch organization:',
       membershipError
     )
 
@@ -138,7 +138,7 @@ export async function switchOrganization(
     !membership
   ) {
     console.warn(
-      'AFRI CLUB - unauthorized organization switch:',
+      'EWUKAI - unauthorized organization switch:',
       {
         userId,
         organizationId,

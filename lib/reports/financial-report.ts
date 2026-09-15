@@ -5,7 +5,7 @@ import type {
 } from '@supabase/supabase-js'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // SOURCE UNIQUE DU RAPPORT FINANCIER
 //
 // Cette fonction alimente :
@@ -244,7 +244,7 @@ export async function buildFinancialReport({
     profileError
   ) {
     console.error(
-      'AFRI CLUB - FINANCIAL REPORT PROFILE:',
+      'EWUKAI - FINANCIAL REPORT PROFILE:',
       profileError
     )
   }

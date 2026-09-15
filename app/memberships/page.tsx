@@ -139,7 +139,7 @@ export default async function MembershipsPage({
 
   if (error) {
     console.error(
-      'AFRI CLUB - memberships:',
+      'EWUKAI - memberships:',
       error
     )
 

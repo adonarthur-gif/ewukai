@@ -7,7 +7,7 @@ import {
 import PaymentStatusClient from './payment-status-client'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // LECTURE SERVEUR DE LA DERNIERE TENTATIVE DE PAIEMENT
 // ============================================================
 
@@ -91,7 +91,7 @@ export default async function MemberPaymentAttemptStatus({
 
   if (error) {
     console.error(
-      'AFRI CLUB - MEMBER PAYMENT STATUS:',
+      'EWUKAI - MEMBER PAYMENT STATUS:',
       {
         code:
           error.code,

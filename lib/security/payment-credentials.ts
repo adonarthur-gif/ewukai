@@ -7,7 +7,7 @@ import {
 } from 'node:crypto'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // CHIFFREMENT DES IDENTIFIANTS DE PRESTATAIRES DE PAIEMENT
 // ============================================================
 

@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // PREPARATION PAIEMENT MEMBRE
 // ============================================================
 
@@ -171,7 +171,7 @@ export async function prepareMemberPayment(
     memberSpacesError
   ) {
     console.error(
-      'AFRI CLUB - PREPARE MEMBER PAYMENT SPACES:',
+      'EWUKAI - PREPARE MEMBER PAYMENT SPACES:',
       {
         code:
           memberSpacesError.code,
@@ -236,7 +236,7 @@ export async function prepareMemberPayment(
     paymentMethodsError
   ) {
     console.error(
-      'AFRI CLUB - PREPARE MEMBER PAYMENT METHODS:',
+      'EWUKAI - PREPARE MEMBER PAYMENT METHODS:',
       {
         code:
           paymentMethodsError.code,
@@ -315,7 +315,7 @@ export async function prepareMemberPayment(
     attemptError
   ) {
     console.error(
-      'AFRI CLUB - PREPARE MEMBER PAYMENT:',
+      'EWUKAI - PREPARE MEMBER PAYMENT:',
       {
         code:
           attemptError.code,

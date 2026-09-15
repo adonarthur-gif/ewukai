@@ -17,7 +17,7 @@ import {
 } from '@/lib/auth/current-organization'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ENCAISSEMENT DES COTISATIONS
 //
 // Deux circuits :
@@ -243,7 +243,7 @@ export async function recordPayment(
     !obligation
   ) {
     console.error(
-      'AFRI CLUB - payment obligation:',
+      'EWUKAI - payment obligation:',
       obligationError
     )
 
@@ -410,7 +410,7 @@ export async function recordPayment(
       prepareError
     ) {
       console.error(
-        'AFRI CLUB - prepare regular payment plan:',
+        'EWUKAI - prepare regular payment plan:',
         prepareError
       )
 
@@ -477,7 +477,7 @@ export async function recordPayment(
       0
   ) {
     console.error(
-      'AFRI CLUB - record payment:',
+      'EWUKAI - record payment:',
       paymentError
     )
 
@@ -582,7 +582,7 @@ export async function recordPayment(
       .new_payment_id
   ) {
     console.error(
-      'AFRI CLUB - payment result without payment id'
+      'EWUKAI - payment result without payment id'
     )
 
     redirect(

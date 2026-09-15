@@ -5,7 +5,7 @@ import { requireCurrentOrganization } from '@/lib/auth/current-organization'
 import { createMember } from './actions'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // CREATION D'UN NOUVEAU MEMBRE
 // ============================================================
 
@@ -43,7 +43,7 @@ export default async function NewMemberPage({
 
   // Diagnostic visible dans le terminal
   console.log(
-    'AFRI CLUB - /members/new',
+    'EWUKAI - /members/new',
     {
       organizationId,
       role,

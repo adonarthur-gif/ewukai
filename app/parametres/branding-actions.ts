@@ -120,7 +120,7 @@ export async function updateOrganizationBranding(
 
     if (uploadError) {
       console.error(
-        'AFRI CLUB - logo upload:',
+        'EWUKAI - logo upload:',
         uploadError
       )
 
@@ -161,7 +161,7 @@ export async function updateOrganizationBranding(
 
   if (error) {
     console.error(
-      'AFRI CLUB - update branding:',
+      'EWUKAI - update branding:',
       error
     )
 

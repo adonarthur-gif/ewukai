@@ -115,7 +115,7 @@ async function resolveCurrentMembership({
     membershipError
   ) {
     console.error(
-      'AFRI CLUB - current organization - memberships:',
+      'EWUKAI - current organization - memberships:',
       membershipError
     )
 

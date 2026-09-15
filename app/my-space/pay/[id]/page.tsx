@@ -17,7 +17,7 @@ import MemberPaymentAttemptStatus
   from './payment-attempt-status'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // PAIEMENT D'UNE COTISATION DEPUIS L'ESPACE MEMBRE
 //
 // PRINCIPES :
@@ -328,7 +328,7 @@ export default async function MemberPaymentPage({
 
   if (spacesError) {
     console.error(
-      'AFRI CLUB - MEMBER PAYMENT SPACES:',
+      'EWUKAI - MEMBER PAYMENT SPACES:',
       {
         code:
           spacesError.code,
@@ -428,7 +428,7 @@ export default async function MemberPaymentPage({
 
     if (financialError) {
       console.error(
-        'AFRI CLUB - MEMBER PAYMENT FINANCIAL SPACE:',
+        'EWUKAI - MEMBER PAYMENT FINANCIAL SPACE:',
         {
           code:
             financialError.code,
@@ -609,7 +609,7 @@ export default async function MemberPaymentPage({
     paymentMethodsError
   ) {
     console.error(
-      'AFRI CLUB - MEMBER PAYMENT METHODS:',
+      'EWUKAI - MEMBER PAYMENT METHODS:',
       {
         code:
           paymentMethodsError.code,
@@ -928,7 +928,7 @@ export default async function MemberPaymentPage({
 
             <p className="text-xs leading-5 text-slate-500">
               Le montant à payer est calculé
-              automatiquement par Afri Club.
+              automatiquement par EWUKAI.
               Il ne peut pas être modifié depuis
               cette page.
             </p>
@@ -1133,7 +1133,7 @@ export default async function MemberPaymentPage({
           </p>
 
           <p className="mt-2 text-sm leading-6 text-blue-800">
-            Afri Club ne considère jamais
+            EWUKAI ne considère jamais
             le simple retour du navigateur
             comme une preuve de paiement.
             La cotisation est enregistrée

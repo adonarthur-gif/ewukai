@@ -10,7 +10,7 @@ import {
 } from '@/lib/reports/financial-report'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // EXPORT EXCEL - RAPPORT FINANCIER
 //
 // Format : SpreadsheetML 2003 (.xls XML)

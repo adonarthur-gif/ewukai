@@ -135,7 +135,7 @@ export async function createContributionType(
 
   if (error) {
     console.error(
-      'AFRI CLUB - createContributionType:',
+      'EWUKAI - createContributionType:',
       error
     )
 

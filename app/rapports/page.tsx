@@ -37,7 +37,7 @@ import {
 import PrintReportButton from './print-button'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // CENTRE RAPPORTS - RAPPORT FINANCIER GENERAL
 // ============================================================
 
@@ -844,7 +844,7 @@ export default async function ReportsPage({
           {/* FOOTER */}
 
           <footer className="border-t border-slate-200 bg-slate-50 px-6 py-5 text-center text-xs text-slate-500">
-            Rapport généré électroniquement par la mutuelle via Afri Club.
+            Rapport généré électroniquement par la mutuelle via EWUKAI.
             La plateforme ne détient pas les fonds de la mutuelle.
           </footer>
 

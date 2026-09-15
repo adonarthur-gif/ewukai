@@ -8,12 +8,12 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ADMINISTRATION PLATEFORME
 // UTILISATEURS
 //
 // Fonctionnalités :
-// - liste globale des comptes Afri Club ;
+// - liste globale des comptes EWUKAI ;
 // - recherche ;
 // - rôles de gestion distincts des dossiers membres ;
 // - identification Super-admin ;
@@ -190,7 +190,7 @@ export default async function AdminUsersPage({
     error
   ) {
     console.error(
-      'AFRI CLUB - admin users:',
+      'EWUKAI - admin users:',
       error
     )
   }
@@ -273,7 +273,7 @@ export default async function AdminUsersPage({
             <div>
 
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-                Administration Afri Club
+                Administration EWUKAI
               </p>
 
               <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">

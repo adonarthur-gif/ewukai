@@ -13,7 +13,7 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ACTIONS - PARAMETRES PLATEFORME
 // ============================================================
 
@@ -143,7 +143,7 @@ export async function updatePlatformSettings(
     error
   ) {
     console.error(
-      'AFRI CLUB - update platform settings:',
+      'EWUKAI - update platform settings:',
       error
     )
 

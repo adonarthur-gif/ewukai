@@ -8,7 +8,7 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ADMINISTRATION PLATEFORME
 // FICHE DETAILLEE D'UNE ORGANISATION
 //
@@ -331,7 +331,7 @@ export default async function PlatformOrganizationDetailPage({
     error
   ) {
     console.error(
-      'AFRI CLUB - admin organization detail:',
+      'EWUKAI - admin organization detail:',
       error
     )
 
@@ -726,7 +726,7 @@ export default async function PlatformOrganizationDetailPage({
           <SectionHeader
             eyebrow="Vue d’ensemble"
             title="Indicateurs de l’organisation"
-            description="Situation générale enregistrée dans Afri Club."
+            description="Situation générale enregistrée dans EWUKAI."
           />
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -830,7 +830,7 @@ export default async function PlatformOrganizationDetailPage({
           </div>
 
           <p className="mt-3 text-xs leading-5 text-slate-500">
-            Afri Club assure le suivi et la
+            EWUKAI assure le suivi et la
             traçabilité des opérations enregistrées.
             La plateforme ne constitue pas le
             détenteur des fonds de l&apos;organisation.

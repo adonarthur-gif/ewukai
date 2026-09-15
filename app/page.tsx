@@ -26,7 +26,7 @@ import {
 } from 'lucide-react'
 
 // ============================================================
-// PAGE D'ACCUEIL AFRI CLUB - PREMIUM BILINGUE V6
+// PAGE D'ACCUEIL EWUKAI - PREMIUM BILINGUE V6
 // ============================================================
 
 type HomePageProps = {
@@ -75,7 +75,7 @@ export default async function HomePage({
 
             <div>
               <p className="text-lg font-black tracking-tight text-slate-950">
-                AFRI CLUB
+                EWUKAI
               </p>
 
               <p className="hidden text-[10px] font-semibold text-slate-500 xl:block">
@@ -509,8 +509,8 @@ export default async function HomePage({
                 </p>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
                   {t(
-                    'Afri Club peut également accompagner d’autres formes de communautés et de structures organisées.',
-                    'Afri Club can also support many other kinds of communities and organized groups.'
+                    'EWUKAI peut également accompagner d’autres formes de communautés et de structures organisées.',
+                    'EWUKAI can also support many other kinds of communities and organized groups.'
                   )}
                 </p>
               </div>
@@ -539,15 +539,15 @@ export default async function HomePage({
             <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.17em] text-emerald-300">
-                  {t('Le principe Afri Club', 'The Afri Club principle')}
+                  {t('Le principe EWUKAI', 'The EWUKAI principle')}
                 </p>
                 <h3 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">
                   {t('Des organisations indépendantes. Un même écosystème.', 'Independent organizations. One shared ecosystem.')}
                 </h3>
                 <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
                   {t(
-                    'Chaque organisation conserve son identité, ses membres, ses données et sa gestion. Afri Club fournit l’infrastructure commune qui simplifie le fonctionnement au quotidien.',
-                    'Each organization keeps its identity, members, data and management. Afri Club provides the shared infrastructure that simplifies day-to-day operations.'
+                    'Chaque organisation conserve son identité, ses membres, ses données et sa gestion. EWUKAI fournit l’infrastructure commune qui simplifie le fonctionnement au quotidien.',
+                    'Each organization keeps its identity, members, data and management. EWUKAI provides the shared infrastructure that simplifies day-to-day operations.'
                   )}
                 </p>
               </div>
@@ -612,8 +612,8 @@ export default async function HomePage({
 
             <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
               {t(
-                'Afri Club fournit le canal technologique et les outils de suivi. Les cotisations sont traitées par le prestataire de paiement configuré par votre organisation, au bénéfice de votre organisation.',
-                'Afri Club provides the technology channel and tracking tools. Contributions are processed by the payment provider configured by your organization, for the benefit of your organization.'
+                'EWUKAI fournit le canal technologique et les outils de suivi. Les cotisations sont traitées par le prestataire de paiement configuré par votre organisation, au bénéfice de votre organisation.',
+                'EWUKAI provides the technology channel and tracking tools. Contributions are processed by the payment provider configured by your organization, for the benefit of your organization.'
               )}
             </p>
           </div>
@@ -667,8 +667,8 @@ export default async function HomePage({
                 </h3>
                 <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">
                   {t(
-                    'Après confirmation du prestataire, Afri Club met à jour la situation du membre et la traçabilité de l’organisation.',
-                    'After provider confirmation, Afri Club updates the member status and the organization’s transaction trail.'
+                    'Après confirmation du prestataire, EWUKAI met à jour la situation du membre et la traçabilité de l’organisation.',
+                    'After provider confirmation, EWUKAI updates the member status and the organization’s transaction trail.'
                   )}
                 </p>
               </div>
@@ -688,7 +688,7 @@ export default async function HomePage({
                 </span>
                 <div>
                   <p className="font-black text-emerald-950">
-                    {t('Aucun fonds de cotisation n’est conservé par Afri Club.', 'Afri Club does not hold contribution funds.')}
+                    {t('Aucun fonds de cotisation n’est conservé par EWUKAI.', 'EWUKAI does not hold contribution funds.')}
                   </p>
                   <p className="mt-1 text-sm leading-6 text-emerald-800">
                     {t(
@@ -915,7 +915,7 @@ export default async function HomePage({
           <SectionIntro
             eyebrow={t("Simple à mettre en place", "Easy to set up")}
             title={t("Votre organisation en ligne en quelques étapes", "Bring your organization online in a few steps")}
-            description={t("Afri Club est conçu pour permettre aux responsables de démarrer sans procédure compliquée.", "Afri Club is designed so managers can get started without complicated procedures.")}
+            description={t("EWUKAI est conçu pour permettre aux responsables de démarrer sans procédure compliquée.", "EWUKAI is designed so managers can get started without complicated procedures.")}
           />
 
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
@@ -1115,7 +1115,7 @@ export default async function HomePage({
 
             <div>
               <p className="font-black text-slate-950">
-                AFRI CLUB
+                EWUKAI
               </p>
 
               <p className="text-sm text-slate-500">

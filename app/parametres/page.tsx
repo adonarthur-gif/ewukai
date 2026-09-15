@@ -352,7 +352,7 @@ export default async function ParametresPage({
 
 
         {/* ================================================== */}
-        {/* ABONNEMENT AFRI CLUB */}
+        {/* ABONNEMENT EWUKAI */}
         {/* ================================================== */}
 
         <section className="mt-7 rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm sm:p-8">
@@ -372,16 +372,16 @@ export default async function ParametresPage({
               </p>
 
               <h2 className="mt-2 text-xl font-black text-slate-950">
-                Votre formule Afri Club
+                Votre formule EWUKAI
               </h2>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
                 Consultez votre formule actuelle, le nombre de membres actifs,
-                la formule recommandée et gérez votre abonnement Afri Club.
+                la formule recommandée et gérez votre abonnement EWUKAI.
               </p>
 
               <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">
-                Cet abonnement concerne l’utilisation de la plateforme Afri Club.
+                Cet abonnement concerne l’utilisation de la plateforme EWUKAI.
                 Il est distinct des moyens de paiement utilisés par la mutuelle
                 pour recevoir les cotisations de ses membres.
               </p>

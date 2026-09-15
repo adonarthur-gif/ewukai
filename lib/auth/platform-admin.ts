@@ -9,7 +9,7 @@ import {
 } from '@/lib/supabase/server'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // AUTHENTIFICATION ADMINISTRATION PLATEFORME
 // ============================================================
 
@@ -80,7 +80,7 @@ export async function getPlatformAdmin():
       authError
     ) {
       console.error(
-        'AFRI CLUB - platform admin - erreur auth :',
+        'EWUKAI - platform admin - erreur auth :',
         authError
       )
     }
@@ -118,7 +118,7 @@ export async function getPlatformAdmin():
     adminError
   ) {
     console.error(
-      'AFRI CLUB - platform admin - erreur lookup :',
+      'EWUKAI - platform admin - erreur lookup :',
       adminError
     )
 
@@ -198,7 +198,7 @@ export async function requirePlatformSuperAdmin():
       authError
     ) {
       console.error(
-        'AFRI CLUB - require platform admin - erreur auth :',
+        'EWUKAI - require platform admin - erreur auth :',
         authError
       )
     }
@@ -238,7 +238,7 @@ export async function requirePlatformSuperAdmin():
     adminError
   ) {
     console.error(
-      'AFRI CLUB - require platform admin - erreur lookup :',
+      'EWUKAI - require platform admin - erreur lookup :',
       adminError
     )
 

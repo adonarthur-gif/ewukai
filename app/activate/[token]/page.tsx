@@ -94,7 +94,7 @@ export default async function ActivateMemberPage({
         <div className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
 
           <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-300">
-            AFRI CLUB
+            EWUKAI
           </p>
 
           <h1 className="mt-3 text-4xl font-black">
@@ -219,7 +219,7 @@ export default async function ActivateMemberPage({
                     type="submit"
                     className="mt-5 w-full rounded-2xl bg-emerald-700 px-6 py-4 font-black text-white"
                   >
-                    Activer mon espace Afri Club
+                    Activer mon espace EWUKAI
                   </button>
 
                 </form>
@@ -285,7 +285,7 @@ export default async function ActivateMemberPage({
                   >
 
                     <h3 className="text-lg font-black">
-                      J&apos;ai déjà un compte Afri Club
+                      J&apos;ai déjà un compte EWUKAI
                     </h3>
 
                     <input

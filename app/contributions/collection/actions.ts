@@ -9,7 +9,7 @@ import {
 } from '@/lib/auth/current-organization'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // RECOUVREMENT DES COTISATIONS
 // SERVER ACTIONS
 // ============================================================
@@ -103,7 +103,7 @@ export async function generateObligations(
 
   if (error) {
     console.error(
-      'AFRI CLUB - generate obligations:',
+      'EWUKAI - generate obligations:',
       error
     )
 
@@ -247,7 +247,7 @@ export async function openPayment(
     !obligation
   ) {
     console.error(
-      'AFRI CLUB - open payment obligation:',
+      'EWUKAI - open payment obligation:',
       obligationError
     )
 
@@ -321,7 +321,7 @@ export async function openPayment(
 
   if (prepareError) {
     console.error(
-      'AFRI CLUB - prepare contribution plan:',
+      'EWUKAI - prepare contribution plan:',
       prepareError
     )
 

@@ -140,7 +140,7 @@ export async function updateMember(
 
   if (error) {
     console.error(
-      'AFRI CLUB - update member:',
+      'EWUKAI - update member:',
       error
     )
 

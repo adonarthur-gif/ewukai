@@ -75,7 +75,7 @@ export async function approveApplication(
 
   if (error) {
     console.error(
-      'AFRI CLUB - approve membership:',
+      'EWUKAI - approve membership:',
       error
     )
 
@@ -178,7 +178,7 @@ export async function rejectApplication(
 
   if (error) {
     console.error(
-      'AFRI CLUB - reject membership:',
+      'EWUKAI - reject membership:',
       error
     )
 

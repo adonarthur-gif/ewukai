@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ACTIONS DE CONNEXION
 // ============================================================
 
@@ -74,7 +74,7 @@ export async function loginMember(
   }
 
   console.log(
-    'AFRI CLUB - LOGIN MEMBER:',
+    'EWUKAI - LOGIN MEMBER:',
     userId
   )
 
@@ -140,7 +140,7 @@ export async function loginManager(
 
   if (error) {
     console.error(
-      'AFRI CLUB - LOGIN MANAGER:',
+      'EWUKAI - LOGIN MANAGER:',
       error
     )
 
@@ -176,7 +176,7 @@ export async function loginManager(
 
   if (managementMembership) {
     console.log(
-      'AFRI CLUB - LOGIN MANAGER:',
+      'EWUKAI - LOGIN MANAGER:',
       {
         userId,
         organizationId:
@@ -199,7 +199,7 @@ export async function loginManager(
   // ----------------------------------------------------------
 
   console.log(
-    'AFRI CLUB - LOGIN MANAGER - ONBOARDING:',
+    'EWUKAI - LOGIN MANAGER - ONBOARDING:',
     {
       userId,
       message:
@@ -261,7 +261,7 @@ export async function login(
 
   if (membershipsError) {
     console.error(
-      'AFRI CLUB - LOGIN MEMBERSHIPS:',
+      'EWUKAI - LOGIN MEMBERSHIPS:',
       membershipsError
     )
   }
@@ -301,7 +301,7 @@ export async function login(
 
   if (memberSpaceError) {
     console.error(
-      'AFRI CLUB - LOGIN MEMBER SPACE:',
+      'EWUKAI - LOGIN MEMBER SPACE:',
       memberSpaceError
     )
   }
@@ -407,7 +407,7 @@ async function authenticate(
   ) {
     if (error) {
       console.error(
-        'AFRI CLUB - AUTH:',
+        'EWUKAI - AUTH:',
         {
           code:
             error.code,
@@ -429,7 +429,7 @@ async function authenticate(
   // ----------------------------------------------------------
 
   console.log(
-    'AFRI CLUB - AUTH OK:',
+    'EWUKAI - AUTH OK:',
     {
       userId:
         data.user.id,

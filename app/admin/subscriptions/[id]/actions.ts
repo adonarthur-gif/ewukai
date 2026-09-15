@@ -13,7 +13,7 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // SUPER ADMIN
 // CHANGEMENT D'ABONNEMENT
 // ============================================================
@@ -104,7 +104,7 @@ export async function changeOrganizationSubscription(
     error
   ) {
     console.error(
-      'AFRI CLUB - change subscription:',
+      'EWUKAI - change subscription:',
       error
     )
 

@@ -72,7 +72,7 @@ export default async function AdminSettingsPage({
     error
   ) {
     console.error(
-      'AFRI CLUB - platform settings:',
+      'EWUKAI - platform settings:',
       error
     )
 
@@ -94,7 +94,7 @@ export default async function AdminSettingsPage({
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
           <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-            Administration Afri Club
+            Administration EWUKAI
           </p>
 
           <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
@@ -104,7 +104,7 @@ export default async function AdminSettingsPage({
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
             Gérez les informations générales et
             les valeurs par défaut utilisées par
-            Afri Club.
+            EWUKAI.
           </p>
 
         </div>
@@ -124,7 +124,7 @@ export default async function AdminSettingsPage({
             </p>
 
             <p className="mt-1 text-sm text-emerald-700">
-              La configuration globale Afri Club
+              La configuration globale EWUKAI
               a été mise à jour.
             </p>
 
@@ -163,7 +163,7 @@ export default async function AdminSettingsPage({
 
             <Header
               title="Identité de la plateforme"
-              description="Informations générales utilisées pour identifier Afri Club."
+              description="Informations générales utilisées pour identifier EWUKAI."
             />
 
             <div className="grid gap-5 p-6 sm:grid-cols-2">

@@ -5,7 +5,7 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // ADMINISTRATION PLATEFORME
 // ACTIVITE GLOBALE
 // ============================================================
@@ -169,7 +169,7 @@ export default async function AdminActivityPage({
 
   if (error) {
     console.error(
-      'AFRI CLUB - admin activity:',
+      'EWUKAI - admin activity:',
       error
     )
   }
@@ -249,7 +249,7 @@ export default async function AdminActivityPage({
             <div>
 
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-                Administration Afri Club
+                Administration EWUKAI
               </p>
 
               <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
@@ -258,7 +258,7 @@ export default async function AdminActivityPage({
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
                 Suivez les principaux événements
-                enregistrés dans Afri Club :
+                enregistrés dans EWUKAI :
                 comptes, organisations, membres
                 et opérations financières.
               </p>
@@ -633,7 +633,7 @@ export default async function AdminActivityPage({
             issus des données métier existantes.
             Elle ne constitue pas encore le journal
             d&apos;audit immuable de sécurité
-            d&apos;Afri Club.
+            d&apos;EWUKAI.
           </p>
 
         </section>

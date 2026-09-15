@@ -11,7 +11,7 @@ import {
 import PrintButton from './print-button'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // RECU DE PAIEMENT
 //
 // Visible par :
@@ -176,7 +176,7 @@ export default async function ReceiptPage({
     !data
   ) {
     console.error(
-      'AFRI CLUB - secure receipt:',
+      'EWUKAI - secure receipt:',
       error
         ? {
             code:

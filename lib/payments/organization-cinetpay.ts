@@ -14,7 +14,7 @@ import {
 } from '@/lib/supabase/admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // CHARGEMENT DU COMPTE CINETPAY D'UNE MUTUELLE
 //
 // JAMAIS importé dans un composant client.
@@ -76,7 +76,7 @@ export async function getOrganizationCinetPayConfig(
 
   if (error) {
     console.error(
-      'AFRI CLUB - ORGANIZATION CINETPAY CONFIG:',
+      'EWUKAI - ORGANIZATION CINETPAY CONFIG:',
       {
         code:
           error.code,

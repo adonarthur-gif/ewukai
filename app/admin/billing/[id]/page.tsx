@@ -6,7 +6,7 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // SUPER ADMIN
 // FICHE D'UNE FACTURE
 //
@@ -260,7 +260,7 @@ export default async function AdminInvoiceDetailPage({
     error
   ) {
     console.error(
-      'AFRI CLUB - invoice detail:',
+      'EWUKAI - invoice detail:',
       error
     )
 
@@ -385,7 +385,7 @@ export default async function AdminInvoiceDetailPage({
             <div>
 
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-                Facture Afri Club
+                Facture EWUKAI
               </p>
 
 
@@ -547,7 +547,7 @@ export default async function AdminInvoiceDetailPage({
 
             <SectionHeader
               title="Détails de la facture"
-              description="Informations commerciales liées à cet abonnement Afri Club."
+              description="Informations commerciales liées à cet abonnement EWUKAI."
             />
 
 
@@ -796,7 +796,7 @@ export default async function AdminInvoiceDetailPage({
                         Cette facture a été réglée
                         intégralement. L&apos;abonnement
                         correspondant est traité
-                        automatiquement par Afri Club.
+                        automatiquement par EWUKAI.
                       </p>
 
                     </div>
@@ -892,7 +892,7 @@ export default async function AdminInvoiceDetailPage({
 
 
                       <p className="mt-2 text-sm leading-6 text-blue-800">
-                        Afri Club attend la confirmation
+                        EWUKAI attend la confirmation
                         serveur du prestataire de
                         paiement.
                       </p>
@@ -943,7 +943,7 @@ export default async function AdminInvoiceDetailPage({
                               : 'text-emerald-700'
                           }`}
                         >
-                          Recouvrement Afri Club
+                          Recouvrement EWUKAI
                         </p>
 
                         <p
@@ -1212,7 +1212,7 @@ export default async function AdminInvoiceDetailPage({
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
                 La transaction apparaîtra ici dès
-                qu&apos;Afri Club recevra et validera
+                qu&apos;EWUKAI recevra et validera
                 techniquement la confirmation du
                 prestataire.
               </p>
@@ -1342,7 +1342,7 @@ export default async function AdminInvoiceDetailPage({
         <section className="rounded-3xl border border-blue-200 bg-blue-50 p-6">
 
           <p className="font-black text-blue-950">
-            Traçabilité Afri Club
+            Traçabilité EWUKAI
           </p>
 
 

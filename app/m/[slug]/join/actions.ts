@@ -179,7 +179,7 @@ export async function submitMembershipApplication(
 
   if (error) {
     console.error(
-      'AFRI CLUB - membership application:',
+      'EWUKAI - membership application:',
       error
     )
 

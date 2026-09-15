@@ -72,7 +72,7 @@ type CinetPayInitializationResponse = {
 }
 
 // ============================================================
-// INITIALISATION CINETPAY - COMPTE AFRI CLUB
+// INITIALISATION CINETPAY - COMPTE EWUKAI
 //
 // Utilisé notamment pour les abonnements SaaS.
 // Continue à utiliser .env.local.
@@ -215,7 +215,7 @@ export async function initializeCinetPayPaymentWithCredentials(
 }
 
 // ============================================================
-// VERIFICATION TRANSACTION - COMPTE AFRI CLUB
+// VERIFICATION TRANSACTION - COMPTE EWUKAI
 // ============================================================
 
 export async function verifyCinetPayTransaction(
@@ -332,7 +332,7 @@ const HMAC_FIELDS = [
 ] as const
 
 // ============================================================
-// HMAC - COMPTE AFRI CLUB
+// HMAC - COMPTE EWUKAI
 // ============================================================
 
 export function verifyCinetPayHmac({
@@ -428,7 +428,7 @@ export function verifyCinetPayHmacWithSecret({
 }
 
 // ============================================================
-// SITE ID AFRI CLUB
+// SITE ID EWUKAI
 //
 // Conservé pour le webhook des abonnements SaaS.
 // ============================================================
@@ -486,7 +486,7 @@ export function getCinetPayPublicBaseUrl() {
 }
 
 // ============================================================
-// CONFIGURATION GLOBALE AFRI CLUB
+// CONFIGURATION GLOBALE EWUKAI
 //
 // Ne pas utiliser cette fonction pour les cotisations des
 // membres d'une mutuelle.

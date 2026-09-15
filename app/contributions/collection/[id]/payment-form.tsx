@@ -8,7 +8,7 @@ import {
 import { recordPayment } from './actions'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // FORMULAIRE D'ENCAISSEMENT
 // ============================================================
 

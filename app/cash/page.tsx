@@ -4,10 +4,10 @@ import { redirect } from 'next/navigation'
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // TRESORERIE
 //
-// Afri Club ne détient pas les fonds.
+// EWUKAI ne détient pas les fonds.
 // Cette page présente les opérations comptabilisées
 // et les soldes enregistrés dans la plateforme.
 // ============================================================
@@ -288,7 +288,7 @@ export default async function CashPage({
     cashSummaryResult.error
   ) {
     console.error(
-      'AFRI CLUB - treasury summary:',
+      'EWUKAI - treasury summary:',
       cashSummaryResult.error
     )
 
@@ -301,7 +301,7 @@ export default async function CashPage({
     yearSummaryResult.error
   ) {
     console.error(
-      'AFRI CLUB - yearly treasury summary:',
+      'EWUKAI - yearly treasury summary:',
       yearSummaryResult.error
     )
 
@@ -314,7 +314,7 @@ export default async function CashPage({
     monthlySummaryResult.error
   ) {
     console.error(
-      'AFRI CLUB - monthly treasury summary:',
+      'EWUKAI - monthly treasury summary:',
       monthlySummaryResult.error
     )
 
@@ -327,7 +327,7 @@ export default async function CashPage({
     movementsResult.error
   ) {
     console.error(
-      'AFRI CLUB - treasury movements:',
+      'EWUKAI - treasury movements:',
       movementsResult.error
     )
 

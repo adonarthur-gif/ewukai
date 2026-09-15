@@ -171,7 +171,7 @@ export default async function SubscriptionPage({
     !data
   ) {
     console.error(
-      'AFRI CLUB - SUBSCRIPTION PORTAL:',
+      'EWUKAI - SUBSCRIPTION PORTAL:',
       error
     )
 
@@ -269,7 +269,7 @@ export default async function SubscriptionPage({
                 </p>
 
                 <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
-                  Abonnement Afri Club
+                  Abonnement EWUKAI
                 </h1>
 
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
@@ -404,7 +404,7 @@ export default async function SubscriptionPage({
                 Retour du guichet de paiement reçu.
               </p>
               <p className="mt-1 leading-6 text-blue-800">
-                Afri Club n&apos;active jamais une formule à partir du retour navigateur.
+                EWUKAI n&apos;active jamais une formule à partir du retour navigateur.
                 L&apos;activation intervient uniquement après la notification CinetPay
                 et la vérification serveur du paiement. Si le statut n&apos;a pas encore
                 changé, actualisez cette page dans quelques instants.
@@ -449,7 +449,7 @@ export default async function SubscriptionPage({
 
                 <p className="mt-1 max-w-sm text-xs leading-5 text-slate-500">
                   Vous serez redirigé vers le guichet CinetPay. Le montant
-                  provient directement de la facture Afri Club et ne peut pas
+                  provient directement de la facture EWUKAI et ne peut pas
                   être modifié depuis le navigateur.
                 </p>
 
@@ -599,7 +599,7 @@ export default async function SubscriptionPage({
               </h2>
               <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600">
                 Le navigateur ne décide jamais du montant payé ni de
-                l&apos;activation. Pour Standard et Pro, Afri Club attendra
+                l&apos;activation. Pour Standard et Pro, EWUKAI attendra
                 la confirmation authentique du prestataire de paiement.
                 Une confirmation valide donnera droit à 30 jours d&apos;accès
                 selon les règles de l&apos;abonnement.

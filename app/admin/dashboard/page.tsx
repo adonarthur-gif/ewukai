@@ -275,7 +275,7 @@ export default async function AdminDashboardPage() {
               </p>
 
               <h1 className="mt-2 text-3xl font-black sm:text-4xl">
-                Tableau de bord Afri Club
+                Tableau de bord EWUKAI
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
@@ -318,7 +318,7 @@ export default async function AdminDashboardPage() {
           <SectionTitle
             eyebrow="Plateforme"
             title="Vue globale"
-            description="Les principaux indicateurs d’Afri Club."
+            description="Les principaux indicateurs d’EWUKAI."
           />
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -350,7 +350,7 @@ export default async function AdminDashboardPage() {
                   registeredUsers
                 )
               }
-              description="Comptes Afri Club créés"
+              description="Comptes EWUKAI créés"
             />
 
             <KpiCard
