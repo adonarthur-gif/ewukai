@@ -11,6 +11,20 @@ type MembersPageProps = {
   }>
 }
 
+type MemberListRow = {
+  id: string
+  member_number: string | null
+  first_name: string | null
+  last_name: string | null
+  phone: string | null
+  status: string
+  joined_at: string | null
+  total_count:
+    | number
+    | string
+    | null
+}
+
 const validStatuses = [
   'active',
   'inactive',
@@ -35,37 +49,47 @@ export default async function MembersPage({
 
   const status =
     params.status &&
-    validStatuses.includes(params.status)
+    validStatuses.includes(
+      params.status
+    )
       ? params.status
       : null
 
-  const currentPage = Math.max(
-    1,
-    Number.parseInt(
-      params.page ?? '1',
-      10
-    ) || 1
-  )
+  const currentPage =
+    Math.max(
+      1,
+      Number.parseInt(
+        params.page ?? '1',
+        10
+      ) || 1
+    )
 
   const pageSize = 25
 
-  const { data, error } =
-    await supabase.rpc('list_members', {
-      target_organization_id:
-        organizationId,
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      'list_members',
+      {
+        target_organization_id:
+          organizationId,
 
-      search_term:
-        q || null,
+        search_term:
+          q || null,
 
-      status_filter:
-        status,
+        status_filter:
+          status,
 
-      page_size:
-        pageSize,
+        page_size:
+          pageSize,
 
-      page_offset:
-        (currentPage - 1) * pageSize,
-    })
+        page_offset:
+          (currentPage - 1) *
+          pageSize,
+      }
+    )
 
   if (error) {
     throw new Error(
@@ -73,19 +97,25 @@ export default async function MembersPage({
     )
   }
 
-  const members = data ?? []
+  const members =
+    (data ?? []) as MemberListRow[]
 
   const total =
     members.length > 0
       ? Number(
-          members[0].total_count
+          members[0]
+            .total_count
         )
       : 0
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(total / pageSize)
-  )
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        total /
+          pageSize
+      )
+    )
 
   const canCreate = [
     'owner',
@@ -96,7 +126,9 @@ export default async function MembersPage({
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-8">
+
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
           <div>
             <p className="text-sm font-semibold text-emerald-700">
               ESPACE MUTUELLE
@@ -108,7 +140,9 @@ export default async function MembersPage({
 
             <p className="mt-2 text-slate-600">
               {total} membre
-              {total !== 1 ? 's' : ''}
+              {total !== 1
+                ? 's'
+                : ''}
             </p>
           </div>
 
@@ -120,6 +154,7 @@ export default async function MembersPage({
               + Ajouter un membre
             </Link>
           )}
+
         </div>
 
         {params.error && (
@@ -142,7 +177,9 @@ export default async function MembersPage({
 
           <select
             name="status"
-            defaultValue={status ?? ''}
+            defaultValue={
+              status ?? ''
+            }
             className="rounded-lg border bg-white px-3 py-2"
           >
             <option value="">
@@ -179,8 +216,10 @@ export default async function MembersPage({
         </form>
 
         <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
+
           {members.length === 0 ? (
             <div className="p-12 text-center">
+
               <p className="text-lg font-semibold">
                 Aucun membre trouvé
               </p>
@@ -189,12 +228,16 @@ export default async function MembersPage({
                 Commencez par enregistrer le
                 premier adhérent.
               </p>
+
             </div>
           ) : (
             <div className="overflow-x-auto">
+
               <table className="w-full text-left">
+
                 <thead className="border-b bg-slate-50 text-sm text-slate-600">
                   <tr>
+
                     <th className="px-5 py-4">
                       Matricule
                     </th>
@@ -216,27 +259,41 @@ export default async function MembersPage({
                     </th>
 
                     <th className="px-5 py-4" />
+
                   </tr>
                 </thead>
 
                 <tbody>
                   {members.map(
-                    (member: any) => (
+                    (member) => (
                       <tr
-                        key={member.id}
+                        key={
+                          member.id
+                        }
                         className="border-b last:border-b-0"
                       >
+
                         <td className="px-5 py-4 font-mono text-sm">
-                          {member.member_number}
+                          {
+                            member.member_number
+                          }
                         </td>
 
                         <td className="px-5 py-4 font-medium">
-                          {member.last_name}{' '}
-                          {member.first_name}
+                          {
+                            member.last_name
+                          }
+                          {' '}
+                          {
+                            member.first_name
+                          }
                         </td>
 
                         <td className="px-5 py-4 text-slate-600">
-                          {member.phone ?? '—'}
+                          {
+                            member.phone ??
+                            '—'
+                          }
                         </td>
 
                         <td className="px-5 py-4">
@@ -248,7 +305,9 @@ export default async function MembersPage({
                         </td>
 
                         <td className="px-5 py-4 text-sm text-slate-600">
-                          {member.joined_at}
+                          {
+                            member.joined_at
+                          }
                         </td>
 
                         <td className="px-5 py-4 text-right">
@@ -259,17 +318,22 @@ export default async function MembersPage({
                             Voir
                           </Link>
                         </td>
+
                       </tr>
                     )
                   )}
                 </tbody>
+
               </table>
+
             </div>
           )}
+
         </div>
 
         {totalPages > 1 && (
           <div className="mt-6 flex items-center justify-between">
+
             <PaginationLink
               page={
                 currentPage - 1
@@ -301,8 +365,10 @@ export default async function MembersPage({
             >
               Suivant →
             </PaginationLink>
+
           </div>
         )}
+
       </div>
     </main>
   )
@@ -313,20 +379,24 @@ function StatusBadge({
 }: {
   status: string
 }) {
-  const labels: Record<
-    string,
-    string
-  > = {
-    active: 'Actif',
-    inactive: 'Inactif',
-    suspended: 'Suspendu',
-    deceased: 'Décédé',
-    archived: 'Archivé',
-  }
+  const labels:
+    Record<
+      string,
+      string
+    > = {
+      active: 'Actif',
+      inactive: 'Inactif',
+      suspended: 'Suspendu',
+      deceased: 'Décédé',
+      archived: 'Archivé',
+    }
 
   return (
     <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium">
-      {labels[status] ?? status}
+      {
+        labels[status] ??
+        status
+      }
     </span>
   )
 }
@@ -361,7 +431,10 @@ function PaginationLink({
   )
 
   if (q) {
-    params.set('q', q)
+    params.set(
+      'q',
+      q
+    )
   }
 
   if (status) {

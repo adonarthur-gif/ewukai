@@ -91,7 +91,7 @@ export default async function NewMemberPage({
             <div className="mt-5 rounded-xl bg-slate-100 p-4">
 
               <p className="text-xs font-bold uppercase text-slate-500">
-                Droits d'accès détectés
+                Droits d&apos;accès détectés
               </p>
 
               <p className="mt-1 font-mono text-lg font-black text-red-700">

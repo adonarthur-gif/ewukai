@@ -782,9 +782,7 @@ export default async function MemberPaymentPage({
 
         {/* ================================================== */}
         {/* ANCIEN ETAT PREPARE */}
-        //
-        // Conservé pour compatibilité pendant les tests.
-        // Le nouveau flux redirige directement vers CinetPay.
+        {/* Legacy prepared state kept for compatibility. The new flow redirects directly to CinetPay. */}
         {/* ================================================== */}
 
         {query.prepared ===

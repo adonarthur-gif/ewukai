@@ -11,7 +11,7 @@ import {
 } from '@/lib/auth/platform-admin'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // NAVIGATION SERVEUR
 //
 // Responsabilités :
@@ -90,7 +90,7 @@ const DEFAULT_ACCENT =
 // Si une variable d'environnement existe,
 // elle est prioritaire.
 //
-// Sinon Afri Club utilisera organization-logos.
+// Sinon EWUKAI utilisera organization-logos.
 // ============================================================
 
 const ORGANIZATION_LOGO_BUCKET =
@@ -245,7 +245,7 @@ export default async function AppNavigationServer() {
     membershipsError
   ) {
     console.error(
-      'AFRI CLUB - navigation - management memberships:',
+      'EWUKAI - navigation - management memberships:',
       membershipsError
     )
   }
@@ -316,7 +316,7 @@ export default async function AppNavigationServer() {
       organizationsError
     ) {
       console.error(
-        'AFRI CLUB - navigation - organizations:',
+        'EWUKAI - navigation - organizations:',
         organizationsError
       )
     } else {
@@ -396,7 +396,7 @@ export default async function AppNavigationServer() {
       activeOrganizationError
     ) {
       console.error(
-        'AFRI CLUB - navigation - active organization:',
+        'EWUKAI - navigation - active organization:',
         activeOrganizationError
       )
     }
@@ -457,7 +457,7 @@ export default async function AppNavigationServer() {
     brandingError
   ) {
     console.error(
-      'AFRI CLUB - navigation - branding:',
+      'EWUKAI - navigation - branding:',
       brandingError
     )
   } else if (
@@ -549,7 +549,7 @@ export default async function AppNavigationServer() {
     memberError
   ) {
     console.error(
-      'AFRI CLUB - navigation - member space:',
+      'EWUKAI - navigation - member space:',
       memberError
     )
   }

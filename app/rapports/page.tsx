@@ -9,10 +9,8 @@ import {
 } from 'next/navigation'
 
 import {
-  BarChart3,
   CalendarDays,
   CircleDollarSign,
-  Download,
   FileSpreadsheet,
   ReceiptText,
   ShieldCheck,

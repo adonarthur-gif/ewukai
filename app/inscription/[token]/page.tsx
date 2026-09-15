@@ -160,6 +160,7 @@ export default async function MemberRegistrationPage({
       new Date(
         invitation.expires_at
       ).getTime() <=
+        // eslint-disable-next-line react-hooks/purity -- verification d'expiration cote serveur
         Date.now()
     ) {
       title =

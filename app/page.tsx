@@ -19,7 +19,6 @@ import {
   ReceiptText,
   ShieldCheck,
   Smartphone,
-  Sparkles,
   TrendingUp,
   Users,
   Wallet,

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // TARIFS PAGE D'ACCUEIL
 // ============================================================
 
@@ -18,7 +18,7 @@ const plans = [
     price: '0',
     suffix: 'FCFA',
     description:
-      'Pour découvrir Afri Club et commencer simplement.',
+      'Pour découvrir EWUKAI et commencer simplement.',
     memberLimit:
       'Jusqu’à 20 membres',
     featured: false,
