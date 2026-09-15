@@ -26,7 +26,7 @@ import {
 } from 'lucide-react'
 
 // ============================================================
-// PAGE D'ACCUEIL EWUKAI - PREMIUM BILINGUE V6
+// PAGE D'ACCUEIL EWUKAI - PREMIUM BILINGUE
 // ============================================================
 
 type HomePageProps = {
@@ -69,8 +69,15 @@ export default async function HomePage({
             href="/"
             className="flex shrink-0 items-center gap-3"
           >
-            <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-500 font-black text-white shadow-lg shadow-emerald-950/10">
-              AC
+            <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white p-0.5 shadow-lg shadow-slate-950/10 ring-1 ring-slate-200/80">
+              <Image
+                src="/branding/ewukai-mark.png"
+                alt="Symbole EWUKAI"
+                width={48}
+                height={48}
+                priority
+                className="h-full w-full object-contain"
+              />
             </div>
 
             <div>
@@ -79,7 +86,10 @@ export default async function HomePage({
               </p>
 
               <p className="hidden text-[10px] font-semibold text-slate-500 xl:block">
-                {t('La gestion moderne des organisations', 'Modern organization management')}
+                {t(
+                  'La plateforme de gestion des organisations',
+                  'The organization management platform'
+                )}
               </p>
             </div>
           </Link>
@@ -190,8 +200,16 @@ export default async function HomePage({
 
           <div className="relative z-10">
             <div className="afri-enter-up inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-xs font-black uppercase tracking-[0.17em] text-emerald-300 backdrop-blur">
-              <Sparkles className="h-4 w-4" />
-              {t('La plateforme des organisations', 'The platform for organizations')}
+              <span className="flex h-5 w-5 items-center justify-center overflow-hidden rounded-full bg-white/95 ring-1 ring-white/20">
+                <Image
+                  src="/branding/ewukai-mark.png"
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="h-full w-full object-contain"
+                />
+              </span>
+              {t('EWUKAI · La plateforme des organisations', 'EWUKAI · The platform for organizations')}
             </div>
 
             <h1 className="afri-enter-up mt-7 max-w-3xl text-4xl font-black leading-[1.02] tracking-[-0.04em] [animation-delay:120ms] sm:text-5xl lg:text-[3.65rem]">
@@ -1109,8 +1127,14 @@ export default async function HomePage({
 
           <div className="flex items-center gap-3">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-700 to-teal-500 font-black text-white">
-              AC
+            <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-slate-200">
+              <Image
+                src="/branding/ewukai-mark.png"
+                alt="Symbole EWUKAI"
+                width={44}
+                height={44}
+                className="h-full w-full object-contain"
+              />
             </div>
 
             <div>
