@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import EwukaiBrand from '@/components/branding/ewukai-brand'
 
 export default function LoginPage() {
   return (
@@ -6,9 +7,7 @@ export default function LoginPage() {
       <div className="mx-auto max-w-5xl">
 
         <div className="text-center">
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">
-            EWUKAI
-          </p>
+          <EwukaiBrand variant="compact" href="/" showTagline />
 
           <h1 className="mt-3 text-3xl font-black text-slate-950 sm:text-4xl">
             Connexion

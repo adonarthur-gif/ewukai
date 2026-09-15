@@ -20,6 +20,8 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
 
+import EwukaiBrand from '@/components/branding/ewukai-brand'
+
 import {
   createOrganization,
 } from './actions'
@@ -189,9 +191,7 @@ export default async function OnboardingPage({
 
           </div>
 
-          <p className="mt-6 text-sm font-black uppercase tracking-[0.2em] text-emerald-400">
-            EWUKAI
-          </p>
+          <EwukaiBrand variant="hero" href="/" showTagline />
 
           <h1 className="mx-auto mt-3 max-w-3xl text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
             Créons votre organisation

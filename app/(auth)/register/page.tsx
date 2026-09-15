@@ -5,6 +5,8 @@ import {
   Crown,
 } from 'lucide-react'
 
+import EwukaiBrand from '@/components/branding/ewukai-brand'
+
 import {
   register,
 } from './actions'
@@ -268,9 +270,7 @@ export default async function RegisterPage({
 
           <div className="mb-8">
 
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-              EWUKAI
-            </p>
+            <EwukaiBrand variant="compact" href="/" showTagline />
 
             <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
               Créer mon compte
