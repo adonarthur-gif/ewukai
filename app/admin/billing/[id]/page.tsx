@@ -344,6 +344,19 @@ export default async function AdminInvoiceDetailPage({
     null
 
 
+  const isCollectible =
+    remaining > 0 &&
+    invoice.stored_status !==
+      'paid' &&
+    invoice.stored_status !==
+      'cancelled'
+
+
+  const isOverdue =
+    invoice.effective_status ===
+      'overdue'
+
+
   // ==========================================================
   // RENDU
   // ==========================================================
@@ -403,12 +416,29 @@ export default async function AdminInvoiceDetailPage({
             </div>
 
 
-            <InvoiceStatus
-              status={
-                invoice.effective_status
-              }
-              large
-            />
+            <div className="flex flex-col items-start gap-3 lg:items-end">
+
+              <InvoiceStatus
+                status={
+                  invoice.effective_status
+                }
+                large
+              />
+
+              {isCollectible && (
+                <a
+                  href="#recouvrement"
+                  className={`inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 ${
+                    isOverdue
+                      ? 'bg-red-600 hover:bg-red-700'
+                      : 'bg-emerald-700 hover:bg-emerald-800'
+                  }`}
+                >
+                  Recouvrer cette facture ↓
+                </a>
+              )}
+
+            </div>
 
           </div>
 
@@ -726,11 +756,14 @@ export default async function AdminInvoiceDetailPage({
           {/* PAIEMENT AUTOMATIQUE */}
           {/* ================================================== */}
 
-          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div
+            id="recouvrement"
+            className="scroll-mt-28 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+          >
 
             <SectionHeader
-              title="Paiement"
-              description="Supervision du règlement de cette facture."
+              title="Paiement & recouvrement"
+              description="Suivi du règlement et actions de recouvrement de cette facture."
             />
 
 
@@ -889,6 +922,110 @@ export default async function AdminInvoiceDetailPage({
                     prévu. Le paiement doit correspondre
                     exactement au montant de la facture.
                   </p>
+
+
+                  <div
+                    className={`mt-5 rounded-2xl border p-4 ${
+                      isOverdue
+                        ? 'border-red-200 bg-red-50'
+                        : 'border-emerald-200 bg-emerald-50'
+                    }`}
+                  >
+
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+                      <div>
+
+                        <p
+                          className={`text-xs font-black uppercase tracking-wide ${
+                            isOverdue
+                              ? 'text-red-700'
+                              : 'text-emerald-700'
+                          }`}
+                        >
+                          Recouvrement Afri Club
+                        </p>
+
+                        <p
+                          className={`mt-2 text-lg font-black ${
+                            isOverdue
+                              ? 'text-red-950'
+                              : 'text-emerald-950'
+                          }`}
+                        >
+                          {isOverdue
+                            ? 'Facture en retard'
+                            : 'Facture à recouvrer'}
+                        </p>
+
+                        <p
+                          className={`mt-1 text-sm leading-6 ${
+                            isOverdue
+                              ? 'text-red-800'
+                              : 'text-emerald-800'
+                          }`}
+                        >
+                          Reste à encaisser :{' '}
+                          <strong>{formatMoney(remaining)}</strong>.
+                          Échéance :{' '}
+                          <strong>{formatDate(invoice.due_at)}</strong>.
+                        </p>
+
+                      </div>
+
+                      <span
+                        className={`w-fit rounded-full px-3 py-1.5 text-[10px] font-black uppercase ${
+                          isOverdue
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-emerald-100 text-emerald-700'
+                        }`}
+                      >
+                        {isOverdue
+                          ? 'À relancer'
+                          : 'À encaisser'}
+                      </span>
+
+                    </div>
+
+
+                    <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+
+                      <Link
+                        href={`/admin/subscriptions/${invoice.organization_id}`}
+                        className={`inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-xs font-black text-white transition ${
+                          isOverdue
+                            ? 'bg-red-600 hover:bg-red-700'
+                            : 'bg-emerald-700 hover:bg-emerald-800'
+                        }`}
+                      >
+                        Gérer le recouvrement →
+                      </Link>
+
+                      <Link
+                        href={`/admin/organizations/${invoice.organization_id}`}
+                        className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-black text-slate-700 transition hover:bg-slate-50"
+                      >
+                        Voir l&apos;organisation
+                      </Link>
+
+                    </div>
+
+
+                    <p
+                      className={`mt-4 text-[11px] leading-5 ${
+                        isOverdue
+                          ? 'text-red-700'
+                          : 'text-emerald-700'
+                      }`}
+                    >
+                      Le règlement est initié par un dirigeant autorisé
+                      de l&apos;organisation. La confirmation du paiement
+                      reste automatique après retour du prestataire ;
+                      le Super-administrateur ne marque pas la facture
+                      payée manuellement.
+                    </p>
+
+                  </div>
 
                 </div>
 

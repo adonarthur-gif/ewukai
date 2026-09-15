@@ -168,6 +168,52 @@ type Stats = {
     MoneyValue
 }
 
+
+type CollectionRow = {
+  organization_id: string
+
+  organization_name: string
+
+  organization_short_name:
+    | string
+    | null
+
+  invoice_id: string
+
+  invoice_number: string
+
+  plan_code:
+    | string
+    | null
+
+  plan_name:
+    | string
+    | null
+
+  stored_status: string
+
+  effective_status: string
+
+  currency: string
+
+  total_xof:
+    MoneyValue
+
+  amount_paid_xof:
+    MoneyValue
+
+  amount_remaining_xof:
+    MoneyValue
+
+  issued_at:
+    | string
+    | null
+
+  due_at:
+    | string
+    | null
+}
+
 // ============================================================
 // PAGE
 // ============================================================
@@ -217,6 +263,7 @@ export default async function AdminSubscriptionsPage({
   const [
     subscriptionsResult,
     statsResult,
+    collectionResult,
   ] =
     await Promise.all([
 
@@ -247,6 +294,10 @@ export default async function AdminSubscriptionsPage({
         'get_platform_subscription_admin_stats'
       ),
 
+      supabase.rpc(
+        'list_platform_subscription_collection'
+      ),
+
     ])
 
   // ==========================================================
@@ -271,6 +322,15 @@ export default async function AdminSubscriptionsPage({
     )
   }
 
+  if (
+    collectionResult.error
+  ) {
+    console.error(
+      'AFRI CLUB - subscription collection:',
+      collectionResult.error
+    )
+  }
+
   // ==========================================================
   // NORMALISATION
   // ==========================================================
@@ -289,6 +349,57 @@ export default async function AdminSubscriptionsPage({
       statsResult.data ??
       {}
     ) as Stats
+
+  const collectionRows =
+    (
+      Array.isArray(
+        collectionResult.data
+      )
+        ? collectionResult.data
+        : []
+    ) as CollectionRow[]
+
+  const collectionByOrganization =
+    new Map<
+      string,
+      CollectionRow
+    >()
+
+  for (
+    const collection of
+      collectionRows
+  ) {
+    if (
+      !collectionByOrganization.has(
+        collection.organization_id
+      )
+    ) {
+      collectionByOrganization.set(
+        collection.organization_id,
+        collection
+      )
+    }
+  }
+
+  const invoiceCountToCollect =
+    collectionRows.length
+
+  const overdueInvoiceCount =
+    collectionRows.filter(
+      item =>
+        item.effective_status ===
+        'overdue'
+    ).length
+
+  const amountToCollect =
+    collectionRows.reduce(
+      (total, item) =>
+        total +
+        numberValue(
+          item.amount_remaining_xof
+        ),
+      0
+    )
 
   const totalResults =
     subscriptions[0]
@@ -365,12 +476,23 @@ export default async function AdminSubscriptionsPage({
 
             </div>
 
-            <Link
-              href="/admin/plans"
-              className="inline-flex w-fit items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 shadow-sm transition hover:bg-slate-50"
-            >
-              Voir les plans
-            </Link>
+            <div className="flex flex-wrap gap-2">
+
+              <Link
+                href="/admin/billing"
+                className="inline-flex w-fit items-center justify-center rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-black text-white shadow-sm transition hover:bg-emerald-800"
+              >
+                Facturation & recouvrement →
+              </Link>
+
+              <Link
+                href="/admin/plans"
+                className="inline-flex w-fit items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 shadow-sm transition hover:bg-slate-50"
+              >
+                Voir les plans
+              </Link>
+
+            </div>
 
           </div>
 
@@ -442,7 +564,7 @@ export default async function AdminSubscriptionsPage({
         {/* RESUME SECONDAIRE */}
         {/* ================================================== */}
 
-        <section className="grid gap-4 sm:grid-cols-2">
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
           <MiniStat
             label="Abonnements gratuits"
@@ -458,6 +580,32 @@ export default async function AdminSubscriptionsPage({
             }
             warning={
               pastDueSubscriptions >
+              0
+            }
+          />
+
+          <CollectionMiniStat
+            label="Factures à recouvrer"
+            value={formatNumber(
+              invoiceCountToCollect
+            )}
+            note={`${formatNumber(
+              overdueInvoiceCount
+            )} en retard`}
+            warning={
+              overdueInvoiceCount >
+              0
+            }
+          />
+
+          <CollectionMiniStat
+            label="Montant à recouvrer"
+            value={formatInvoiceMoney(
+              amountToCollect
+            )}
+            note="Factures ouvertes Afri Club"
+            warning={
+              amountToCollect >
               0
             }
           />
@@ -629,7 +777,8 @@ export default async function AdminSubscriptionsPage({
         {/* ================================================== */}
 
         {(subscriptionsResult.error ||
-          statsResult.error) && (
+          statsResult.error ||
+          collectionResult.error) && (
           <section className="rounded-2xl border border-red-200 bg-red-50 p-5">
 
             <p className="font-black text-red-900">
@@ -772,6 +921,10 @@ export default async function AdminSubscriptionsPage({
 
                       <Heading>
                         Situation
+                      </Heading>
+
+                      <Heading>
+                        Recouvrement
                       </Heading>
 
                       <Heading align="right">
@@ -967,6 +1120,22 @@ export default async function AdminSubscriptionsPage({
                           </td>
 
                           {/* ================================== */}
+                          {/* RECOUVREMENT */}
+                          {/* ================================== */}
+
+                          <td className="px-6 py-5">
+
+                            <CollectionCell
+                              collection={
+                                collectionByOrganization.get(
+                                  item.organization_id
+                                )
+                              }
+                            />
+
+                          </td>
+
+                          {/* ================================== */}
                           {/* ACTION */}
                           {/* ================================== */}
 
@@ -1111,6 +1280,14 @@ export default async function AdminSubscriptionsPage({
 
                       </div>
 
+                      <MobileCollection
+                        collection={
+                          collectionByOrganization.get(
+                            item.organization_id
+                          )
+                        }
+                      />
+
                       {/* ACTIONS MOBILE */}
 
                       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
@@ -1204,14 +1381,16 @@ export default async function AdminSubscriptionsPage({
 
           <p className="mt-1 text-sm leading-6 text-blue-800">
             Cette page détecte automatiquement
-            les dépassements et recommande une
-            formule adaptée. Pour modifier
-            officiellement un abonnement,
-            utilisez le bouton{' '}
-            <strong>Gérer</strong>. Afri Club ne
-            facture pas automatiquement une
-            organisation sur la seule base du
-            nombre de membres.
+            les dépassements, recommande une
+            formule adaptée et fait maintenant
+            apparaître les factures à recouvrer.
+            Le bouton <strong>Recouvrer</strong> ouvre
+            la facture concernée pour son suivi.
+            La validation du règlement reste
+            automatique après confirmation du
+            prestataire : le Super-administrateur
+            ne marque pas une facture payée
+            manuellement.
           </p>
 
         </section>
@@ -1319,6 +1498,257 @@ function MiniStat({
           value
         )}
       </p>
+
+    </div>
+  )
+}
+
+// ============================================================
+// KPI RECOUVREMENT
+// ============================================================
+
+function CollectionMiniStat({
+  label,
+  value,
+  note,
+  warning = false,
+}: {
+  label: string
+  value: string
+  note: string
+  warning?: boolean
+}) {
+  return (
+    <div
+      className={
+        warning
+          ? 'rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4'
+          : 'rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4'
+      }
+    >
+
+      <div className="flex items-center justify-between gap-3">
+
+        <p
+          className={
+            warning
+              ? 'text-sm font-black text-amber-900'
+              : 'text-sm font-black text-emerald-900'
+          }
+        >
+          {label}
+        </p>
+
+        <span
+          className={
+            warning
+              ? 'rounded-full bg-amber-100 px-2 py-1 text-[9px] font-black uppercase text-amber-700'
+              : 'rounded-full bg-emerald-100 px-2 py-1 text-[9px] font-black uppercase text-emerald-700'
+          }
+        >
+          Recouvrement
+        </span>
+
+      </div>
+
+      <p
+        className={
+          warning
+            ? 'mt-2 text-xl font-black text-amber-950'
+            : 'mt-2 text-xl font-black text-emerald-950'
+        }
+      >
+        {value}
+      </p>
+
+      <p
+        className={
+          warning
+            ? 'mt-1 text-[11px] font-semibold text-amber-700'
+            : 'mt-1 text-[11px] font-semibold text-emerald-700'
+        }
+      >
+        {note}
+      </p>
+
+    </div>
+  )
+}
+
+// ============================================================
+// CELLULE RECOUVREMENT
+// ============================================================
+
+function CollectionCell({
+  collection,
+}: {
+  collection?: CollectionRow
+}) {
+  if (!collection) {
+    return (
+      <div>
+        <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase text-emerald-700">
+          À jour
+        </span>
+        <p className="mt-2 text-[10px] font-semibold text-slate-400">
+          Aucune facture ouverte
+        </p>
+      </div>
+    )
+  }
+
+  const overdue =
+    collection.effective_status ===
+      'overdue'
+
+  return (
+    <div className="min-w-[150px]">
+
+      <p
+        className={
+          overdue
+            ? 'font-black text-red-700'
+            : 'font-black text-slate-900'
+        }
+      >
+        {formatInvoiceMoney(
+          numberValue(
+            collection.amount_remaining_xof
+          )
+        )}
+      </p>
+
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+
+        <span
+          className={
+            overdue
+              ? 'rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-black uppercase text-red-700'
+              : 'rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black uppercase text-blue-700'
+          }
+        >
+          {overdue
+            ? 'En retard'
+            : 'À payer'}
+        </span>
+
+        <Link
+          href={`/admin/billing/${collection.invoice_id}`}
+          className={
+            overdue
+              ? 'text-[10px] font-black text-red-700 underline underline-offset-2'
+              : 'text-[10px] font-black text-emerald-700 underline underline-offset-2'
+          }
+        >
+          Recouvrer →
+        </Link>
+
+      </div>
+
+      <p className="mt-2 text-[10px] font-semibold text-slate-400">
+        {collection.invoice_number}
+      </p>
+
+      <p className="mt-1 text-[10px] font-semibold text-slate-400">
+        Échéance {formatShortDate(
+          collection.due_at
+        )}
+      </p>
+
+    </div>
+  )
+}
+
+// ============================================================
+// RECOUVREMENT MOBILE
+// ============================================================
+
+function MobileCollection({
+  collection,
+}: {
+  collection?: CollectionRow
+}) {
+  if (!collection) {
+    return (
+      <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+        <p className="text-xs font-black uppercase text-emerald-700">
+          Recouvrement à jour
+        </p>
+        <p className="mt-1 text-xs font-semibold text-emerald-800">
+          Aucune facture Afri Club ouverte.
+        </p>
+      </div>
+    )
+  }
+
+  const overdue =
+    collection.effective_status ===
+      'overdue'
+
+  return (
+    <div
+      className={
+        overdue
+          ? 'mt-4 rounded-2xl border border-red-200 bg-red-50 p-4'
+          : 'mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4'
+      }
+    >
+
+      <div className="flex items-start justify-between gap-3">
+
+        <div>
+          <p
+            className={
+              overdue
+                ? 'text-[10px] font-black uppercase text-red-700'
+                : 'text-[10px] font-black uppercase text-blue-700'
+            }
+          >
+            {overdue
+              ? 'Recouvrement en retard'
+              : 'Facture à recouvrer'}
+          </p>
+
+          <p
+            className={
+              overdue
+                ? 'mt-1 text-lg font-black text-red-950'
+                : 'mt-1 text-lg font-black text-blue-950'
+            }
+          >
+            {formatInvoiceMoney(
+              numberValue(
+                collection.amount_remaining_xof
+              )
+            )}
+          </p>
+
+          <p
+            className={
+              overdue
+                ? 'mt-1 text-xs font-semibold text-red-700'
+                : 'mt-1 text-xs font-semibold text-blue-700'
+            }
+          >
+            {collection.invoice_number} · échéance{' '}
+            {formatShortDate(
+              collection.due_at
+            )}
+          </p>
+        </div>
+
+        <Link
+          href={`/admin/billing/${collection.invoice_id}`}
+          className={
+            overdue
+              ? 'inline-flex shrink-0 items-center justify-center rounded-xl bg-red-600 px-3 py-2 text-xs font-black text-white hover:bg-red-700'
+              : 'inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-xs font-black text-white hover:bg-emerald-800'
+          }
+        >
+          Recouvrer
+        </Link>
+
+      </div>
 
     </div>
   )
@@ -1614,6 +2044,50 @@ function formatMoney(
   ).toLocaleString(
     'fr-FR'
   )} FCFA / mois`
+}
+
+function formatInvoiceMoney(
+  value: number
+) {
+  return `${Math.round(
+    value
+  ).toLocaleString(
+    'fr-FR'
+  )} FCFA`
+}
+
+function formatShortDate(
+  value:
+    | string
+    | null
+) {
+  if (!value) {
+    return '—'
+  }
+
+  const date =
+    new Date(
+      value
+    )
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return '—'
+  }
+
+  return new Intl.DateTimeFormat(
+    'fr-FR',
+    {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }
+  ).format(
+    date
+  )
 }
 
 function formatCurrentPlanPrice(
