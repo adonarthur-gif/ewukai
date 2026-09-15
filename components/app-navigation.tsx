@@ -8,7 +8,7 @@ import {
 } from '@/app/actions/switch-organization'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // NAVIGATION PRINCIPALE DE L'ESPACE DE GESTION
 //
 // Fonctionnalités :
@@ -17,7 +17,7 @@ import {
 // - branding personnalisé ;
 // - droits selon le rôle ;
 // - accès à l'espace membre ;
-// - accès Super-administrateur Afri Club ;
+// - accès Super-administrateur EWUKAI ;
 // - responsive mobile / desktop.
 // ============================================================
 
@@ -303,9 +303,7 @@ export default function AppNavigation({
     organizationName ||
     null
 
-  const hasMultipleOrganizations =
-    managementOrganizations
-      .length > 1
+  const hasMultipleOrganizations = false
 
   // ==========================================================
   // PERMISSIONS
@@ -380,8 +378,7 @@ export default function AppNavigation({
           {/* ================================================== */}
 
           <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
-
-            {/* ================================================ */}
+{/* ================================================ */}
             {/* LOGO */}
             {/* ================================================ */}
 
@@ -555,7 +552,7 @@ export default function AppNavigation({
           <div className="flex shrink-0 items-center gap-2">
 
             {/* ================================================ */}
-            {/* SUPER ADMIN AFRI CLUB */}
+            {/* SUPER ADMIN EWUKAI */}
             {/* ================================================ */}
 
             {isPlatformAdmin && (
@@ -570,7 +567,7 @@ export default function AppNavigation({
                 </span>
 
                 <span>
-                  Administration Afri Club
+                  Administration EWUKAI
                 </span>
               </Link>
             )}
@@ -763,7 +760,7 @@ export default function AppNavigation({
                   ⚙
                 </span>
 
-                Admin Afri Club
+                Admin EWUKAI
               </Link>
             )}
 
@@ -984,7 +981,7 @@ function getInitials(
     words.length ===
     0
   ) {
-    return 'AC'
+    return 'OR'
   }
 
   if (

@@ -1,10 +1,11 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 // ============================================================
-// AFRI CLUB
+// EWUKAI
 // NAVIGATION ADMINISTRATION PLATEFORME
 // ============================================================
 
@@ -72,13 +73,20 @@ export default function AdminNavigation() {
           >
 
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-400 text-sm font-black text-slate-950 shadow-lg shadow-emerald-950/20">
-              AC
+              <Image
+                src="/branding/ewukai-mark.png"
+                alt="Symbole EWUKAI"
+                width={48}
+                height={48}
+                priority
+                className="h-full w-full object-contain"
+              />
             </div>
 
             <div className="min-w-0">
 
               <p className="truncate text-lg font-black tracking-tight text-white">
-                Afri Club
+                EWUKAI
               </p>
 
               <p className="mt-0.5 truncate text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">
@@ -129,7 +137,7 @@ export default function AdminNavigation() {
       {/* ==================================================== */}
 
       <nav
-        aria-label="Administration Afri Club"
+        aria-label="Administration EWUKAI"
         className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6 lg:px-8"
       >
 
