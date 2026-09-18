@@ -24,7 +24,6 @@ import {
 
 import {
   requestSubscriptionCheckout,
-  startCinetPayPayment,
 } from './actions'
 
 type PlanCode =
@@ -89,13 +88,23 @@ type PortalData = {
   plans?: SubscriptionPlan[] | null
 }
 
+type CapacityData = {
+  organization_id?: string | null
+  plan_id?: string | null
+  plan_code?: string | null
+  plan_name?: string | null
+  member_limit?: number | null
+  active_member_count?: number | string | null
+  remaining_slots?: number | string | null
+  is_unlimited?: boolean | null
+  is_at_limit?: boolean | null
+}
 type SubscriptionPageProps = {
   searchParams: Promise<{
     checkout?: string
     plan?: string
     invoice?: string
     error?: string
-    payment?: string
   }>
 }
 
@@ -111,25 +120,25 @@ const PLAN_META: Record<
   free: {
     name: 'Gratuit',
     price: '0 FCFA',
-    members: "Jusqu'à 20 membres",
+    members: '0 à 20 membres',
     description: 'Pour démarrer et gérer une petite organisation.',
   },
   standard: {
     name: 'Standard',
     price: '5 000 FCFA / 30 jours',
-    members: "Jusqu'à 50 membres",
+    members: '21 à 50 membres',
     description: 'Pour une organisation qui structure sa gestion et son suivi.',
   },
   pro: {
     name: 'Pro',
     price: '10 000 FCFA / 30 jours',
-    members: "Jusqu'à 500 membres",
+    members: '51 à 500 membres',
     description: 'Pour les organisations en croissance avec un volume important de membres.',
   },
   enterprise: {
     name: 'Entreprise',
     price: 'Sur devis',
-    members: 'Plus de 500 membres',
+    members: '501 membres et plus',
     description: 'Pour les grandes structures et les besoins spécifiques.',
   },
 }
@@ -183,6 +192,31 @@ export default async function SubscriptionPage({
   const portal =
     data as unknown as PortalData
 
+  const {
+    data: capacityRaw,
+    error: capacityError,
+  } =
+    await supabase.rpc(
+      'get_organization_member_capacity_snapshot',
+      {
+        target_organization_id:
+          organizationId,
+      }
+    )
+
+  if (capacityError) {
+    console.error(
+      'EWUKAI - MEMBER CAPACITY:',
+      capacityError
+    )
+  }
+
+  const capacity =
+    !capacityError &&
+    capacityRaw &&
+    typeof capacityRaw === 'object'
+      ? capacityRaw as CapacityData
+      : null
   const organizationName =
     portal.organization?.short_name ||
     portal.organization?.name ||
@@ -249,6 +283,53 @@ export default async function SubscriptionPage({
       currentPlanCode
     ]
 
+  const capacityLimit =
+    capacity?.member_limit ??
+    null
+
+  const capacityActive =
+    Math.max(
+      0,
+      Number(
+        capacity?.active_member_count ??
+        activeMembers
+      ) || 0
+    )
+
+  const capacityRemaining =
+    capacityLimit === null
+      ? null
+      : Math.max(
+          0,
+          Number(
+            capacity?.remaining_slots ??
+            capacityLimit - capacityActive
+          ) || 0
+        )
+
+  const capacityPercent =
+    capacityLimit !== null &&
+    capacityLimit > 0
+      ? Math.min(
+          100,
+          Math.round(
+            capacityActive /
+              capacityLimit *
+              100
+          )
+        )
+      : 0
+
+  const capacityAtLimit =
+    Boolean(
+      capacity?.is_at_limit
+    )
+
+  const capacityNearLimit =
+    capacityLimit !== null &&
+    !capacityAtLimit &&
+    capacityPercent >= 80
+
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -295,6 +376,120 @@ export default async function SubscriptionPage({
           </div>
         </section>
 
+        {capacity && (
+          <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
+                  Capacité des membres
+                </p>
+                <h2 className="mt-2 text-2xl font-black text-slate-950">
+                  Utilisation de votre capacité
+                </h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                  Seuls les membres actifs consomment une place. Un membre
+                  inactif reste dans l&apos;historique sans réduire la capacité
+                  disponible de votre organisation.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-slate-950 px-5 py-4 text-white">
+                <p className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+                  Formule {capacity.plan_name || currentMeta.name}
+                </p>
+                <p className="mt-1 text-2xl font-black">
+                  {capacityLimit === null
+                    ? `${capacityActive} actifs`
+                    : `${capacityActive} / ${capacityLimit}`}
+                </p>
+              </div>
+            </div>
+
+            {capacityLimit !== null && (
+              <div className="mt-6">
+                <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-slate-500">
+                  <span>{capacityPercent}% utilisé</span>
+                  <span>
+                    {capacityRemaining} place
+                    {capacityRemaining !== 1 ? 's' : ''} restante
+                    {capacityRemaining !== 1 ? 's' : ''}
+                  </span>
+                </div>
+                <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      capacityAtLimit
+                        ? 'bg-red-500'
+                        : capacityNearLimit
+                          ? 'bg-amber-500'
+                          : 'bg-emerald-600'
+                    }`}
+                    style={{
+                      width: `${capacityPercent}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <CapacityMetric
+                label="Membres actifs"
+                value={String(capacityActive)}
+              />
+              <CapacityMetric
+                label="Places restantes"
+                value={
+                  capacityLimit === null
+                    ? 'Illimité'
+                    : String(capacityRemaining ?? 0)
+                }
+              />
+              <CapacityMetric
+                label="Plafond"
+                value={
+                  capacityLimit === null
+                    ? 'Sur mesure'
+                    : String(capacityLimit)
+                }
+              />
+            </div>
+
+            {capacityAtLimit ? (
+              <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+                <p className="font-black">Plafond atteint</p>
+                <p className="mt-1 leading-6 text-red-800">
+                  Aucun nouveau membre actif ne peut être ajouté ou réactivé
+                  avec cette formule. Choisissez une formule supérieure pour
+                  augmenter la capacité.
+                </p>
+                <a
+                  href="#formules"
+                  className="mt-3 inline-flex font-black text-red-900 underline underline-offset-4"
+                >
+                  Voir les formules disponibles
+                </a>
+              </div>
+            ) : capacityNearLimit ? (
+              <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                <p className="font-black">Vous approchez du plafond</p>
+                <p className="mt-1 leading-6 text-amber-800">
+                  Il reste {capacityRemaining} place
+                  {capacityRemaining !== 1 ? 's' : ''}. Vous pouvez préparer
+                  une formule supérieure avant d&apos;atteindre la limite.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+                <p className="font-black">Capacité disponible</p>
+                <p className="mt-1 leading-6 text-emerald-800">
+                  Votre organisation peut encore ajouter ou réactiver des
+                  membres actifs dans la limite de sa formule actuelle.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
         {params.error && (
           <div className="mt-6 flex gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
             <CircleAlert className="mt-0.5 h-5 w-5 shrink-0" />
@@ -307,16 +502,31 @@ export default async function SubscriptionPage({
             <Check className="mt-0.5 h-5 w-5 shrink-0" />
             <div>
               <p className="font-black">
-                Votre demande de changement de formule est prête.
+                Demande d&apos;abonnement enregistrée.
               </p>
               <p className="mt-1 leading-6 text-emerald-800">
-                La facture a été préparée. Aucun abonnement payant
-                n&apos;est activé tant que le prestataire de paiement
-                n&apos;a pas confirmé le règlement intégral.
+                La formule choisie et sa facture sont maintenant préparées
+                dans EWUKAI. Le paiement en ligne sera activé lorsque le
+                prestataire de paiement de la plateforme sera configuré.
               </p>
             </div>
           </div>
         )}
+
+        <div className="mt-6 flex gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
+          <div>
+            <p className="font-black">
+              Paiement en ligne en cours de configuration
+            </p>
+            <p className="mt-1 leading-6 text-blue-800">
+              Vous pouvez déjà choisir Standard ou Pro et préparer la facture.
+              Aucun paiement n&apos;est lancé depuis cette page pour le moment.
+              Le bouton de règlement sera activé après la mise en service du
+              prestataire de paiement EWUKAI.
+            </p>
+          </div>
+        </div>
 
         <section className="mt-7 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
@@ -382,8 +592,8 @@ export default async function SubscriptionPage({
 
             <p className="mt-3 text-sm leading-6 text-slate-600">
               Avec <strong>{activeMembers}</strong> membre
-              {activeMembers > 1 ? 's' : ''} actif
-              {activeMembers > 1 ? 's' : ''}, cette formule correspond
+              {activeMembers !== 1 ? 's' : ''} actif
+              {activeMembers !== 1 ? 's' : ''}, cette formule correspond
               à la capacité actuelle de votre organisation.
             </p>
 
@@ -396,98 +606,102 @@ export default async function SubscriptionPage({
           </div>
         </section>
 
-        {params.payment === 'returned' && (
-          <div className="mt-6 flex gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
-            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
-            <div>
-              <p className="font-black">
-                Retour du guichet de paiement reçu.
-              </p>
-              <p className="mt-1 leading-6 text-blue-800">
-                EWUKAI n&apos;active jamais une formule à partir du retour navigateur.
-                L&apos;activation intervient uniquement après la notification CinetPay
-                et la vérification serveur du paiement. Si le statut n&apos;a pas encore
-                changé, actualisez cette page dans quelques instants.
-              </p>
-            </div>
-          </div>
-        )}
-
         {pendingSubscription && pendingPlanCode && pendingInvoice && (
-          <section className="mt-7 rounded-3xl border border-amber-200 bg-amber-50 p-6 shadow-sm sm:p-7">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-600 text-white">
-                  <ReceiptText className="h-6 w-6" />
-                </div>
+          <section className="mt-7 overflow-hidden rounded-3xl border border-amber-200 bg-amber-50 shadow-sm">
+            <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="p-6 sm:p-7">
+                <div className="flex gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-600 text-white">
+                    <ReceiptText className="h-6 w-6" />
+                  </div>
 
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
-                    Paiement en attente
-                  </p>
-                  <h2 className="mt-1 text-xl font-black text-slate-950">
-                    {PLAN_META[pendingPlanCode].name}
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
-                    Facture <strong>{pendingInvoice.invoice_number || 'préparée'}</strong>
-                    {' '}— montant exact à régler :{' '}
-                    <strong>{formatMoney(pendingInvoice.total_xof)}</strong>.
-                  </p>
-
-                  {pendingInvoice.due_at && (
-                    <p className="mt-1 text-xs text-slate-600">
-                      Échéance : {formatDateTime(pendingInvoice.due_at)}
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
+                      Demande en attente de règlement
                     </p>
-                  )}
+                    <h2 className="mt-1 text-xl font-black text-slate-950">
+                      {PLAN_META[pendingPlanCode].name}
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-slate-700">
+                      Votre demande est enregistrée. La formule actuelle reste
+                      inchangée tant qu&apos;aucun règlement n&apos;a été confirmé.
+                    </p>
+                  </div>
                 </div>
+
+                <div className="mt-6 overflow-hidden rounded-2xl border border-amber-200 bg-white">
+                  <SummaryRow
+                    label="Organisation"
+                    value={organizationName}
+                  />
+                  <SummaryRow
+                    label="Formule demandée"
+                    value={PLAN_META[pendingPlanCode].name}
+                  />
+                  <SummaryRow
+                    label="Période"
+                    value="30 jours"
+                  />
+                  <SummaryRow
+                    label="Facture"
+                    value={pendingInvoice.invoice_number || 'Préparée'}
+                  />
+                  <SummaryRow
+                    label="Montant"
+                    value={formatMoney(pendingInvoice.total_xof)}
+                    strong
+                  />
+                  <SummaryRow
+                    label="Statut"
+                    value="En attente de paiement"
+                    strong
+                    last
+                  />
+                </div>
+
+                {pendingInvoice.due_at && (
+                  <p className="mt-3 text-xs font-semibold text-slate-600">
+                    Échéance indicative : {formatDateTime(pendingInvoice.due_at)}
+                  </p>
+                )}
               </div>
 
-              <div className="rounded-2xl border border-amber-200 bg-white px-5 py-4 text-sm">
-                <p className="font-black text-slate-900">
-                  Paiement sécurisé
-                </p>
+              <div className="border-t border-amber-200 bg-white p-6 sm:p-7 lg:border-l lg:border-t-0">
+                <div className="flex h-full flex-col justify-center">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+                    Paiement en ligne
+                  </p>
 
-                <p className="mt-1 max-w-sm text-xs leading-5 text-slate-500">
-                  Vous serez redirigé vers le guichet CinetPay. Le montant
-                  provient directement de la facture EWUKAI et ne peut pas
-                  être modifié depuis le navigateur.
-                </p>
+                  <h3 className="mt-2 text-xl font-black text-slate-950">
+                    Bientôt disponible
+                  </h3>
 
-                {canManage ? (
-                  <form
-                    action={startCinetPayPayment}
-                    className="mt-3"
+                  <p className="mt-3 text-sm leading-6 text-slate-600">
+                    La facture est prête, mais aucun prestataire de paiement
+                    n&apos;est encore relié à EWUKAI. Aucun débit ne peut donc
+                    être lancé depuis cet écran.
+                  </p>
+
+                  <button
+                    type="button"
+                    disabled
+                    className="mt-5 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-slate-200 px-4 py-3 text-sm font-black text-slate-500"
                   >
-                    <input
-                      type="hidden"
-                      name="invoiceId"
-                      value={pendingInvoice.id ?? ''}
-                    />
+                    <CreditCard className="h-4 w-4" />
+                    Payer {formatMoney(pendingInvoice.total_xof)}
+                  </button>
 
-                    <button
-                      type="submit"
-                      disabled={!pendingInvoice.id}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-black text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300"
-                    >
-                      <CreditCard className="h-4 w-4" />
-                      Payer {formatMoney(pendingInvoice.total_xof)}
-                    </button>
-                  </form>
-                ) : (
-                  <div className="mt-3 rounded-xl bg-slate-100 px-4 py-3 text-center text-xs font-bold text-slate-500">
-                    Réservé au responsable, président ou trésorier
-                  </div>
-                )}
-
-                <p className="mt-3 text-[11px] font-semibold leading-5 text-slate-500">
-                  Seul le règlement intégral confirmé par CinetPay active la formule.
-                </p>
+                  <p className="mt-3 text-[11px] font-semibold leading-5 text-slate-500">
+                    Ce bouton sera activé lorsque le compte marchand de la
+                    plateforme sera configuré.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
         )}
 
-        <section className="mt-10">
+        <section id="formules" className="mt-10 scroll-mt-24">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
               Nos formules
@@ -496,8 +710,9 @@ export default async function SubscriptionPage({
               Choisissez la capacité adaptée à votre organisation
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              Standard et Pro sont facturés pour 30 jours complets.
-              Seul le paiement intégral confirmé active une formule.
+              Standard et Pro sont préparés sur une période de 30 jours.
+              La formule payante ne devient active qu&apos;après confirmation
+              du règlement.
             </p>
           </div>
 
@@ -572,12 +787,15 @@ export default async function SubscriptionPage({
                           </div>
                         )
                       ) : planCode === 'enterprise' ? (
-                        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-black text-slate-700">
-                          Offre commerciale sur devis
-                        </div>
+                        <Link
+                          href="/contact?subject=Formule%20Entreprise"
+                          className="flex w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-center text-sm font-black text-slate-800 transition hover:bg-slate-100"
+                        >
+                          Demander une offre
+                        </Link>
                       ) : (
                         <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-xs font-bold leading-5 text-slate-500">
-                          Le retour au Gratuit sera ajouté avec la gestion des changements de formule.
+                          Le retour au Gratuit sera géré séparément à l&apos;échéance de la formule payante.
                         </div>
                       )}
                     </div>
@@ -595,20 +813,74 @@ export default async function SubscriptionPage({
             </div>
             <div>
               <h2 className="font-black text-slate-950">
-                Paiement et activation sécurisés
+                Abonnement prêt, paiement séparé
               </h2>
               <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600">
-                Le navigateur ne décide jamais du montant payé ni de
-                l&apos;activation. Pour Standard et Pro, EWUKAI attendra
-                la confirmation authentique du prestataire de paiement.
-                Une confirmation valide donnera droit à 30 jours d&apos;accès
-                selon les règles de l&apos;abonnement.
+                EWUKAI prépare dès maintenant la demande d&apos;abonnement et
+                la facture correspondante. Le règlement en ligne reste séparé
+                et sera branché ensuite sur un prestataire sécurisé. Cette
+                séparation évite qu&apos;une formule payante soit activée sans
+                confirmation réelle du paiement.
               </p>
             </div>
           </div>
         </section>
       </div>
     </main>
+  )
+}
+
+function CapacityMetric({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <p className="text-xs font-bold text-slate-500">
+        {label}
+      </p>
+      <p className="mt-2 text-xl font-black text-slate-950">
+        {value}
+      </p>
+    </div>
+  )
+}
+function SummaryRow({
+  label,
+  value,
+  strong = false,
+  last = false,
+}: {
+  label: string
+  value: string
+  strong?: boolean
+  last?: boolean
+}) {
+  return (
+    <div
+      className={`flex items-center justify-between gap-4 px-4 py-3 text-sm ${
+        last
+          ? ''
+          : 'border-b border-slate-100'
+      }`}
+    >
+      <span className="font-semibold text-slate-500">
+        {label}
+      </span>
+
+      <span
+        className={
+          strong
+            ? 'text-right font-black text-slate-950'
+            : 'text-right font-bold text-slate-800'
+        }
+      >
+        {value}
+      </span>
+    </div>
   )
 }
 
