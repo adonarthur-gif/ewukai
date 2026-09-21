@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
+import { requireOrganizationFeatureAccess } from '@/lib/subscriptions/feature-access'
 
 const createSchema = z.object({
   amount: z.coerce
@@ -84,6 +85,14 @@ export async function createCashExpense(
   ) {
     redirect('/cash')
   }
+
+  await requireOrganizationFeatureAccess(
+    {
+      supabase,
+      organizationId,
+    },
+    'treasury'
+  )
 
   const parsed =
     createSchema.safeParse({
@@ -241,6 +250,14 @@ export async function reverseCashExpense(
   ) {
     redirect('/cash')
   }
+
+  await requireOrganizationFeatureAccess(
+    {
+      supabase,
+      organizationId,
+    },
+    'treasury'
+  )
 
   const expenseId =
     String(

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
+import { requireOrganizationFeatureAccess } from '@/lib/subscriptions/feature-access'
 
 const schema = z.object({
   label: z
@@ -78,6 +79,14 @@ export async function createTreasuryAccount(
   ) {
     redirect('/cash/accounts')
   }
+
+  await requireOrganizationFeatureAccess(
+    {
+      supabase,
+      organizationId,
+    },
+    'treasury'
+  )
 
   const parsed = schema.safeParse({
     label:
@@ -252,6 +261,14 @@ export async function archiveTreasuryAccount(
   ) {
     redirect('/cash/accounts')
   }
+
+  await requireOrganizationFeatureAccess(
+    {
+      supabase,
+      organizationId,
+    },
+    'treasury'
+  )
 
   const accountId =
     String(

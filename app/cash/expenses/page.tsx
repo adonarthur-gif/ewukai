@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
+import { requireOrganizationFeatureAccess } from '@/lib/subscriptions/feature-access'
 
 type PageProps = {
   searchParams: Promise<{
@@ -47,6 +48,14 @@ export default async function ExpensesPage({
   ) {
     redirect('/dashboard')
   }
+
+  await requireOrganizationFeatureAccess(
+    {
+      supabase,
+      organizationId,
+    },
+    'treasury'
+  )
 
   const canManage =
     [

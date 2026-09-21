@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
+import { requireOrganizationFeatureAccess } from '@/lib/subscriptions/feature-access'
 import { archiveTreasuryAccount } from './actions'
 
 type PageProps = {
@@ -59,6 +60,14 @@ export default async function TreasuryAccountsPage({
   ) {
     redirect('/dashboard')
   }
+
+  await requireOrganizationFeatureAccess(
+    {
+      supabase,
+      organizationId,
+    },
+    'treasury'
+  )
 
   const canManage =
     [

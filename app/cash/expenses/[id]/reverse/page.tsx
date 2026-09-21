@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
+import { requireOrganizationFeatureAccess } from '@/lib/subscriptions/feature-access'
 import { reverseCashExpense } from '../../actions'
 
 type PageProps = {
@@ -40,6 +41,14 @@ export default async function ReverseExpensePage({
   ) {
     redirect('/cash')
   }
+
+  await requireOrganizationFeatureAccess(
+    {
+      supabase,
+      organizationId,
+    },
+    'treasury'
+  )
 
   const {
     data: expense,

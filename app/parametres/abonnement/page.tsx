@@ -181,6 +181,7 @@ type SubscriptionPageProps = {
     plan?: string
     invoice?: string
     error?: string
+    feature?: string
   }>
 }
 
@@ -698,6 +699,27 @@ export default async function SubscriptionPage({
               Le contrôle serveur sera activé progressivement après validation.
             </p>
           </section>
+        )}
+
+        {params.feature === 'treasury' && (
+          <div className="mt-6 flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <p className="font-black">
+                La trésorerie n&apos;est pas incluse dans votre formule actuelle.
+              </p>
+              <p className="mt-1 leading-6 text-amber-800">
+                Cette fonctionnalité est disponible à partir de la formule
+                Standard. Vos données existantes restent conservées.
+              </p>
+              <a
+                href="#formules"
+                className="mt-2 inline-flex font-black text-amber-900 underline underline-offset-4"
+              >
+                Voir les formules disponibles
+              </a>
+            </div>
+          </div>
         )}
 
         {params.error && (

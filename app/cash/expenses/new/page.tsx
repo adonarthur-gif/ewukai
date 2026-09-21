@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
+import { requireOrganizationFeatureAccess } from '@/lib/subscriptions/feature-access'
 import { createCashExpense } from '../actions'
 import SubmitButton from './submit-button'
 
@@ -34,6 +35,14 @@ export default async function NewExpensePage({
   ) {
     redirect('/cash')
   }
+
+  await requireOrganizationFeatureAccess(
+    {
+      supabase,
+      organizationId,
+    },
+    'treasury'
+  )
 
   const today =
     new Date()

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
+import { requireOrganizationFeatureAccess } from '@/lib/subscriptions/feature-access'
 import { createTreasuryAccount } from '../actions'
 import SubmitButton from './submit-button'
 
@@ -18,6 +19,8 @@ export default async function NewTreasuryAccountPage({
     await searchParams
 
   const {
+    supabase,
+    organizationId,
     role,
   } =
     await requireCurrentOrganization()
@@ -31,6 +34,14 @@ export default async function NewTreasuryAccountPage({
   ) {
     redirect('/cash/accounts')
   }
+
+  await requireOrganizationFeatureAccess(
+    {
+      supabase,
+      organizationId,
+    },
+    'treasury'
+  )
 
   return (
     <main className="min-h-screen bg-slate-50">
