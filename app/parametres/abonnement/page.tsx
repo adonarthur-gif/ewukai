@@ -12,6 +12,7 @@ import {
   CircleAlert,
   CreditCard,
   Crown,
+  LockKeyhole,
   ReceiptText,
   ShieldCheck,
   Sparkles,
@@ -99,6 +100,81 @@ type CapacityData = {
   is_unlimited?: boolean | null
   is_at_limit?: boolean | null
 }
+
+type FeatureKey =
+  | 'basic_dashboard'
+  | 'members'
+  | 'contributions'
+  | 'receipts'
+  | 'treasury'
+  | 'automation'
+  | 'advanced_reports'
+  | 'priority_support'
+  | 'custom_integrations'
+
+type EntitlementsData = {
+  organization_id?: string | null
+  subscription_id?: string | null
+  subscription_status?: string | null
+  source?: string | null
+  plan_id?: string | null
+  plan_code?: string | null
+  plan_name?: string | null
+  member_limit?: number | null
+  features?: Record<string, boolean> | null
+}
+
+const FEATURE_META: Array<{
+  key: FeatureKey
+  label: string
+  description: string
+}> = [
+  {
+    key: 'basic_dashboard',
+    label: 'Tableau de bord',
+    description: 'Synthèse et indicateurs essentiels de votre organisation.',
+  },
+  {
+    key: 'members',
+    label: 'Gestion des membres',
+    description: 'Création, suivi, activation et gestion des membres.',
+  },
+  {
+    key: 'contributions',
+    label: 'Cotisations',
+    description: 'Appels, obligations, collecte et suivi des cotisations.',
+  },
+  {
+    key: 'receipts',
+    label: 'Reçus',
+    description: 'Consultation et édition des reçus liés aux encaissements.',
+  },
+  {
+    key: 'treasury',
+    label: 'Trésorerie',
+    description: 'Comptes, dépenses et mouvements de trésorerie.',
+  },
+  {
+    key: 'automation',
+    label: 'Automatisation',
+    description: 'Fonctions automatisées réservées aux formules supérieures.',
+  },
+  {
+    key: 'advanced_reports',
+    label: 'Rapports avancés',
+    description: 'Analyses et rapports enrichis pour le pilotage.',
+  },
+  {
+    key: 'priority_support',
+    label: 'Support prioritaire',
+    description: 'Traitement prioritaire des demandes d’assistance.',
+  },
+  {
+    key: 'custom_integrations',
+    label: 'Intégrations personnalisées',
+    description: 'Connexions et intégrations spécifiques à l’organisation.',
+  },
+]
 type SubscriptionPageProps = {
   searchParams: Promise<{
     checkout?: string
@@ -217,6 +293,33 @@ export default async function SubscriptionPage({
     typeof capacityRaw === 'object'
       ? capacityRaw as CapacityData
       : null
+
+  const {
+    data: entitlementsRaw,
+    error: entitlementsError,
+  } =
+    await supabase.rpc(
+      'get_organization_entitlements',
+      {
+        target_organization_id:
+          organizationId,
+      }
+    )
+
+  if (entitlementsError) {
+    console.error(
+      'EWUKAI - ENTITLEMENTS:',
+      entitlementsError
+    )
+  }
+
+  const entitlements =
+    !entitlementsError &&
+    entitlementsRaw &&
+    typeof entitlementsRaw === 'object'
+      ? entitlementsRaw as EntitlementsData
+      : null
+
   const organizationName =
     portal.organization?.short_name ||
     portal.organization?.name ||
@@ -329,6 +432,20 @@ export default async function SubscriptionPage({
     capacityLimit !== null &&
     !capacityAtLimit &&
     capacityPercent >= 80
+
+  const entitlementFeatures =
+    entitlements?.features ??
+    {}
+
+  const entitlementPlanName =
+    entitlements?.plan_name ||
+    currentMeta.name
+
+  const enabledFeatureCount =
+    FEATURE_META.filter(
+      (feature) =>
+        entitlementFeatures[feature.key] === true
+    ).length
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -490,6 +607,99 @@ export default async function SubscriptionPage({
             )}
           </section>
         )}
+
+        {entitlements && (
+          <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
+                  Droits de votre formule
+                </p>
+                <h2 className="mt-2 text-2xl font-black text-slate-950">
+                  Fonctionnalités incluses
+                </h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                  Ces droits proviennent de votre formule actuellement effective.
+                  Une formule en attente de paiement ne débloque aucune
+                  fonctionnalité supplémentaire.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-slate-950 px-5 py-4 text-white">
+                <p className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+                  Formule {entitlementPlanName}
+                </p>
+                <p className="mt-1 text-2xl font-black">
+                  {enabledFeatureCount} / {FEATURE_META.length}
+                </p>
+                <p className="mt-1 text-[11px] font-semibold text-slate-400">
+                  fonctionnalités incluses
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {FEATURE_META.map((feature) => {
+                const enabled =
+                  entitlementFeatures[feature.key] === true
+
+                return (
+                  <div
+                    key={feature.key}
+                    className={`rounded-2xl border p-4 ${
+                      enabled
+                        ? 'border-emerald-200 bg-emerald-50'
+                        : 'border-slate-200 bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                          enabled
+                            ? 'bg-emerald-700 text-white'
+                            : 'bg-slate-200 text-slate-500'
+                        }`}
+                      >
+                        {enabled ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <LockKeyhole className="h-4 w-4" />
+                        )}
+                      </div>
+
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-black text-slate-950">
+                            {feature.label}
+                          </p>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
+                              enabled
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : 'bg-slate-200 text-slate-600'
+                            }`}
+                          >
+                            {enabled ? 'Inclus' : 'Non inclus'}
+                          </span>
+                        </div>
+
+                        <p className="mt-1 text-xs leading-5 text-slate-600">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            <p className="mt-5 text-xs font-semibold leading-5 text-slate-500">
+              Cette version affiche les droits effectifs sans bloquer les modules.
+              Le contrôle serveur sera activé progressivement après validation.
+            </p>
+          </section>
+        )}
+
         {params.error && (
           <div className="mt-6 flex gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
             <CircleAlert className="mt-0.5 h-5 w-5 shrink-0" />
