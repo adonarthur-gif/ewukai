@@ -190,6 +190,23 @@ type PaymentMethod = {
     | null
 }
 
+type MemberAutomationReminder = {
+  reminder_id: string
+  obligation_id: string
+  reminder_type:
+    | 'before_due'
+    | 'due_today'
+    | 'overdue'
+    | string
+  due_date: string
+  scheduled_for: string
+  amount_remaining:
+    | number
+    | string
+  title: string
+  message: string
+  generated_at: string
+}
 // ============================================================
 // ROLES DE GESTION
 // ============================================================
@@ -415,6 +432,44 @@ export default async function MySpacePage({
   // DROITS DE GESTION
   // ==========================================================
 
+  // ==========================================================
+  // RAPPELS AUTOMATIQUES
+  // ==========================================================
+
+  const {
+    data: automationRemindersRaw,
+    error: automationRemindersError,
+  } =
+    await supabase.rpc(
+      'list_my_automation_reminders',
+      {
+        target_organization_id:
+          organization.id,
+
+        target_limit:
+          20,
+      }
+    )
+
+  if (
+    automationRemindersError
+  ) {
+    console.error(
+      'MEMBER SPACE - automation reminders:',
+      automationRemindersError
+    )
+  }
+
+  const automationReminders =
+    !automationRemindersError &&
+    Array.isArray(
+      automationRemindersRaw
+    )
+      ? (
+          automationRemindersRaw as
+            MemberAutomationReminder[]
+        )
+      : []
   const {
     data:
       managementMembership,
@@ -747,6 +802,19 @@ export default async function MySpacePage({
               }
             />
 
+            {automationReminders.length > 0 && (
+              <MemberNavLink
+                href="#rappels"
+                label="Mes rappels"
+                primaryColor={
+                  primaryColor
+                }
+                accentColor={
+                  accentColor
+                }
+              />
+            )}
+
             <MemberNavLink
               href="#reglement"
               label="Payer"
@@ -993,6 +1061,116 @@ export default async function MySpacePage({
           </section>
         )}
 
+        {/* ================================================== */}
+        {/* RAPPELS AUTOMATIQUES */}
+        {/* ================================================== */}
+
+        {automationReminders.length > 0 && (
+          <section
+            id="rappels"
+            className="mt-8 scroll-mt-40 overflow-hidden rounded-3xl border border-amber-200 bg-white shadow-sm"
+          >
+
+            <div className="border-b border-amber-100 bg-amber-50 px-6 py-5">
+
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
+                Mes rappels
+              </p>
+
+              <h2 className="mt-1 text-2xl font-black text-slate-950">
+                Cotisations à régulariser
+              </h2>
+
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                Ces rappels sont générés automatiquement par votre organisation
+                à partir des échéances qui présentent encore un solde à payer.
+              </p>
+
+            </div>
+
+            <div className="divide-y divide-slate-100">
+
+              {automationReminders.map(
+                (reminder) => (
+                  <div
+                    key={
+                      reminder.reminder_id
+                    }
+                    className="p-6"
+                  >
+
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+                      <div className="min-w-0">
+
+                        <div className="flex flex-wrap items-center gap-2">
+
+                          <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-800">
+                            {formatAutomationReminderType(
+                              reminder.reminder_type
+                            )}
+                          </span>
+
+                          <span className="text-xs font-bold text-slate-400">
+                            Échéance{' '}
+                            {formatDate(
+                              reminder.due_date
+                            )}
+                          </span>
+
+                        </div>
+
+                        <p className="mt-3 font-black text-slate-950">
+                          {reminder.title}
+                        </p>
+
+                        <p className="mt-1 text-sm leading-6 text-slate-600">
+                          {reminder.message}
+                        </p>
+
+                      </div>
+
+                      <div className="shrink-0 sm:text-right">
+
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                          Reste à payer
+                        </p>
+
+                        <p className="mt-1 text-xl font-black text-amber-700">
+                          {formatMoney(
+                            money(
+                              reminder.amount_remaining
+                            )
+                          )}
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+                )
+              )}
+
+            </div>
+
+            <div className="border-t border-slate-100 bg-slate-50 px-6 py-4">
+
+              <Link
+                href="#reglement"
+                className="inline-flex rounded-xl px-4 py-2.5 text-sm font-black text-white transition hover:opacity-90"
+                style={{
+                  backgroundColor:
+                    primaryColor,
+                }}
+              >
+                Régler mes cotisations
+              </Link>
+
+            </div>
+
+          </section>
+        )}
         {/* ================================================== */}
         {/* REGLEMENT */}
         {/* ================================================== */}
@@ -2431,6 +2609,27 @@ function money(
 // FORMAT MONTANT
 // ============================================================
 
+function formatAutomationReminderType(
+  value: string
+) {
+  switch (value) {
+    case 'before_due':
+      return 'Avant échéance'
+
+    case 'due_today':
+      return 'Échéance du jour'
+
+    case 'overdue':
+      return 'En retard'
+
+    default:
+      return 'Rappel'
+  }
+}
+
+// ============================================================
+// FORMAT MONTANT
+// ============================================================
 function formatMoney(
   value: number
 ) {
