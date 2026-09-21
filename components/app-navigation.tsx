@@ -144,6 +144,14 @@ const navigation = [
   },
 
   {
+    href:
+      '/automatisations',
+
+    label:
+      'Automatisations',
+  },
+
+  {
     href: 
       '/rapports',
 
