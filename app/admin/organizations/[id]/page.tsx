@@ -7,14 +7,19 @@ import {
   requirePlatformSuperAdmin,
 } from '@/lib/auth/platform-admin'
 
+import {
+  deleteOrganization,
+  setOrganizationStatus,
+} from '../actions'
+
 // ============================================================
 // EWUKAI
 // ADMINISTRATION PLATEFORME
 // FICHE DETAILLEE D'UNE ORGANISATION
 //
-// Cette page est volontairement en LECTURE SEULE.
-// Le Super-admin observe les données mais ne modifie
-// pas directement les opérations financières de la mutuelle.
+// Les opérations financières restent en lecture seule.
+// Le Super-admin peut toutefois activer, désactiver ou,
+// lorsqu'elle est totalement vide, supprimer une organisation.
 // ============================================================
 
 // ============================================================
@@ -254,9 +259,48 @@ type OrganizationDetail = {
     OrganizationStats
 }
 
+type SubscriptionPlanSummary = {
+  code?: string | null
+  name?: string | null
+}
+
+type SubscriptionSummary = {
+  status?: string | null
+  plan?: SubscriptionPlanSummary | null
+}
+
+type SubscriptionHistorySummary = {
+  status?: string | null
+  plan_code?: string | null
+  plan_name?: string | null
+}
+
+type PlatformSubscriptionDetail = {
+  current_subscription?: SubscriptionSummary | null
+  history?: SubscriptionHistorySummary[] | null
+}
+
+type SubscriptionCollectionRow = {
+  organization_id: string
+  invoice_id: string
+  invoice_number: string
+  plan_code?: string | null
+  plan_name?: string | null
+  effective_status: string
+  currency: string
+  total_xof: NumberValue
+  amount_remaining_xof: NumberValue
+  due_at?: string | null
+}
+
 type PageProps = {
   params: Promise<{
     id: string
+  }>
+
+  searchParams: Promise<{
+    statusUpdated?: string
+    error?: string
   }>
 }
 
@@ -285,11 +329,15 @@ const ORGANIZATION_LOGO_BUCKET =
 
 export default async function PlatformOrganizationDetailPage({
   params,
+  searchParams,
 }: PageProps) {
   const {
     id,
   } =
     await params
+
+  const query =
+    await searchParams
 
   // ==========================================================
   // 1. SUPER ADMIN
@@ -315,28 +363,43 @@ export default async function PlatformOrganizationDetailPage({
   // 3. DONNEES
   // ==========================================================
 
-  const {
-    data,
-    error,
-  } =
-    await supabase.rpc(
-      'get_platform_organization_detail',
-      {
-        target_organization_id:
-          id,
-      }
-    )
+  const [
+    organizationResult,
+    subscriptionResult,
+    collectionResult,
+  ] =
+    await Promise.all([
+      supabase.rpc(
+        'get_platform_organization_detail',
+        {
+          target_organization_id:
+            id,
+        }
+      ),
+
+      supabase.rpc(
+        'get_platform_subscription_detail',
+        {
+          target_organization_id:
+            id,
+        }
+      ),
+
+      supabase.rpc(
+        'list_platform_subscription_collection'
+      ),
+    ])
 
   if (
-    error
+    organizationResult.error
   ) {
     console.error(
       'EWUKAI - admin organization detail:',
-      error
+      organizationResult.error
     )
 
     if (
-      error.message
+      organizationResult.error.message
         ?.toLowerCase()
         .includes(
           'organization not found'
@@ -351,13 +414,31 @@ export default async function PlatformOrganizationDetailPage({
   }
 
   if (
-    !data
+    subscriptionResult.error
+  ) {
+    console.error(
+      'EWUKAI - organization subscription summary:',
+      subscriptionResult.error
+    )
+  }
+
+  if (
+    collectionResult.error
+  ) {
+    console.error(
+      'EWUKAI - organization billing summary:',
+      collectionResult.error
+    )
+  }
+
+  if (
+    !organizationResult.data
   ) {
     notFound()
   }
 
   const detail =
-    data as OrganizationDetail
+    organizationResult.data as OrganizationDetail
 
   const organization =
     detail.organization
@@ -389,6 +470,52 @@ export default async function PlatformOrganizationDetailPage({
       treasury_debit_total: 0,
       treasury_balance: 0,
     }
+
+  const subscriptionDetail =
+    subscriptionResult.data
+      ? subscriptionResult.data as PlatformSubscriptionDetail
+      : null
+
+  const currentSubscription =
+    subscriptionDetail
+      ?.current_subscription ??
+    null
+
+  const rawSubscriptionHistory =
+    subscriptionDetail
+      ?.history
+
+  const subscriptionHistory =
+    Array.isArray(
+      rawSubscriptionHistory
+    )
+      ? rawSubscriptionHistory
+      : []
+
+  const pendingSubscription =
+    subscriptionHistory.find(
+      item =>
+        item.status ===
+        'pending_payment'
+    ) ??
+    null
+
+  const collectionRows =
+    (
+      Array.isArray(
+        collectionResult.data
+      )
+        ? collectionResult.data
+        : []
+    ) as SubscriptionCollectionRow[]
+
+  const pendingInvoice =
+    collectionRows.find(
+      item =>
+        item.organization_id ===
+        id
+    ) ??
+    null
 
   // ==========================================================
   // 4. BRANDING
@@ -538,6 +665,14 @@ export default async function PlatformOrganizationDetailPage({
         )}`
       : null
 
+  const isActive =
+    organization.status ===
+    'active'
+
+  const isInactive =
+    organization.status ===
+    'inactive'
+
   // ==========================================================
   // RENDU
   // ==========================================================
@@ -666,6 +801,49 @@ export default async function PlatformOrganizationDetailPage({
                   </Link>
                 )}
 
+              <form
+                action={
+                  setOrganizationStatus
+                }
+              >
+                <input
+                  type="hidden"
+                  name="organizationId"
+                  value={
+                    organization.id
+                  }
+                />
+
+                <input
+                  type="hidden"
+                  name="nextStatus"
+                  value={
+                    isActive
+                      ? 'inactive'
+                      : 'active'
+                  }
+                />
+
+                <input
+                  type="hidden"
+                  name="returnTo"
+                  value={`/admin/organizations/${organization.id}`}
+                />
+
+                <button
+                  type="submit"
+                  className={`rounded-xl border px-4 py-2.5 text-sm font-black transition ${
+                    isActive
+                      ? 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
+                      : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                  }`}
+                >
+                  {isActive
+                    ? 'Désactiver'
+                    : 'Réactiver'}
+                </button>
+              </form>
+
               <Link
                 href="/admin/organizations"
                 className="rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white transition hover:bg-slate-800"
@@ -687,8 +865,23 @@ export default async function PlatformOrganizationDetailPage({
 
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
 
+        {query.statusUpdated && (
+          <section className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-bold text-emerald-800">
+            {query.statusUpdated ===
+            'active'
+              ? 'L’organisation a été réactivée. Les accès précédemment actifs ont été restaurés.'
+              : 'L’organisation a été désactivée. Ses accès utilisateurs ont été suspendus et son historique est conservé.'}
+          </section>
+        )}
+
+        {query.error && (
+          <section className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-bold text-red-800">
+            {query.error}
+          </section>
+        )}
+
         {/* ================================================== */}
-        {/* MODE LECTURE SEULE */}
+        {/* SUPERVISION PLATEFORME */}
         {/* ================================================== */}
 
         <section className="rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4">
@@ -705,16 +898,121 @@ export default async function PlatformOrganizationDetailPage({
               </p>
 
               <p className="mt-1 text-sm leading-6 text-blue-800">
-                Cette fiche permet de superviser
-                l&apos;organisation à l&apos;échelle
-                de la plateforme. Les informations
-                financières présentées ici sont en
-                lecture seule.
+                Les informations financières restent en lecture seule. Le Super-administrateur peut en revanche activer ou désactiver l&apos;organisation. La désactivation suspend les accès sans effacer les données.
               </p>
             </div>
 
           </div>
 
+        </section>
+
+        {/* ================================================== */}
+        {/* ABONNEMENT EWUKAI */}
+        {/* ================================================== */}
+
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-col gap-4 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
+                Abonnement EWUKAI
+              </p>
+              <h2 className="mt-2 text-lg font-black text-slate-950">
+                Situation commerciale de l&apos;organisation
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-slate-500">
+                Suivez la formule active, les demandes de changement et les factures ouvertes sans modifier les fonds de l&apos;organisation.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={`/admin/subscriptions/${organization.id}`}
+                className="rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white transition hover:bg-slate-800"
+              >
+                Gérer l&apos;abonnement
+              </Link>
+
+              {pendingInvoice && (
+                <Link
+                  href={`/admin/billing/${pendingInvoice.invoice_id}`}
+                  className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-black text-emerald-800 transition hover:bg-emerald-100"
+                >
+                  Voir la facture
+                </Link>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-4">
+            <KpiCard
+              label="Formule actuelle"
+              value={
+                currentSubscription
+                  ?.plan
+                  ?.name ||
+                'Aucune'
+              }
+              note={
+                formatAdminSubscriptionStatus(
+                  currentSubscription?.status ??
+                  null
+                )
+              }
+            />
+
+            <KpiCard
+              label="Formule demandée"
+              value={
+                pendingSubscription?.plan_name ||
+                pendingInvoice?.plan_name ||
+                'Aucune'
+              }
+              note={
+                pendingSubscription ||
+                pendingInvoice
+                  ? 'En attente de paiement'
+                  : 'Aucune demande ouverte'
+              }
+            />
+
+            <KpiCard
+              label="Montant à régler"
+              value={
+                pendingInvoice
+                  ? formatMoney(
+                      numberValue(
+                        pendingInvoice.amount_remaining_xof
+                      ),
+                      pendingInvoice.currency
+                    )
+                  : '0 FCFA'
+              }
+              note={
+                pendingInvoice
+                  ? pendingInvoice.invoice_number
+                  : 'Aucune facture ouverte'
+              }
+            />
+
+            <KpiCard
+              label="État du règlement"
+              value={
+                pendingInvoice?.effective_status ===
+                'overdue'
+                  ? 'En retard'
+                  : pendingInvoice
+                    ? 'À payer'
+                    : 'À jour'
+              }
+              note={
+                pendingInvoice?.due_at
+                  ? `Échéance ${formatDate(
+                      pendingInvoice.due_at
+                    )}`
+                  : 'Aucune échéance ouverte'
+              }
+            />
+          </div>
         </section>
 
         {/* ================================================== */}
@@ -1216,6 +1514,134 @@ export default async function PlatformOrganizationDetailPage({
                 organization.description
               }
             />
+
+          </div>
+
+        </section>
+
+        {/* ================================================== */}
+        {/* GESTION DE L'ORGANISATION */}
+        {/* ================================================== */}
+
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+
+          <CardHeader
+            title="Gestion de l’organisation"
+            description="Activation, suspension des accès et suppression définitive sécurisée."
+          />
+
+          <div className="p-6">
+
+            <div className="flex flex-col gap-4 rounded-2xl bg-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+
+              <div>
+                <p className="font-black text-slate-900">
+                  {isActive
+                    ? 'Organisation active'
+                    : 'Organisation désactivée'}
+                </p>
+
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+                  {isActive
+                    ? 'La désactivation conserve toutes les données mais suspend temporairement les accès de cette organisation.'
+                    : 'La réactivation restaure les accès qui étaient actifs avant la désactivation.'}
+                </p>
+              </div>
+
+              <form
+                action={
+                  setOrganizationStatus
+                }
+              >
+                <input
+                  type="hidden"
+                  name="organizationId"
+                  value={
+                    organization.id
+                  }
+                />
+
+                <input
+                  type="hidden"
+                  name="nextStatus"
+                  value={
+                    isActive
+                      ? 'inactive'
+                      : 'active'
+                  }
+                />
+
+                <input
+                  type="hidden"
+                  name="returnTo"
+                  value={`/admin/organizations/${organization.id}`}
+                />
+
+                <button
+                  type="submit"
+                  className={`rounded-xl px-5 py-3 text-sm font-black transition ${
+                    isActive
+                      ? 'border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
+                      : 'bg-emerald-700 text-white hover:bg-emerald-800'
+                  }`}
+                >
+                  {isActive
+                    ? 'Désactiver l’organisation'
+                    : 'Réactiver l’organisation'}
+                </button>
+              </form>
+
+            </div>
+
+            {isInactive && (
+              <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5">
+
+                <p className="font-black text-red-900">
+                  Suppression définitive
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-red-800">
+                  EWUKAI n&apos;autorise cette suppression que si l&apos;organisation est réellement vide : aucun membre, aucune cotisation, aucun paiement, aucune opération de trésorerie, aucune demande et aucun historique de facturation.
+                </p>
+
+                <form
+                  action={
+                    deleteOrganization
+                  }
+                  className="mt-4 grid gap-3 sm:max-w-md"
+                >
+                  <input
+                    type="hidden"
+                    name="organizationId"
+                    value={
+                      organization.id
+                    }
+                  />
+
+                  <label className="block">
+                    <span className="text-xs font-black uppercase tracking-wide text-red-800">
+                      Confirmer avec SUPPRIMER
+                    </span>
+
+                    <input
+                      name="confirmation"
+                      type="text"
+                      autoComplete="off"
+                      placeholder="SUPPRIMER"
+                      className="mt-2 w-full rounded-xl border border-red-200 bg-white px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-red-400 focus:ring-4 focus:ring-red-500/10"
+                    />
+                  </label>
+
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-red-700 px-5 py-3 text-sm font-black text-white transition hover:bg-red-800"
+                  >
+                    Supprimer définitivement
+                  </button>
+                </form>
+
+              </div>
+            )}
 
           </div>
 
@@ -1727,6 +2153,39 @@ function formatDate(
     .format(
       date
     )
+}
+
+function formatAdminSubscriptionStatus(
+  status:
+    | string
+    | null
+    | undefined
+) {
+  switch (status) {
+    case 'active':
+      return 'Actif'
+
+    case 'trialing':
+      return 'Essai'
+
+    case 'pending_payment':
+      return 'En attente de paiement'
+
+    case 'past_due':
+      return 'En retard'
+
+    case 'cancelled':
+      return 'Annulé'
+
+    case 'expired':
+      return 'Expiré'
+
+    case 'replaced':
+      return 'Remplacé'
+
+    default:
+      return 'Sans abonnement actif'
+  }
 }
 
 function formatRole(

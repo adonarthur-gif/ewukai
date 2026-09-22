@@ -3,6 +3,10 @@ import { notFound } from 'next/navigation'
 
 import { requireCurrentOrganization } from '@/lib/auth/current-organization'
 import MemberAccessCard from './member-access-card'
+import {
+  deleteMember,
+  setMemberStatus,
+} from './actions'
 
 // ============================================================
 // EWUKAI
@@ -12,6 +16,11 @@ import MemberAccessCard from './member-access-card'
 type MemberPageProps = {
   params: Promise<{
     id: string
+  }>
+
+  searchParams: Promise<{
+    statusUpdated?: string
+    error?: string
   }>
 }
 
@@ -57,8 +66,10 @@ type Member = {
 
 export default async function MemberDetailPage({
   params,
+  searchParams,
 }: MemberPageProps) {
   const { id } = await params
+  const query = await searchParams
 
   const {
     supabase,
@@ -138,6 +149,21 @@ export default async function MemberDetailPage({
       'secretary',
     ].includes(role)
 
+  const canManageMemberStatus =
+    [
+      'owner',
+      'president',
+      'secretary',
+    ].includes(role)
+
+  const isActive =
+    member.status ===
+    'active'
+
+  const isInactive =
+    member.status ===
+    'inactive'
+
   // ==========================================================
   // NOM COMPLET
   // ==========================================================
@@ -164,6 +190,21 @@ export default async function MemberDetailPage({
         >
           ← Retour aux membres
         </Link>
+
+        {query.statusUpdated && (
+          <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-bold text-emerald-800">
+            {query.statusUpdated ===
+            'active'
+              ? 'Le membre a été réactivé.'
+              : 'Le membre a été désactivé. Son historique est conservé.'}
+          </div>
+        )}
+
+        {query.error && (
+          <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-bold text-red-800">
+            {query.error}
+          </div>
+        )}
 
         {/* ================================================== */}
         {/* HEADER MEMBRE */}
@@ -245,6 +286,45 @@ export default async function MemberDetailPage({
                   >
                     Modifier
                   </Link>
+                )}
+
+                {canManageMemberStatus && (
+                  <form
+                    action={
+                      setMemberStatus
+                    }
+                  >
+                    <input
+                      type="hidden"
+                      name="memberId"
+                      value={
+                        member.id
+                      }
+                    />
+
+                    <input
+                      type="hidden"
+                      name="nextStatus"
+                      value={
+                        isActive
+                          ? 'inactive'
+                          : 'active'
+                      }
+                    />
+
+                    <button
+                      type="submit"
+                      className={`rounded-xl px-5 py-3 font-black transition ${
+                        isActive
+                          ? 'border border-red-300/40 bg-red-500/15 text-red-100 hover:bg-red-500/25'
+                          : 'bg-emerald-400 text-emerald-950 hover:bg-emerald-300'
+                      }`}
+                    >
+                      {isActive
+                        ? 'Désactiver'
+                        : 'Réactiver'}
+                    </button>
+                  </form>
                 )}
 
               </div>
@@ -534,6 +614,116 @@ export default async function MemberDetailPage({
                 canManageMemberAccess
               }
             />
+
+            {/* =============================================== */}
+            {/* GESTION DU MEMBRE */}
+            {/* =============================================== */}
+
+            {canManageMemberStatus && (
+              <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+                  GESTION DU MEMBRE
+                </p>
+
+                <h2 className="mt-1 text-xl font-black text-slate-900">
+                  Activation et suppression
+                </h2>
+
+                <p className="mt-3 text-sm leading-6 text-slate-500">
+                  La désactivation conserve le matricule, les cotisations, les paiements et l&apos;historique du membre.
+                </p>
+
+                <form
+                  action={
+                    setMemberStatus
+                  }
+                  className="mt-5"
+                >
+                  <input
+                    type="hidden"
+                    name="memberId"
+                    value={
+                      member.id
+                    }
+                  />
+
+                  <input
+                    type="hidden"
+                    name="nextStatus"
+                    value={
+                      isActive
+                        ? 'inactive'
+                        : 'active'
+                    }
+                  />
+
+                  <button
+                    type="submit"
+                    className={`w-full rounded-xl px-5 py-3 text-sm font-black transition ${
+                      isActive
+                        ? 'border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
+                        : 'bg-emerald-700 text-white hover:bg-emerald-800'
+                    }`}
+                  >
+                    {isActive
+                      ? 'Désactiver ce membre'
+                      : 'Réactiver ce membre'}
+                  </button>
+                </form>
+
+                {isInactive && (
+                  <div className="mt-6 border-t border-slate-100 pt-6">
+
+                    <p className="font-black text-red-800">
+                      Suppression définitive
+                    </p>
+
+                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                      EWUKAI refusera automatiquement la suppression si ce membre possède un compte lié, des cotisations, des paiements ou tout autre historique.
+                    </p>
+
+                    <form
+                      action={
+                        deleteMember
+                      }
+                      className="mt-4 space-y-3"
+                    >
+                      <input
+                        type="hidden"
+                        name="memberId"
+                        value={
+                          member.id
+                        }
+                      />
+
+                      <label className="block">
+                        <span className="text-xs font-black uppercase tracking-wide text-slate-500">
+                          Confirmer avec SUPPRIMER
+                        </span>
+
+                        <input
+                          name="confirmation"
+                          type="text"
+                          autoComplete="off"
+                          placeholder="SUPPRIMER"
+                          className="mt-2 w-full rounded-xl border border-red-200 bg-white px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-red-400 focus:ring-4 focus:ring-red-500/10"
+                        />
+                      </label>
+
+                      <button
+                        type="submit"
+                        className="w-full rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-black text-red-700 transition hover:bg-red-100"
+                      >
+                        Supprimer définitivement
+                      </button>
+                    </form>
+
+                  </div>
+                )}
+
+              </section>
+            )}
 
             {/* =============================================== */}
             {/* COTISATIONS */}

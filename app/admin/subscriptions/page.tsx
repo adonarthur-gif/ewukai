@@ -384,6 +384,23 @@ export default async function AdminSubscriptionsPage({
   const invoiceCountToCollect =
     collectionRows.length
 
+  const pendingPlanRequests =
+    collectionRows.filter(
+      item =>
+        [
+          'standard',
+          'pro',
+        ].includes(
+          item.plan_code
+            ?.trim()
+            .toLowerCase() ??
+          ''
+        ) &&
+        numberValue(
+          item.amount_remaining_xof
+        ) > 0
+    ).length
+
   const overdueInvoiceCount =
     collectionRows.filter(
       item =>
@@ -567,9 +584,13 @@ export default async function AdminSubscriptionsPage({
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
           <MiniStat
-            label="Abonnements gratuits"
+            label="Demandes de formule"
             value={
-              freeSubscriptions
+              pendingPlanRequests
+            }
+            warning={
+              pendingPlanRequests >
+              0
             }
           />
 
@@ -1604,6 +1625,12 @@ function CollectionCell({
   return (
     <div className="min-w-[150px]">
 
+      {collection.plan_name && (
+        <p className="mb-2 text-[10px] font-black uppercase tracking-wide text-amber-700">
+          Demande {collection.plan_name}
+        </p>
+      )}
+
       <p
         className={
           overdue
@@ -1640,7 +1667,7 @@ function CollectionCell({
               : 'text-[10px] font-black text-emerald-700 underline underline-offset-2'
           }
         >
-          Recouvrer →
+          Voir facture →
         </Link>
 
       </div>
@@ -1704,9 +1731,11 @@ function MobileCollection({
                 : 'text-[10px] font-black uppercase text-blue-700'
             }
           >
-            {overdue
-              ? 'Recouvrement en retard'
-              : 'Facture à recouvrer'}
+            {collection.plan_name
+              ? `Demande ${collection.plan_name}`
+              : overdue
+                ? 'Recouvrement en retard'
+                : 'Facture à régler'}
           </p>
 
           <p
@@ -1745,7 +1774,7 @@ function MobileCollection({
               : 'inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-xs font-black text-white hover:bg-emerald-800'
           }
         >
-          Recouvrer
+          Voir facture
         </Link>
 
       </div>
@@ -1855,6 +1884,9 @@ function SubscriptionStatus({
         'bg-blue-50 text-blue-700',
 
       past_due:
+        'bg-amber-50 text-amber-700',
+
+      pending_payment:
         'bg-amber-50 text-amber-700',
 
       cancelled:
@@ -2132,6 +2164,9 @@ function formatSubscriptionStatus(
 
     case 'past_due':
       return 'En retard'
+
+    case 'pending_payment':
+      return 'En attente de paiement'
 
     case 'cancelled':
       return 'Annulé'

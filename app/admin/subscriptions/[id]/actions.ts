@@ -15,8 +15,20 @@ import {
 // ============================================================
 // EWUKAI
 // SUPER ADMIN
-// CHANGEMENT D'ABONNEMENT
+// GESTION ADMINISTRATIVE DES ABONNEMENTS
+//
+// Standard et Pro ne sont jamais activés manuellement ici.
+// Ils passent par : demande -> facture -> paiement confirmé.
+//
+// Les changements directs restent réservés à :
+// - Gratuit ;
+// - Entreprise (offre / contrat géré administrativement).
 // ============================================================
+
+const administrativePlanCodes = [
+  'free',
+  'enterprise',
+] as const
 
 export async function changeOrganizationSubscription(
   formData: FormData
@@ -49,10 +61,6 @@ export async function changeOrganizationSubscription(
         500
       )
 
-  // ==========================================================
-  // VALIDATIONS
-  // ==========================================================
-
   if (
     !isUuid(
       organizationId
@@ -78,9 +86,76 @@ export async function changeOrganizationSubscription(
     )
   }
 
-  // ==========================================================
-  // CHANGEMENT
-  // ==========================================================
+  // Standard / Pro doivent suivre le circuit de paiement.
+  if (
+    planCode === 'standard' ||
+    planCode === 'pro'
+  ) {
+    redirect(
+      `/admin/subscriptions/${organizationId}?error=payment_required`
+    )
+  }
+
+  if (
+    !administrativePlanCodes.includes(
+      planCode as
+        (typeof administrativePlanCodes)[number]
+    )
+  ) {
+    redirect(
+      `/admin/subscriptions/${organizationId}?error=plan`
+    )
+  }
+
+  // Une facture ouverte doit d'abord être traitée avant tout
+  // changement administratif afin de ne pas créer deux états
+  // commerciaux contradictoires.
+  const {
+    data:
+      collectionData,
+    error:
+      collectionError,
+  } =
+    await supabase.rpc(
+      'list_platform_subscription_collection'
+    )
+
+  if (collectionError) {
+    console.error(
+      'EWUKAI - subscription collection check:',
+      collectionError
+    )
+
+    redirect(
+      `/admin/subscriptions/${organizationId}?error=billing_check`
+    )
+  }
+
+  const collectionRows =
+    (
+      Array.isArray(
+        collectionData
+      )
+        ? collectionData
+        : []
+    ) as Array<{
+      organization_id?:
+        | string
+        | null
+    }>
+
+  const hasOpenInvoice =
+    collectionRows.some(
+      item =>
+        item.organization_id ===
+        organizationId
+    )
+
+  if (hasOpenInvoice) {
+    redirect(
+      `/admin/subscriptions/${organizationId}?error=pending_request`
+    )
+  }
 
   const {
     error,
@@ -100,9 +175,7 @@ export async function changeOrganizationSubscription(
       }
     )
 
-  if (
-    error
-  ) {
+  if (error) {
     console.error(
       'EWUKAI - change subscription:',
       error
@@ -124,10 +197,6 @@ export async function changeOrganizationSubscription(
     )
   }
 
-  // ==========================================================
-  // REVALIDATION
-  // ==========================================================
-
   revalidatePath(
     '/admin/subscriptions'
   )
@@ -138,6 +207,10 @@ export async function changeOrganizationSubscription(
 
   revalidatePath(
     `/admin/organizations/${organizationId}`
+  )
+
+  revalidatePath(
+    '/admin/billing'
   )
 
   revalidatePath(
@@ -152,10 +225,6 @@ export async function changeOrganizationSubscription(
     `/admin/subscriptions/${organizationId}?saved=1`
   )
 }
-
-// ============================================================
-// HELPERS
-// ============================================================
 
 function formValue(
   formData: FormData,

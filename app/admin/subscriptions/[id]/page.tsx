@@ -177,6 +177,22 @@ type Detail = {
     Plan[]
 }
 
+type CollectionRow = {
+  organization_id: string
+  invoice_id: string
+  invoice_number: string
+  plan_code: string | null
+  plan_name: string | null
+  stored_status: string
+  effective_status: string
+  currency: string
+  total_xof: MoneyValue
+  amount_paid_xof: MoneyValue
+  amount_remaining_xof: MoneyValue
+  issued_at: string | null
+  due_at: string | null
+}
+
 // ============================================================
 // PAGE
 // ============================================================
@@ -206,28 +222,34 @@ export default async function AdminSubscriptionDetailPage({
   } =
     await requirePlatformSuperAdmin()
 
-  const {
-    data,
-    error,
-  } =
-    await supabase.rpc(
-      'get_platform_subscription_detail',
-      {
-        target_organization_id:
-          id,
-      }
-    )
+  const [
+    detailResult,
+    collectionResult,
+  ] =
+    await Promise.all([
+      supabase.rpc(
+        'get_platform_subscription_detail',
+        {
+          target_organization_id:
+            id,
+        }
+      ),
+
+      supabase.rpc(
+        'list_platform_subscription_collection'
+      ),
+    ])
 
   if (
-    error
+    detailResult.error
   ) {
     console.error(
       'EWUKAI - subscription detail:',
-      error
+      detailResult.error
     )
 
     if (
-      error.message
+      detailResult.error.message
         ?.toLowerCase()
         .includes(
           'organization not found'
@@ -242,13 +264,22 @@ export default async function AdminSubscriptionDetailPage({
   }
 
   if (
-    !data
+    collectionResult.error
+  ) {
+    console.error(
+      'EWUKAI - subscription collection detail:',
+      collectionResult.error
+    )
+  }
+
+  if (
+    !detailResult.data
   ) {
     notFound()
   }
 
   const detail =
-    data as Detail
+    detailResult.data as Detail
 
   const organization =
     detail.organization
@@ -272,6 +303,48 @@ export default async function AdminSubscriptionDetailPage({
     )
       ? detail.history
       : []
+
+  const pendingSubscription =
+    history.find(
+      item =>
+        item.status ===
+        'pending_payment'
+    ) ??
+    null
+
+  const collectionRows =
+    (
+      Array.isArray(
+        collectionResult.data
+      )
+        ? collectionResult.data
+        : []
+    ) as CollectionRow[]
+
+  const pendingInvoice =
+    collectionRows.find(
+      item =>
+        item.organization_id ===
+        id
+    ) ??
+    null
+
+  const hasPendingRequest =
+    Boolean(
+      pendingSubscription ||
+      pendingInvoice
+    )
+
+  const administrativePlans =
+    plans.filter(
+      plan =>
+        [
+          'free',
+          'enterprise',
+        ].includes(
+          plan.code
+        )
+    )
 
   const activeMembers =
     numberValue(
@@ -350,13 +423,13 @@ export default async function AdminSubscriptionDetailPage({
           <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
 
             <p className="font-black text-emerald-900">
-              Abonnement modifié
+              Changement administratif enregistré
             </p>
 
             <p className="mt-1 text-sm text-emerald-700">
-              Le nouveau plan est actif et
-              l&apos;ancien abonnement a été
-              conservé dans l&apos;historique.
+              La modification administrative a été appliquée.
+              Les abonnements Standard et Pro restent soumis au
+              circuit facture puis paiement confirmé.
             </p>
 
           </section>
@@ -375,7 +448,19 @@ export default async function AdminSubscriptionDetailPage({
               {query.error ===
               'same_plan'
                 ? 'Cette organisation utilise déjà ce plan.'
-                : 'Le changement de formule n’a pas pu être enregistré.'}
+                : query.error ===
+                    'payment_required'
+                  ? 'Standard et Pro ne peuvent pas être activés manuellement. La formule doit être demandée, facturée puis réglée.'
+                  : query.error ===
+                      'pending_request'
+                    ? 'Une demande ou une facture est déjà en attente. Traitez-la avant tout changement administratif.'
+                    : query.error ===
+                        'billing_check'
+                      ? 'Impossible de vérifier les factures ouvertes. Aucun changement n’a été effectué.'
+                      : query.error ===
+                          'plan'
+                        ? 'La formule demandée est invalide.'
+                        : 'Le changement de formule n’a pas pu être enregistré.'}
             </p>
 
           </section>
@@ -445,6 +530,86 @@ export default async function AdminSubscriptionDetailPage({
 
         </section>
 
+        {/* DEMANDE EN ATTENTE */}
+
+        {hasPendingRequest && (
+          <section className="overflow-hidden rounded-3xl border border-amber-200 bg-amber-50 shadow-sm">
+            <div className="border-b border-amber-200 px-6 py-5">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
+                Demande en attente de paiement
+              </p>
+              <h2 className="mt-2 text-xl font-black text-slate-950">
+                {pendingSubscription?.plan_name ||
+                  pendingInvoice?.plan_name ||
+                  'Formule payante'}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-amber-900">
+                La formule actuelle reste inchangée tant qu&apos;aucun règlement intégral n&apos;a été confirmé.
+              </p>
+            </div>
+
+            <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-4">
+              <Info
+                label="Formule demandée"
+                value={
+                  pendingSubscription?.plan_name ||
+                  pendingInvoice?.plan_name ||
+                  '—'
+                }
+              />
+
+              <Info
+                label="Facture"
+                value={
+                  pendingInvoice?.invoice_number ||
+                  'Préparée'
+                }
+              />
+
+              <Info
+                label="Montant restant"
+                value={
+                  pendingInvoice
+                    ? formatInvoiceMoney(
+                        numberValue(
+                          pendingInvoice.amount_remaining_xof
+                        )
+                      )
+                    : '—'
+                }
+              />
+
+              <Info
+                label="Statut"
+                value={
+                  pendingInvoice?.effective_status ===
+                  'overdue'
+                    ? 'En retard'
+                    : 'En attente de paiement'
+                }
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2 border-t border-amber-200 px-6 py-5">
+              {pendingInvoice && (
+                <Link
+                  href={`/admin/billing/${pendingInvoice.invoice_id}`}
+                  className="rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white transition hover:bg-slate-800"
+                >
+                  Voir la facture
+                </Link>
+              )}
+
+              <Link
+                href="/admin/billing"
+                className="rounded-xl border border-amber-300 bg-white px-4 py-2.5 text-sm font-black text-amber-900 transition hover:bg-amber-100"
+              >
+                Facturation & recouvrement
+              </Link>
+            </div>
+          </section>
+        )}
+
         {/* PLAN ACTUEL + RECOMMANDE */}
 
         <section className="grid gap-6 lg:grid-cols-2">
@@ -477,156 +642,137 @@ export default async function AdminSubscriptionDetailPage({
 
         </section>
 
-        {/* CHANGEMENT */}
+        {/* GESTION ADMINISTRATIVE */}
 
         <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-
           <div className="border-b border-slate-100 px-6 py-5">
-
             <h2 className="text-lg font-black text-slate-950">
-              Changer la formule
+              Gestion administrative
             </h2>
 
             <p className="mt-1 text-sm leading-6 text-slate-500">
-              Le changement crée un nouvel
-              abonnement. L&apos;abonnement
-              précédent reste conservé dans
-              l&apos;historique.
+              Le Super-administrateur peut gérer directement Gratuit ou Entreprise. Standard et Pro passent obligatoirement par une demande, une facture puis un paiement confirmé.
             </p>
-
           </div>
 
-          <form
-            action={
-              changeOrganizationSubscription
-            }
-            className="space-y-5 p-6"
-          >
-
-            <input
-              type="hidden"
-              name="organization_id"
-              value={
-                organization.id
-              }
-            />
-
-            <div>
-
-              <label
-                htmlFor="plan_code"
-                className="mb-2 block text-xs font-black uppercase tracking-wide text-slate-500"
-              >
-                Nouvelle formule
-              </label>
-
-              <select
-                id="plan_code"
-                name="plan_code"
-                required
-                defaultValue={
-                  recommended?.code &&
-                  recommended.code !==
-                    current?.plan?.code
-                    ? recommended.code
-                    : ''
-                }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-emerald-500"
-              >
-
-                <option
-                  value=""
-                  disabled
-                >
-                  Choisir une formule
-                </option>
-
-                {plans.map(
-                  plan => (
-                    <option
-                      key={
-                        plan.id
-                      }
-                      value={
-                        plan.code
-                      }
-                      disabled={
-                        plan.code ===
-                        current?.plan?.code
-                      }
-                    >
-                      {plan.name}
-                      {' — '}
-                      {formatPlanPrice(
-                        plan
-                      )}
-                      {' — '}
-                      {getPlanRange(
-                        plan.code
-                      )}
-                      {plan.code ===
-                      current?.plan?.code
-                        ? ' (actuel)'
-                        : ''}
-                    </option>
-                  )
-                )}
-
-              </select>
-
+          {hasPendingRequest ? (
+            <div className="p-6">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <p className="font-black text-amber-950">
+                  Changement temporairement verrouillé
+                </p>
+                <p className="mt-2 text-sm leading-6 text-amber-800">
+                  Une demande payante est déjà en attente. Consultez sa facture avant d&apos;effectuer un changement administratif.
+                </p>
+              </div>
             </div>
-
-            <div>
-
-              <label
-                htmlFor="note"
-                className="mb-2 block text-xs font-black uppercase tracking-wide text-slate-500"
-              >
-                Motif / note
-              </label>
-
-              <textarea
-                id="note"
-                name="note"
-                rows={4}
-                maxLength={500}
-                placeholder="Ex. Passage au plan Standard après validation de l'abonnement..."
-                className="w-full resize-y rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-emerald-500"
+          ) : (
+            <form
+              action={
+                changeOrganizationSubscription
+              }
+              className="space-y-5 p-6"
+            >
+              <input
+                type="hidden"
+                name="organization_id"
+                value={
+                  organization.id
+                }
               />
 
-            </div>
+              <div>
+                <label
+                  htmlFor="plan_code"
+                  className="mb-2 block text-xs font-black uppercase tracking-wide text-slate-500"
+                >
+                  Nouvelle formule administrative
+                </label>
 
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                <select
+                  id="plan_code"
+                  name="plan_code"
+                  required
+                  defaultValue=""
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-emerald-500"
+                >
+                  <option
+                    value=""
+                    disabled
+                  >
+                    Choisir une formule
+                  </option>
 
-              <p className="text-sm font-black text-amber-950">
-                Confirmation administrative
-              </p>
+                  {administrativePlans.map(
+                    plan => (
+                      <option
+                        key={
+                          plan.id
+                        }
+                        value={
+                          plan.code
+                        }
+                        disabled={
+                          plan.code ===
+                          current?.plan?.code
+                        }
+                      >
+                        {plan.name}
+                        {' — '}
+                        {formatPlanPrice(
+                          plan
+                        )}
+                        {' — '}
+                        {getPlanRange(
+                          plan.code
+                        )}
+                        {plan.code ===
+                        current?.plan?.code
+                          ? ' (actuel)'
+                          : ''}
+                      </option>
+                    )
+                  )}
+                </select>
+              </div>
 
-              <p className="mt-1 text-xs leading-5 text-amber-800">
-                Pour le moment, cette action
-                active manuellement la formule.
-                Lorsque les paiements
-                d&apos;abonnement seront
-                intégrés, nous rattacherons cette
-                activation à une transaction
-                confirmée.
-              </p>
+              <div>
+                <label
+                  htmlFor="note"
+                  className="mb-2 block text-xs font-black uppercase tracking-wide text-slate-500"
+                >
+                  Motif / note
+                </label>
 
-            </div>
+                <textarea
+                  id="note"
+                  name="note"
+                  rows={4}
+                  maxLength={500}
+                  placeholder="Ex. Retour au Gratuit ou activation d'une offre Entreprise après validation administrative..."
+                  className="w-full resize-y rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-emerald-500"
+                />
+              </div>
 
-            <div className="flex justify-end">
+              <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+                <p className="text-sm font-black text-blue-950">
+                  Standard et Pro protégés
+                </p>
+                <p className="mt-1 text-xs leading-5 text-blue-800">
+                  Ces deux formules ne sont plus activables manuellement depuis le Super Admin. Leur activation sera déclenchée uniquement après confirmation du règlement de la facture EWUKAI.
+                </p>
+              </div>
 
-              <button
-                type="submit"
-                className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-black text-white transition hover:bg-slate-800"
-              >
-                Confirmer le changement
-              </button>
-
-            </div>
-
-          </form>
-
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-black text-white transition hover:bg-slate-800"
+                >
+                  Appliquer le changement administratif
+                </button>
+              </div>
+            </form>
+          )}
         </section>
 
         {/* PERIODE ACTUELLE */}
@@ -975,6 +1121,9 @@ function HistoryStatus({
       past_due:
         'bg-amber-50 text-amber-700',
 
+      pending_payment:
+        'bg-amber-50 text-amber-700',
+
       replaced:
         'bg-slate-100 text-slate-600',
 
@@ -1037,6 +1186,16 @@ function formatMoney(
   ).toLocaleString(
     'fr-FR'
   )} FCFA / mois`
+}
+
+function formatInvoiceMoney(
+  value: number
+) {
+  return `${Math.round(
+    value
+  ).toLocaleString(
+    'fr-FR'
+  )} FCFA`
 }
 
 function formatPlanPrice(
@@ -1106,6 +1265,9 @@ function formatSubscriptionStatus(
 
     case 'past_due':
       return 'En retard'
+
+    case 'pending_payment':
+      return 'En attente de paiement'
 
     case 'replaced':
       return 'Remplacé'

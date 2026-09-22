@@ -4,6 +4,10 @@ import {
   requirePlatformSuperAdmin,
 } from '@/lib/auth/platform-admin'
 
+import {
+  setOrganizationStatus,
+} from './actions'
+
 // ============================================================
 // EWUKAI
 // ADMINISTRATION PLATEFORME
@@ -15,7 +19,8 @@ import {
 // - synthèse des membres ;
 // - identification du statut ;
 // - accès à la fiche détaillée ;
-// - lecture seule.
+// - gestion du statut active/inactive ;
+// - suppression définitive uniquement depuis la fiche détaillée.
 // ============================================================
 
 // ============================================================
@@ -25,6 +30,9 @@ import {
 type PageProps = {
   searchParams: Promise<{
     q?: string
+    statusUpdated?: string
+    deleted?: string
+    error?: string
   }>
 }
 
@@ -92,6 +100,13 @@ export default async function AdminOrganizationsPage({
         120
       ) ??
     ''
+
+  const returnTo =
+    search
+      ? `/admin/organizations?q=${encodeURIComponent(
+          search
+        )}`
+      : '/admin/organizations'
 
   // ==========================================================
   // 2. SUPER ADMIN
@@ -252,6 +267,27 @@ export default async function AdminOrganizationsPage({
       {/* ==================================================== */}
 
       <div className="mx-auto max-w-7xl space-y-7 px-4 py-8 sm:px-6 lg:px-8">
+
+        {params.statusUpdated && (
+          <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm font-bold text-emerald-800">
+            {params.statusUpdated ===
+            'active'
+              ? 'L’organisation a été réactivée.'
+              : 'L’organisation a été désactivée et ses accès ont été suspendus.'}
+          </section>
+        )}
+
+        {params.deleted && (
+          <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm font-bold text-emerald-800">
+            L’organisation vide a été supprimée définitivement.
+          </section>
+        )}
+
+        {params.error && (
+          <section className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm font-bold text-red-800">
+            {params.error}
+          </section>
+        )}
 
         {/* ================================================== */}
         {/* KPI */}
@@ -689,15 +725,67 @@ export default async function AdminOrganizationsPage({
 
                           <td className="px-6 py-5 text-right">
 
-                            <Link
-                              href={`/admin/organizations/${organization.id}`}
-                              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-black text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
-                            >
-                              Consulter
-                              <span aria-hidden="true">
-                                →
-                              </span>
-                            </Link>
+                            <div className="flex justify-end gap-2">
+
+                              <form
+                                action={
+                                  setOrganizationStatus
+                                }
+                              >
+                                <input
+                                  type="hidden"
+                                  name="organizationId"
+                                  value={
+                                    organization.id
+                                  }
+                                />
+
+                                <input
+                                  type="hidden"
+                                  name="nextStatus"
+                                  value={
+                                    organization.status ===
+                                    'active'
+                                      ? 'inactive'
+                                      : 'active'
+                                  }
+                                />
+
+                                <input
+                                  type="hidden"
+                                  name="returnTo"
+                                  value={
+                                    returnTo
+                                  }
+                                />
+
+                                <button
+                                  type="submit"
+                                  className={`rounded-xl border px-3.5 py-2 text-xs font-black transition ${
+                                    organization.status ===
+                                    'active'
+                                      ? 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
+                                      : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                  }`}
+                                >
+                                  {organization.status ===
+                                  'active'
+                                    ? 'Désactiver'
+                                    : 'Activer'}
+                                </button>
+                              </form>
+
+                              <Link
+                                href={`/admin/organizations/${organization.id}`}
+                                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-black text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+                              >
+                                Consulter
+                                <span aria-hidden="true">
+                                  →
+                                </span>
+                              </Link>
+
+                            </div>
 
                           </td>
 
@@ -827,7 +915,7 @@ export default async function AdminOrganizationsPage({
                         </div>
                       )}
 
-                      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+                      <div className="mt-5 border-t border-slate-100 pt-4">
 
                         <p className="text-xs font-semibold text-slate-400">
                           Créée le{' '}
@@ -836,12 +924,64 @@ export default async function AdminOrganizationsPage({
                           )}
                         </p>
 
-                        <Link
-                          href={`/admin/organizations/${organization.id}`}
-                          className="rounded-xl bg-slate-950 px-4 py-2 text-xs font-black text-white"
-                        >
-                          Consulter →
-                        </Link>
+                        <div className="mt-4 flex flex-wrap gap-2">
+
+                          <form
+                            action={
+                              setOrganizationStatus
+                            }
+                          >
+                            <input
+                              type="hidden"
+                              name="organizationId"
+                              value={
+                                organization.id
+                              }
+                            />
+
+                            <input
+                              type="hidden"
+                              name="nextStatus"
+                              value={
+                                organization.status ===
+                                'active'
+                                  ? 'inactive'
+                                  : 'active'
+                              }
+                            />
+
+                            <input
+                              type="hidden"
+                              name="returnTo"
+                              value={
+                                returnTo
+                              }
+                            />
+
+                            <button
+                              type="submit"
+                              className={`rounded-xl border px-4 py-2 text-xs font-black ${
+                                organization.status ===
+                                'active'
+                                  ? 'border-amber-200 bg-amber-50 text-amber-800'
+                                  : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                              }`}
+                            >
+                              {organization.status ===
+                              'active'
+                                ? 'Désactiver'
+                                : 'Activer'}
+                            </button>
+                          </form>
+
+                          <Link
+                            href={`/admin/organizations/${organization.id}`}
+                            className="rounded-xl bg-slate-950 px-4 py-2 text-xs font-black text-white"
+                          >
+                            Consulter →
+                          </Link>
+
+                        </div>
 
                       </div>
 

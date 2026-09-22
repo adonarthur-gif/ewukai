@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
 // ============================================================
@@ -13,6 +14,9 @@ type PageProps = {
     registered?: string
     activated?: string
     organization?: string
+    editProfile?: string
+    profileSaved?: string
+    profileError?: string
   }>
 }
 
@@ -190,6 +194,10 @@ type PaymentMethod = {
     | null
 }
 
+// ============================================================
+// ROLES DE GESTION
+// ============================================================
+
 type MemberAutomationReminder = {
   reminder_id: string
   obligation_id: string
@@ -207,10 +215,10 @@ type MemberAutomationReminder = {
   message: string
   generated_at: string
 }
+
 // ============================================================
 // ROLES DE GESTION
 // ============================================================
-
 const MANAGEMENT_ROLES =
   new Set([
     'owner',
@@ -219,6 +227,212 @@ const MANAGEMENT_ROLES =
     'secretary',
     'auditor',
   ])
+
+// ============================================================
+// MODIFICATION DU PROFIL MEMBRE
+// ============================================================
+
+async function updateMyMemberProfile(
+  formData: FormData
+) {
+  'use server'
+
+  const supabase =
+    await createClient()
+
+  const {
+    data: authData,
+    error: authError,
+  } =
+    await supabase.auth
+      .getClaims()
+
+  const userId =
+    authData?.claims?.sub
+
+  if (
+    authError ||
+    !userId
+  ) {
+    redirect('/login')
+  }
+
+  const organizationId =
+    getFormString(
+      formData,
+      'organizationId'
+    )
+
+  const memberId =
+    getFormString(
+      formData,
+      'memberId'
+    )
+
+  if (
+    !organizationId ||
+    !memberId
+  ) {
+    redirect('/my-space')
+  }
+
+  const returnUrl =
+    `/my-space?organization=${encodeURIComponent(
+      organizationId
+    )}`
+
+  // Vérification avec la RPC déjà utilisée par l'espace membre :
+  // le membre ne peut modifier que son propre dossier.
+  const {
+    data: memberSpacesRaw,
+    error: memberSpacesError,
+  } =
+    await supabase.rpc(
+      'list_my_member_spaces'
+    )
+
+  const memberSpaces =
+    Array.isArray(
+      memberSpacesRaw
+    )
+      ? (
+          memberSpacesRaw as
+            MemberSpaceOption[]
+        )
+      : []
+
+  const ownsMemberRecord =
+    !memberSpacesError &&
+    memberSpaces.some(
+      (space) =>
+        space.member_id ===
+          memberId &&
+        space.organization_id ===
+          organizationId
+    )
+
+  if (!ownsMemberRecord) {
+    redirect(
+      `${returnUrl}&profileError=${encodeURIComponent(
+        'Vous ne pouvez modifier que votre propre profil.'
+      )}#profil`
+    )
+  }
+
+  const firstName =
+    getFormString(
+      formData,
+      'firstName'
+    )
+
+  const lastName =
+    getFormString(
+      formData,
+      'lastName'
+    )
+
+  const phone =
+    nullableString(
+      formData,
+      'phone'
+    )
+
+  const emailRaw =
+    nullableString(
+      formData,
+      'email'
+    )
+
+  const email =
+    emailRaw
+      ? emailRaw.toLowerCase()
+      : null
+
+  const profession =
+    nullableString(
+      formData,
+      'profession'
+    )
+
+  const address =
+    nullableString(
+      formData,
+      'address'
+    )
+
+  if (
+    !firstName ||
+    !lastName
+  ) {
+    redirect(
+      `${returnUrl}&editProfile=1&profileError=${encodeURIComponent(
+        'Le nom et le prénom sont obligatoires.'
+      )}#profil`
+    )
+  }
+
+  if (
+    email &&
+    !isValidEmail(email)
+  ) {
+    redirect(
+      `${returnUrl}&editProfile=1&profileError=${encodeURIComponent(
+        'L’adresse e-mail saisie est invalide.'
+      )}#profil`
+    )
+  }
+
+  const admin =
+    createAdminClient()
+
+  const {
+    error: updateError,
+  } =
+    await admin
+      .from('members')
+      .update({
+        first_name:
+          firstName,
+        last_name:
+          lastName,
+        phone,
+        email,
+        profession,
+        address,
+        updated_at:
+          new Date()
+            .toISOString(),
+      })
+      .eq(
+        'id',
+        memberId
+      )
+      .eq(
+        'organization_id',
+        organizationId
+      )
+      .eq(
+        'user_id',
+        userId
+      )
+
+  if (updateError) {
+    console.error(
+      'MEMBER SPACE - update profile:',
+      updateError
+    )
+
+    redirect(
+      `${returnUrl}&editProfile=1&profileError=${encodeURIComponent(
+        'Impossible d’enregistrer les modifications pour le moment.'
+      )}#profil`
+    )
+  }
+
+  redirect(
+    `${returnUrl}&profileSaved=1#profil`
+  )
+}
 
 // ============================================================
 // PAGE
@@ -246,6 +460,12 @@ export default async function MySpacePage({
 
   const userId =
     authData?.claims?.sub
+
+  const loginEmail =
+    typeof authData?.claims?.email ===
+      'string'
+      ? authData.claims.email
+      : null
 
   if (
     authError ||
@@ -470,6 +690,10 @@ export default async function MySpacePage({
             MemberAutomationReminder[]
         )
       : []
+
+  // ==========================================================
+  // DROITS DE GESTION
+  // ==========================================================
   const {
     data:
       managementMembership,
@@ -655,6 +879,15 @@ export default async function MySpacePage({
         ) > 0
     )
 
+  const currentSpaceUrl =
+    `/my-space?organization=${encodeURIComponent(
+      organization.id
+    )}`
+
+  const isEditingProfile =
+    query.editProfile ===
+    '1'
+
   // ==========================================================
   // RENDU
   // ==========================================================
@@ -780,9 +1013,8 @@ export default async function MySpacePage({
           <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 sm:px-6">
 
             <MemberNavLink
-              href="#accueil"
+              href={`${currentSpaceUrl}#accueil`}
               label="Accueil"
-              active
               primaryColor={
                 primaryColor
               }
@@ -792,7 +1024,7 @@ export default async function MySpacePage({
             />
 
             <MemberNavLink
-              href="#cotisations"
+              href={`${currentSpaceUrl}#cotisations`}
               label="Mes cotisations"
               primaryColor={
                 primaryColor
@@ -804,7 +1036,7 @@ export default async function MySpacePage({
 
             {automationReminders.length > 0 && (
               <MemberNavLink
-                href="#rappels"
+                href={`${currentSpaceUrl}#rappels`}
                 label="Mes rappels"
                 primaryColor={
                   primaryColor
@@ -816,7 +1048,7 @@ export default async function MySpacePage({
             )}
 
             <MemberNavLink
-              href="#reglement"
+              href={`${currentSpaceUrl}#reglement`}
               label="Payer"
               primaryColor={
                 primaryColor
@@ -827,7 +1059,7 @@ export default async function MySpacePage({
             />
 
             <MemberNavLink
-              href="#paiements"
+              href={`${currentSpaceUrl}#paiements`}
               label="Mes paiements"
               primaryColor={
                 primaryColor
@@ -838,7 +1070,7 @@ export default async function MySpacePage({
             />
 
             <MemberNavLink
-              href="#profil"
+              href={`${currentSpaceUrl}#profil`}
               label="Mon profil"
               primaryColor={
                 primaryColor
@@ -1078,12 +1310,12 @@ export default async function MySpacePage({
               </p>
 
               <h2 className="mt-1 text-2xl font-black text-slate-950">
-                Cotisations à régulariser
+                Cotisations À régulariser
               </h2>
 
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Ces rappels sont générés automatiquement par votre organisation
-                à partir des échéances qui présentent encore un solde à payer.
+                À partir des échéances qui présentent encore un solde À payer.
               </p>
 
             </div>
@@ -1133,7 +1365,7 @@ export default async function MySpacePage({
                       <div className="shrink-0 sm:text-right">
 
                         <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                          Reste à payer
+                          Reste À payer
                         </p>
 
                         <p className="mt-1 text-xl font-black text-amber-700">
@@ -1157,7 +1389,7 @@ export default async function MySpacePage({
             <div className="border-t border-slate-100 bg-slate-50 px-6 py-4">
 
               <Link
-                href="#reglement"
+                href={`${currentSpaceUrl}#reglement`}
                 className="inline-flex rounded-xl px-4 py-2.5 text-sm font-black text-white transition hover:opacity-90"
                 style={{
                   backgroundColor:
@@ -1177,7 +1409,7 @@ export default async function MySpacePage({
 
         <section
           id="reglement"
-          className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+          className="mt-8 scroll-mt-40 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
         >
 
           <div
@@ -1310,7 +1542,7 @@ export default async function MySpacePage({
 
         <section
           id="cotisations"
-          className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+          className="mt-8 scroll-mt-40 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
         >
 
           <SectionHeader
@@ -1403,7 +1635,7 @@ export default async function MySpacePage({
 
         <section
           id="paiements"
-          className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+          className="mt-8 scroll-mt-40 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
         >
 
           <SectionHeader
@@ -1530,71 +1762,259 @@ export default async function MySpacePage({
 
         <section
           id="profil"
-          className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+          className="mt-8 scroll-mt-40 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
         >
 
-          <SectionHeader
-            eyebrow="Mon profil"
-            title="Mes informations"
-            primaryColor={
-              primaryColor
-            }
-          />
+          <div className="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
 
-          <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
 
-            <ProfileItem
-              label="Nom"
-              value={
-                [
-                  member.first_name,
-                  member.last_name,
-                ]
-                  .filter(Boolean)
-                  .join(' ')
-              }
-            />
+              <p
+                className="text-xs font-black uppercase tracking-[0.16em]"
+                style={{
+                  color:
+                    primaryColor,
+                }}
+              >
+                Mon profil
+              </p>
 
-            <ProfileItem
-              label="Matricule"
-              value={
-                member.member_number
-              }
-            />
+              <h2 className="mt-1 text-xl font-black text-slate-950">
+                Mes informations
+              </h2>
 
-            <ProfileItem
-              label="Téléphone"
-              value={
-                member.phone ||
-                'Non renseigné'
-              }
-            />
+            </div>
 
-            <ProfileItem
-              label="Adresse e-mail"
-              value={
-                member.email ||
-                'Non renseignée'
-              }
-            />
-
-            <ProfileItem
-              label="Profession"
-              value={
-                member.profession ||
-                'Non renseignée'
-              }
-            />
-
-            <ProfileItem
-              label="Adresse"
-              value={
-                member.address ||
-                'Non renseignée'
-              }
-            />
+            {isEditingProfile ? (
+              <Link
+                href={`${currentSpaceUrl}#profil`}
+                className="inline-flex w-fit items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+              >
+                Annuler
+              </Link>
+            ) : (
+              <Link
+                href={`${currentSpaceUrl}&editProfile=1#profil`}
+                className="inline-flex w-fit items-center justify-center rounded-xl px-4 py-2.5 text-sm font-black text-white shadow-sm transition hover:opacity-90"
+                style={{
+                  backgroundColor:
+                    primaryColor,
+                }}
+              >
+                Modifier
+              </Link>
+            )}
 
           </div>
+
+          {query.profileSaved ===
+            '1' && (
+            <div className="mx-6 mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+
+              <p className="font-black text-emerald-900">
+                ✓ Vos informations ont été mises à jour.
+              </p>
+
+            </div>
+          )}
+
+          {query.profileError && (
+            <div className="mx-6 mt-6 rounded-2xl border border-red-200 bg-red-50 p-4">
+
+              <p className="font-bold text-red-800">
+                {query.profileError}
+              </p>
+
+            </div>
+          )}
+
+          {isEditingProfile ? (
+            <form
+              action={
+                updateMyMemberProfile
+              }
+              className="p-6"
+            >
+
+              <input
+                type="hidden"
+                name="organizationId"
+                value={
+                  organization.id
+                }
+              />
+
+              <input
+                type="hidden"
+                name="memberId"
+                value={
+                  member.id
+                }
+              />
+
+              <div className="grid gap-5 sm:grid-cols-2">
+
+                <ProfileField
+                  label="Prénom"
+                  name="firstName"
+                  defaultValue={
+                    member.first_name
+                  }
+                  required
+                />
+
+                <ProfileField
+                  label="Nom"
+                  name="lastName"
+                  defaultValue={
+                    member.last_name
+                  }
+                  required
+                />
+
+                <ProfileField
+                  label="Téléphone"
+                  name="phone"
+                  defaultValue={
+                    member.phone ??
+                    ''
+                  }
+                />
+
+                <ProfileField
+                  label="Adresse e-mail de contact"
+                  name="email"
+                  type="email"
+                  defaultValue={
+                    member.email ??
+                    ''
+                  }
+                />
+
+                <ProfileField
+                  label="Profession"
+                  name="profession"
+                  defaultValue={
+                    member.profession ??
+                    ''
+                  }
+                />
+
+                <ProfileField
+                  label="Adresse"
+                  name="address"
+                  defaultValue={
+                    member.address ??
+                    ''
+                  }
+                />
+
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+
+                <p className="text-xs font-black uppercase tracking-wide text-blue-700">
+                  E-mail de connexion EWUKAI
+                </p>
+
+                <p className="mt-1 break-words font-bold text-blue-950">
+                  {loginEmail ||
+                    'Non disponible'}
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-blue-800">
+                  Cette adresse sert à vous connecter à EWUKAI. Elle n’est pas modifiée par ce formulaire.
+                </p>
+
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+
+                <button
+                  type="submit"
+                  className="rounded-xl px-5 py-3 text-sm font-black text-white shadow-sm transition hover:opacity-90"
+                  style={{
+                    backgroundColor:
+                      primaryColor,
+                  }}
+                >
+                  Enregistrer
+                </button>
+
+                <Link
+                  href={`${currentSpaceUrl}#profil`}
+                  className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+                >
+                  Annuler
+                </Link>
+
+              </div>
+
+            </form>
+          ) : (
+            <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+
+              <ProfileItem
+                label="Nom"
+                value={
+                  [
+                    member.first_name,
+                    member.last_name,
+                  ]
+                    .filter(Boolean)
+                    .join(' ')
+                }
+              />
+
+              <ProfileItem
+                label="Matricule"
+                value={
+                  member.member_number
+                }
+              />
+
+              <ProfileItem
+                label="Téléphone"
+                value={
+                  member.phone ||
+                  'Non renseigné'
+                }
+              />
+
+              <ProfileItem
+                label="Adresse e-mail de contact"
+                value={
+                  member.email ||
+                  'Non renseignée'
+                }
+              />
+
+              <ProfileItem
+                label="E-mail de connexion"
+                value={
+                  loginEmail ||
+                  'Non disponible'
+                }
+              />
+
+              <ProfileItem
+                label="Profession"
+                value={
+                  member.profession ||
+                  'Non renseignée'
+                }
+              />
+
+              <ProfileItem
+                label="Adresse"
+                value={
+                  member.address ||
+                  'Non renseignée'
+                }
+              />
+
+            </div>
+          )}
 
         </section>
 
@@ -1958,7 +2378,7 @@ function PaymentProviderLogo({
       <div className="flex h-14 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-slate-200">
 
         <Image
-          src="/payment-logos/mtn-momo.png"
+          src="/payment-logos/mtn-mobile-money.png"
           alt="MTN MoMo"
           width={110}
           height={60}
@@ -2381,6 +2801,44 @@ function EmptyState({
 }
 
 // ============================================================
+// CHAMP PROFIL
+// ============================================================
+
+function ProfileField({
+  label,
+  name,
+  defaultValue,
+  type = 'text',
+  required = false,
+}: {
+  label: string
+  name: string
+  defaultValue: string
+  type?: string
+  required?: boolean
+}) {
+  return (
+    <label className="block">
+
+      <span className="text-xs font-black uppercase tracking-wide text-slate-500">
+        {label}
+      </span>
+
+      <input
+        type={type}
+        name={name}
+        defaultValue={
+          defaultValue
+        }
+        required={required}
+        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+      />
+
+    </label>
+  )
+}
+
+// ============================================================
 // PROFIL
 // ============================================================
 
@@ -2579,6 +3037,41 @@ function StatusBadge({
 // ============================================================
 // HELPERS
 // ============================================================
+
+function getFormString(
+  formData: FormData,
+  key: string
+) {
+  const value =
+    formData.get(key)
+
+  return typeof value ===
+    'string'
+    ? value.trim()
+    : ''
+}
+
+function nullableString(
+  formData: FormData,
+  key: string
+) {
+  const value =
+    getFormString(
+      formData,
+      key
+    )
+
+  return value ||
+    null
+}
+
+function isValidEmail(
+  value: string
+) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    value
+  )
+}
 
 function money(
   value: MoneyValue
