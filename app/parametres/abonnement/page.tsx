@@ -33,6 +33,10 @@ type PlanCode =
   | 'pro'
   | 'enterprise'
 
+type BillingCycle =
+  | 'monthly'
+  | 'yearly'
+
 type SubscriptionPlan = {
   id?: string | null
   code?: string | null
@@ -46,6 +50,7 @@ type SubscriptionData = {
   ends_at?: string | null
   current_period_start?: string | null
   current_period_end?: string | null
+  billing_cycle?: string | null
   created_at?: string | null
   plan?: SubscriptionPlan | null
 }
@@ -55,6 +60,7 @@ type InvoiceData = {
   invoice_number?: string | null
   status?: string | null
   currency?: string | null
+  billing_cycle?: string | null
   total_xof?: number | string | null
   amount_paid_xof?: number | string | null
   issued_at?: string | null
@@ -179,6 +185,7 @@ type SubscriptionPageProps = {
   searchParams: Promise<{
     checkout?: string
     plan?: string
+    cycle?: string
     invoice?: string
     error?: string
     feature?: string
@@ -190,6 +197,7 @@ const PLAN_META: Record<
   {
     name: string
     price: string
+    yearlyPrice?: string
     members: string
     description: string
   }
@@ -202,13 +210,15 @@ const PLAN_META: Record<
   },
   standard: {
     name: 'Standard',
-    price: '5 000 FCFA / 30 jours',
+    price: '5 250 FCFA / 8 € par mois',
+    yearlyPrice: '52 500 FCFA / 80 € par an',
     members: '21 à 50 membres',
     description: 'Pour une organisation qui structure sa gestion et son suivi.',
   },
   pro: {
     name: 'Pro',
-    price: '10 000 FCFA / 30 jours',
+    price: '10 500 FCFA / 16 € par mois',
+    yearlyPrice: '105 000 FCFA / 160 € par an',
     members: '51 à 500 membres',
     description: 'Pour les organisations en croissance avec un volume important de membres.',
   },
@@ -356,6 +366,22 @@ export default async function SubscriptionPage({
   const pendingPlanCode =
     subscriptionPlanCode(
       pendingSubscription
+    )
+
+  const currentBillingCycle =
+    normalizeBillingCycle(
+      currentSubscription?.billing_cycle
+    )
+
+  const pendingBillingCycle =
+    normalizeBillingCycle(
+      pendingSubscription?.billing_cycle ??
+      pendingInvoice?.billing_cycle
+    )
+
+  const requestedBillingCycle =
+    normalizeBillingCycle(
+      params.cycle
     )
 
   const recommendedPlanCode =
@@ -758,9 +784,13 @@ export default async function SubscriptionPage({
                 Demande d&apos;abonnement enregistrée.
               </p>
               <p className="mt-1 leading-6 text-emerald-800">
-                La formule choisie et sa facture sont maintenant préparées
-                dans EWUKAI. Le paiement en ligne sera activé lorsque le
-                prestataire de paiement de la plateforme sera configuré.
+                La formule choisie
+                {requestedBillingCycle
+                  ? ` (${billingCycleShortLabel(requestedBillingCycle)})`
+                  : ''}{' '}
+                et sa facture sont maintenant préparées dans EWUKAI. Le paiement
+                en ligne sera activé lorsque le prestataire de paiement de la
+                plateforme sera configuré.
               </p>
             </div>
           </div>
@@ -792,7 +822,10 @@ export default async function SubscriptionPage({
                   {currentMeta.name}
                 </h2>
                 <p className="mt-2 text-lg font-black text-emerald-700">
-                  {currentMeta.price}
+                  {subscriptionPriceLabel(
+                    currentPlanCode,
+                    currentBillingCycle
+                  )}
                 </p>
               </div>
 
@@ -893,7 +926,7 @@ export default async function SubscriptionPage({
                   />
                   <SummaryRow
                     label="Période"
-                    value="30 jours"
+                    value={billingCycleLongLabel(pendingBillingCycle)}
                   />
                   <SummaryRow
                     label="Facture"
@@ -963,9 +996,9 @@ export default async function SubscriptionPage({
               Choisissez la capacité adaptée à votre organisation
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              Standard et Pro sont préparés sur une période de 30 jours.
-              La formule payante ne devient active qu&apos;après confirmation
-              du règlement.
+              Standard et Pro sont disponibles en paiement mensuel ou annuel.
+              En annuel, vous payez l&apos;équivalent de 10 mois pour 12 mois
+              d&apos;utilisation, soit 2 mois offerts.
             </p>
           </div>
 
@@ -999,6 +1032,11 @@ export default async function SubscriptionPage({
                       <p className="mt-2 font-black text-emerald-700">
                         {plan.price}
                       </p>
+                      {plan.yearlyPrice && (
+                        <p className="mt-1 text-xs font-bold leading-5 text-emerald-800">
+                          {plan.yearlyPrice} · 2 mois offerts
+                        </p>
+                      )}
                       <p className="mt-4 text-sm leading-6 text-slate-600">
                         {plan.description}
                       </p>
@@ -1010,7 +1048,45 @@ export default async function SubscriptionPage({
                     </div>
 
                     <div className="mt-auto pt-6">
-                      {isCurrent ? (
+                      {planCode === 'standard' || planCode === 'pro' ? (
+                        canManage ? (
+                          <div className="space-y-3">
+                            <SubscriptionCycleChoice
+                              planCode={planCode}
+                              cycle="monthly"
+                              current={
+                                isCurrent &&
+                                currentBillingCycle === 'monthly'
+                              }
+                              pending={
+                                isPending &&
+                                pendingBillingCycle === 'monthly'
+                              }
+                            />
+
+                            <SubscriptionCycleChoice
+                              planCode={planCode}
+                              cycle="yearly"
+                              current={
+                                isCurrent &&
+                                currentBillingCycle === 'yearly'
+                              }
+                              pending={
+                                isPending &&
+                                pendingBillingCycle === 'yearly'
+                              }
+                            />
+
+                            <p className="text-center text-[11px] font-bold leading-5 text-emerald-700">
+                              Annuel : 2 mois offerts
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="rounded-xl bg-slate-100 px-4 py-3 text-center text-xs font-bold text-slate-500">
+                            Réservé au responsable, président ou trésorier
+                          </div>
+                        )
+                      ) : isCurrent ? (
                         <div className="rounded-xl bg-slate-100 px-4 py-3 text-center text-sm font-black text-slate-700">
                           Formule actuelle
                         </div>
@@ -1018,27 +1094,6 @@ export default async function SubscriptionPage({
                         <div className="rounded-xl bg-amber-100 px-4 py-3 text-center text-sm font-black text-amber-800">
                           Paiement en attente
                         </div>
-                      ) : planCode === 'standard' || planCode === 'pro' ? (
-                        canManage ? (
-                          <form action={requestSubscriptionCheckout}>
-                            <input
-                              type="hidden"
-                              name="planCode"
-                              value={planCode}
-                            />
-                            <button
-                              type="submit"
-                              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-black text-white transition hover:bg-emerald-800"
-                            >
-                              <CreditCard className="h-4 w-4" />
-                              Choisir {plan.name}
-                            </button>
-                          </form>
-                        ) : (
-                          <div className="rounded-xl bg-slate-100 px-4 py-3 text-center text-xs font-bold text-slate-500">
-                            Réservé au responsable, président ou trésorier
-                          </div>
-                        )
                       ) : planCode === 'enterprise' ? (
                         <Link
                           href="/contact?subject=Formule%20Entreprise"
@@ -1080,6 +1135,72 @@ export default async function SubscriptionPage({
         </section>
       </div>
     </main>
+  )
+}
+
+function SubscriptionCycleChoice({
+  planCode,
+  cycle,
+  current,
+  pending,
+}: {
+  planCode: 'standard' | 'pro'
+  cycle: BillingCycle
+  current: boolean
+  pending: boolean
+}) {
+  const price =
+    subscriptionPriceLabel(
+      planCode,
+      cycle
+    )
+
+  const label =
+    cycle === 'yearly'
+      ? 'Annuel'
+      : 'Mensuel'
+
+  if (current) {
+    return (
+      <div className="rounded-xl bg-slate-100 px-4 py-3 text-center text-sm font-black text-slate-700">
+        {label} actuel · {price}
+      </div>
+    )
+  }
+
+  if (pending) {
+    return (
+      <div className="rounded-xl bg-amber-100 px-4 py-3 text-center text-sm font-black text-amber-800">
+        {label} en attente · {price}
+      </div>
+    )
+  }
+
+  return (
+    <form action={requestSubscriptionCheckout}>
+      <input
+        type="hidden"
+        name="planCode"
+        value={planCode}
+      />
+      <input
+        type="hidden"
+        name="billingCycle"
+        value={cycle}
+      />
+
+      <button
+        type="submit"
+        className={
+          cycle === 'yearly'
+            ? 'flex w-full items-center justify-center gap-2 rounded-xl border-2 border-emerald-600 bg-emerald-50 px-4 py-3 text-sm font-black text-emerald-800 transition hover:bg-emerald-100'
+            : 'flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-black text-white transition hover:bg-emerald-800'
+        }
+      >
+        <CreditCard className="h-4 w-4" />
+        {label} · {price}
+      </button>
+    </form>
   )
 }
 
@@ -1205,6 +1326,71 @@ function StatusBadge({
       {label}
     </span>
   )
+}
+
+function normalizeBillingCycle(
+  value:
+    | string
+    | null
+    | undefined
+): BillingCycle | null {
+  switch (
+    value
+      ?.trim()
+      .toLowerCase()
+  ) {
+    case 'monthly':
+      return 'monthly'
+    case 'yearly':
+      return 'yearly'
+    default:
+      return null
+  }
+}
+
+function billingCycleShortLabel(
+  cycle: BillingCycle
+) {
+  return cycle === 'yearly'
+    ? 'annuel'
+    : 'mensuel'
+}
+
+function billingCycleLongLabel(
+  cycle:
+    | BillingCycle
+    | null
+) {
+  if (cycle === 'yearly') {
+    return 'Annuel — 12 mois'
+  }
+
+  if (cycle === 'monthly') {
+    return 'Mensuel — 30 jours'
+  }
+
+  return 'À confirmer'
+}
+
+function subscriptionPriceLabel(
+  planCode: PlanCode,
+  cycle:
+    | BillingCycle
+    | null
+) {
+  if (planCode === 'standard') {
+    return cycle === 'yearly'
+      ? '52 500 FCFA / 80 € par an'
+      : '5 250 FCFA / 8 € par mois'
+  }
+
+  if (planCode === 'pro') {
+    return cycle === 'yearly'
+      ? '105 000 FCFA / 160 € par an'
+      : '10 500 FCFA / 16 € par mois'
+  }
+
+  return PLAN_META[planCode].price
 }
 
 function normalizePlanCode(
