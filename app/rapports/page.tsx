@@ -646,14 +646,134 @@ export default async function ReportsPage({
 
             </div>
 
+
             {/* ================================================ */}
-            {/* 4. TRESORERIE */}
+            {/* 4. DROITS D'ADHESION */}
+            {/* ================================================ */}
+
+            <div className="mt-10">
+
+              <ReportSectionTitle
+                number="4"
+                title="Droits d’adhésion"
+              />
+
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+                <MetricCard
+                  label="Droits acceptés"
+                  value={formatMoney(
+                    report.membershipFees.accepted
+                  )}
+                  caption={`${report.membershipFees.acceptedCount} demande(s) acceptée(s) sur la période`}
+                  icon={<CircleDollarSign className="h-5 w-5" />}
+                  tone="slate"
+                />
+
+                <MetricCard
+                  label="Droits encaissés"
+                  value={formatMoney(
+                    report.membershipFees.collected
+                  )}
+                  caption={`${report.membershipFees.paidCount} paiement(s) confirmé(s)`}
+                  icon={<TrendingUp className="h-5 w-5" />}
+                  tone="green"
+                />
+
+                <MetricCard
+                  label="En attente de paiement"
+                  value={formatMoney(
+                    report.membershipFees.outstanding
+                  )}
+                  caption={`${report.membershipFees.outstandingCount} demande(s) restant à régler`}
+                  icon={<ReceiptText className="h-5 w-5" />}
+                  tone="amber"
+                />
+
+                <MetricCard
+                  label="Droits exonérés"
+                  value={formatMoney(
+                    report.membershipFees.waived
+                  )}
+                  caption={`${report.membershipFees.waivedCount} exonération(s) sur la période`}
+                  icon={<ShieldCheck className="h-5 w-5" />}
+                  tone="blue"
+                />
+
+              </div>
+
+              <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-200">
+
+                <table className="min-w-[720px] w-full text-sm">
+
+                  <thead className="bg-slate-900 text-white">
+                    <tr>
+                      <Th>Candidat</Th>
+                      <Th>Demande</Th>
+                      <Th>Droit d&apos;adhésion</Th>
+                      <Th align="right">Montant</Th>
+                    </tr>
+                  </thead>
+
+                  <tbody className="divide-y divide-slate-100">
+
+                    {report.membershipFees.rows.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={4}
+                          className="px-4 py-8 text-center text-slate-500"
+                        >
+                          Aucun droit d&apos;adhésion dans le périmètre du rapport.
+                        </td>
+                      </tr>
+                    ) : (
+                      report.membershipFees.rows.map(
+                        (row) => (
+                          <tr key={row.applicationId}>
+                            <Td strong>
+                              {row.applicantName}
+                            </Td>
+                            <Td>
+                              {membershipApplicationStatusLabel(
+                                row.applicationStatus
+                              )}
+                            </Td>
+                            <Td>
+                              <MembershipFeeStatusBadge
+                                status={row.feeStatus}
+                              />
+                            </Td>
+                            <Td align="right">
+                              {formatMoney(row.amount)}
+                            </Td>
+                          </tr>
+                        )
+                      )
+                    )}
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+              <p className="mt-3 text-xs leading-5 text-slate-500">
+                Les droits en attente ne constituent pas un encaissement et ne sont pas
+                ajoutés à la trésorerie. Seuls les paiements effectivement confirmés
+                sont comptabilisés comme encaissés. Une exonération est suivie
+                séparément et ne constitue pas une recette.
+              </p>
+
+            </div>
+
+            {/* ================================================ */}
+            {/* 5. TRESORERIE */}
             {/* ================================================ */}
 
             <div className="mt-10 report-break-before">
 
               <ReportSectionTitle
-                number="4"
+                number="5"
                 title="Situation de trésorerie"
               />
 
@@ -713,13 +833,13 @@ export default async function ReportsPage({
             </div>
 
             {/* ================================================ */}
-            {/* 5. JOURNAL */}
+            {/* 6. JOURNAL */}
             {/* ================================================ */}
 
             <div className="mt-10">
 
               <ReportSectionTitle
-                number="5"
+                number="6"
                 title="Journal financier de la période"
               />
 
@@ -785,13 +905,13 @@ export default async function ReportsPage({
             </div>
 
             {/* ================================================ */}
-            {/* 6. CONTROLE */}
+            {/* 7. CONTROLE */}
             {/* ================================================ */}
 
             <div className="mt-10 report-avoid-break">
 
               <ReportSectionTitle
-                number="6"
+                number="7"
                 title="Contrôle et validation"
               />
 
@@ -809,8 +929,8 @@ export default async function ReportsPage({
 
                     <p className="mt-1 text-sm leading-6 text-emerald-900">
                       Ce rapport est généré à partir des données de la mutuelle active.
-                      Les cotisations, paiements et mouvements de trésorerie sont filtrés
-                      par organisation et par période.
+                      Les cotisations, droits d&apos;adhésion, paiements et mouvements de trésorerie
+                      sont filtrés par organisation et par période.
                     </p>
 
                   </div>
@@ -1039,6 +1159,65 @@ function SituationLine({
       </span>
     </div>
   )
+}
+
+
+function MembershipFeeStatusBadge({
+  status,
+}: {
+  status: string
+}) {
+  const normalized =
+    status
+      .trim()
+      .toLowerCase()
+
+  const label =
+    normalized === 'paid'
+      ? 'Payé'
+      : normalized === 'waived'
+        ? 'Exonéré'
+        : 'En attente'
+
+  const classes =
+    normalized === 'paid'
+      ? 'bg-emerald-100 text-emerald-800'
+      : normalized === 'waived'
+        ? 'bg-blue-100 text-blue-800'
+        : 'bg-amber-100 text-amber-900'
+
+  return (
+    <span
+      className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${classes}`}
+    >
+      {label}
+    </span>
+  )
+}
+
+function membershipApplicationStatusLabel(
+  status: string
+) {
+  switch (
+    status
+      .trim()
+      .toLowerCase()
+  ) {
+    case 'approved':
+      return 'Adhésion finalisée'
+
+    case 'awaiting_payment':
+      return 'Acceptée par le bureau'
+
+    case 'rejected':
+      return 'Refusée'
+
+    case 'cancelled':
+      return 'Annulée'
+
+    default:
+      return 'En attente'
+  }
 }
 
 function CategoryTable({

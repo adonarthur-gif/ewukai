@@ -404,6 +404,75 @@ export default async function ParametresPage({
         </section>
 
         {/* ================================================== */}
+        {/* ADHESION */}
+        {/* ================================================== */}
+
+        <section className="mt-7 rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm sm:p-8">
+
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+
+              <p
+                className="text-xs font-black uppercase tracking-[0.16em]"
+                style={{
+                  color:
+                    primaryColor,
+                }}
+              >
+                ADHÉSION
+              </p>
+
+              <h2 className="mt-2 text-xl font-black text-slate-950">
+                Adhésion en ligne
+              </h2>
+
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                Configurez les demandes d&apos;adhésion en ligne, le droit
+                d&apos;adhésion, les éventuelles exonérations et le lien public
+                à partager avec les futurs membres.
+              </p>
+
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-black">
+
+                <span
+                  className={
+                    organization.online_membership_enabled
+                      ? 'rounded-full bg-emerald-100 px-3 py-1.5 text-emerald-800'
+                      : 'rounded-full bg-slate-100 px-3 py-1.5 text-slate-600'
+                  }
+                >
+                  {organization.online_membership_enabled
+                    ? 'Adhésion en ligne activée'
+                    : 'Adhésion en ligne désactivée'}
+                </span>
+
+                {organization.public_slug && (
+                  <span className="rounded-full bg-slate-100 px-3 py-1.5 text-slate-600">
+                    /m/{organization.public_slug}/join
+                  </span>
+                )}
+
+              </div>
+
+            </div>
+
+            <Link
+              href="/parametres/adhesion"
+              className="inline-flex shrink-0 items-center justify-center rounded-xl px-5 py-3 text-sm font-black text-white shadow-sm transition hover:opacity-90"
+              style={{
+                backgroundColor:
+                  primaryColor,
+              }}
+            >
+              Gérer l&apos;adhésion →
+            </Link>
+
+          </div>
+
+        </section>
+
+        {/* ================================================== */}
         {/* IDENTITE VISUELLE */}
         {/* ================================================== */}
 

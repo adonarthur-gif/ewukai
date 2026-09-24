@@ -11,6 +11,12 @@ const REVIEW_ROLES = [
   'secretary',
 ]
 
+type ApprovalResult = {
+  member_id: string | null
+  member_number: string | null
+  created_new_member: boolean
+}
+
 export async function approveApplication(
   formData: FormData
 ) {
@@ -37,7 +43,7 @@ export async function approveApplication(
   }
 
   // Vérifier que la demande appartient bien
-  // à la mutuelle courante.
+  // à l'organisation courante.
   const {
     data: application,
     error: applicationError,
@@ -46,7 +52,10 @@ export async function approveApplication(
     .select(`
       id,
       organization_id,
-      status
+      status,
+      membership_fee_required,
+      membership_fee_amount_xof,
+      membership_fee_status
     `)
     .eq('id', applicationId)
     .eq('organization_id', organizationId)
@@ -95,7 +104,10 @@ export async function approveApplication(
     )
   }
 
-  const result = data?.[0]
+  const result =
+    data?.[0] as
+      | ApprovalResult
+      | undefined
 
   if (!result) {
     redirect(
@@ -104,8 +116,33 @@ export async function approveApplication(
   }
 
   revalidatePath('/memberships')
+  revalidatePath(
+    `/memberships/${applicationId}`
+  )
   revalidatePath('/members')
   revalidatePath('/dashboard')
+
+  // ==========================================================
+  // ADHESION PAYANTE
+  // ==========================================================
+  //
+  // La demande a été acceptée par le bureau, mais aucun membre
+  // n'est encore créé. La création interviendra seulement après
+  // confirmation du paiement ou exonération autorisée.
+  // ==========================================================
+
+  if (
+    !result.member_id ||
+    !result.member_number
+  ) {
+    redirect(
+      `/memberships/${applicationId}?success=awaiting-payment`
+    )
+  }
+
+  // ==========================================================
+  // ADHESION GRATUITE OU DROIT DEJA REGLE
+  // ==========================================================
 
   redirect(
     `/memberships/${applicationId}?success=approved&member=${encodeURIComponent(
@@ -188,6 +225,9 @@ export async function rejectApplication(
   }
 
   revalidatePath('/memberships')
+  revalidatePath(
+    `/memberships/${applicationId}`
+  )
   revalidatePath('/dashboard')
 
   redirect(

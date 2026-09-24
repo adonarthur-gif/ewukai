@@ -218,6 +218,42 @@ function buildWorkbook(
 
         row([
           textCell(
+            "Droits d'adhésion acceptés"
+          ),
+          numberCell(
+            report.membershipFees.accepted
+          ),
+        ]),
+
+        row([
+          textCell(
+            "Droits d'adhésion encaissés"
+          ),
+          numberCell(
+            report.membershipFees.collected
+          ),
+        ]),
+
+        row([
+          textCell(
+            "Droits d'adhésion en attente"
+          ),
+          numberCell(
+            report.membershipFees.outstanding
+          ),
+        ]),
+
+        row([
+          textCell(
+            "Droits d'adhésion exonérés"
+          ),
+          numberCell(
+            report.membershipFees.waived
+          ),
+        ]),
+
+        row([
+          textCell(
             "Solde d'ouverture"
           ),
           numberCell(
@@ -365,6 +401,132 @@ function buildWorkbook(
                 textCell(
                   payment.notes ??
                   ''
+                ),
+              ])
+          ),
+      ]
+    ),
+
+    worksheet(
+      'Droits adhésion',
+      [
+        headerRow([
+          'Indicateur',
+          'Nombre',
+          'Montant',
+        ]),
+
+        row([
+          textCell(
+            'Acceptés par le bureau'
+          ),
+          numberCell(
+            report.membershipFees.acceptedCount
+          ),
+          numberCell(
+            report.membershipFees.accepted
+          ),
+        ]),
+
+        row([
+          textCell(
+            'Encaissés'
+          ),
+          numberCell(
+            report.membershipFees.paidCount
+          ),
+          numberCell(
+            report.membershipFees.collected
+          ),
+        ]),
+
+        row([
+          textCell(
+            'En attente de paiement'
+          ),
+          numberCell(
+            report.membershipFees.outstandingCount
+          ),
+          numberCell(
+            report.membershipFees.outstanding
+          ),
+        ]),
+
+        row([
+          textCell(
+            'Exonérés'
+          ),
+          numberCell(
+            report.membershipFees.waivedCount
+          ),
+          numberCell(
+            report.membershipFees.waived
+          ),
+        ]),
+
+        row([]),
+
+        headerRow([
+          'Candidat',
+          'Statut demande',
+          "Statut droit d'adhésion",
+          'Montant',
+          'Demande déposée le',
+          'Décision du bureau le',
+          'Payé le',
+          'Exonéré le',
+        ]),
+
+        ...report
+          .membershipFees
+          .rows
+          .map(
+            (
+              item
+            ) =>
+              row([
+                textCell(
+                  item.applicantName
+                ),
+
+                textCell(
+                  membershipApplicationStatusLabel(
+                    item.applicationStatus
+                  )
+                ),
+
+                textCell(
+                  membershipFeeStatusLabel(
+                    item.feeStatus
+                  )
+                ),
+
+                numberCell(
+                  item.amount
+                ),
+
+                textCell(
+                  formatExcelDateTime(
+                    item.submittedAt
+                  )
+                ),
+
+                textCell(
+                  formatExcelDateTime(
+                    item.reviewedAt
+                  )
+                ),
+
+                textCell(
+                  formatExcelDateTime(
+                    item.paidAt
+                  )
+                ),
+
+                textCell(
+                  formatExcelDateTime(
+                    item.waivedAt
+                  )
                 ),
               ])
           ),
@@ -650,6 +812,106 @@ function xmlEscape(
     .replace(
       /'/g,
       '&apos;'
+    )
+}
+
+function membershipApplicationStatusLabel(
+  value: string
+) {
+  switch (
+    value
+      .trim()
+      .toLowerCase()
+  ) {
+    case 'approved':
+      return 'Adhésion finalisée'
+
+    case 'awaiting_payment':
+      return 'Acceptée par le bureau'
+
+    case 'rejected':
+      return 'Refusée'
+
+    case 'cancelled':
+      return 'Annulée'
+
+    case 'pending':
+      return 'En attente de décision'
+
+    default:
+      return value || 'Non renseigné'
+  }
+}
+
+function membershipFeeStatusLabel(
+  value: string
+) {
+  switch (
+    value
+      .trim()
+      .toLowerCase()
+  ) {
+    case 'paid':
+      return 'Payé'
+
+    case 'waived':
+      return 'Exonéré'
+
+    case 'not_required':
+      return 'Non requis'
+
+    case 'pending':
+      return 'En attente de paiement'
+
+    default:
+      return value || 'Non renseigné'
+  }
+}
+
+function formatExcelDateTime(
+  value:
+    | string
+    | null
+) {
+  if (
+    !value
+  ) {
+    return ''
+  }
+
+  const date =
+    new Date(
+      value
+    )
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return value
+  }
+
+  return new Intl
+    .DateTimeFormat(
+      'fr-FR',
+      {
+        day:
+          '2-digit',
+        month:
+          '2-digit',
+        year:
+          'numeric',
+        hour:
+          '2-digit',
+        minute:
+          '2-digit',
+        timeZone:
+          'UTC',
+      }
+    )
+    .format(
+      date
     )
 }
 

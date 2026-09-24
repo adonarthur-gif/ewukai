@@ -67,7 +67,12 @@ export default async function MembershipApplicationPage({
       approved_member_id,
       created_at,
       reviewed_at,
-      review_note
+      review_note,
+      membership_fee_required,
+      membership_fee_amount_xof,
+      membership_fee_status,
+      membership_fee_paid_at,
+      membership_fee_waived_at
     `)
     .eq('id', id)
     .eq(
@@ -82,6 +87,41 @@ export default async function MembershipApplicationPage({
 
   const canReview =
     REVIEW_ROLES.includes(role)
+
+  const feeRequired =
+    application
+      .membership_fee_required ===
+    true
+
+  const feeAmount =
+    normalizeAmount(
+      application
+        .membership_fee_amount_xof
+    )
+
+  const feeLabel =
+    feeRequired
+      ? formatXof(
+          feeAmount
+        )
+      : 'Gratuit'
+
+  const feeSettled =
+    application
+      .membership_fee_status ===
+      'paid' ||
+    application
+      .membership_fee_status ===
+      'waived'
+
+  const awaitingPayment =
+    application.status ===
+      'awaiting_payment'
+
+  const willWaitForPayment =
+    feeRequired &&
+    feeAmount > 0 &&
+    !feeSettled
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -108,6 +148,30 @@ export default async function MembershipApplicationPage({
               {query.member
                 ? ` sous le matricule ${query.member}.`
                 : '.'}
+            </p>
+
+          </div>
+        )}
+
+        {query.success ===
+          'awaiting-payment' && (
+          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900">
+
+            <p className="font-black">
+              Demande acceptée par le bureau.
+            </p>
+
+            <p className="mt-1 text-sm leading-6">
+              Le candidat n&apos;est pas
+              encore membre. Le droit
+              d&apos;adhésion de{' '}
+              <strong>
+                {feeLabel}
+              </strong>{' '}
+              doit d&apos;abord être réglé.
+              Après confirmation du paiement,
+              EWUKAI finalisera l&apos;adhésion
+              et créera le membre.
             </p>
 
           </div>
@@ -197,6 +261,55 @@ export default async function MembershipApplicationPage({
 
             </div>
 
+            {/* DROIT D'ADHESION */}
+
+            <div className="mt-7 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                <div>
+
+                  <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                    Droit d&apos;adhésion
+                  </p>
+
+                  <p className="mt-1 text-2xl font-black text-slate-950">
+                    {feeLabel}
+                  </p>
+
+                </div>
+
+                <PaymentStatusBadge
+                  required={feeRequired}
+                  status={
+                    application
+                      .membership_fee_status
+                  }
+                />
+
+              </div>
+
+              {feeRequired && (
+                <p className="mt-4 text-sm leading-6 text-slate-600">
+                  {feePaymentMessage(
+                    application
+                      .membership_fee_status
+                  )}
+                </p>
+              )}
+
+              {awaitingPayment && (
+                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-900">
+                  Le bureau a accepté cette
+                  demande. L&apos;adhésion sera
+                  finalisée après confirmation
+                  du paiement du droit
+                  d&apos;adhésion.
+                </div>
+              )}
+
+            </div>
+
             <div className="mt-7">
 
               <p className="text-xs font-black uppercase tracking-wide text-slate-500">
@@ -265,12 +378,27 @@ export default async function MembershipApplicationPage({
                   Accepter la demande
                 </h2>
 
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Le dossier membre sera créé automatiquement
-                  automatiquement le membre
-                  et lui attribuera son
-                  matricule.
-                </p>
+                {willWaitForPayment ? (
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    En acceptant cette demande,
+                    le candidat devra régler{' '}
+                    <strong>
+                      {feeLabel}
+                    </strong>{' '}
+                    avant de devenir membre.
+                    Aucun dossier membre ni
+                    matricule ne sera créé avant
+                    confirmation du paiement.
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Cette adhésion ne nécessite
+                    aucun paiement supplémentaire.
+                    Le dossier membre sera créé
+                    automatiquement et un matricule
+                    lui sera attribué.
+                  </p>
+                )}
 
                 <textarea
                   name="approvalNote"
@@ -283,7 +411,9 @@ export default async function MembershipApplicationPage({
                   type="submit"
                   className="mt-4 w-full rounded-xl bg-emerald-700 px-5 py-3 font-black text-white hover:bg-emerald-800"
                 >
-                  Accepter et créer le membre
+                  {willWaitForPayment
+                    ? 'Accepter et demander le paiement'
+                    : 'Accepter et créer le membre'}
                 </button>
 
               </form>
@@ -365,20 +495,26 @@ function StatusBadge({
   const label =
     status === 'approved'
       ? 'Acceptée'
-      : status === 'rejected'
-        ? 'Refusée'
-        : status === 'cancelled'
-          ? 'Annulée'
-          : 'En attente'
+      : status ===
+          'awaiting_payment'
+        ? 'Paiement en attente'
+        : status === 'rejected'
+          ? 'Refusée'
+          : status === 'cancelled'
+            ? 'Annulée'
+            : 'En attente'
 
   const style =
     status === 'approved'
       ? 'bg-emerald-100 text-emerald-800'
-      : status === 'rejected'
-        ? 'bg-red-100 text-red-800'
-        : status === 'cancelled'
-          ? 'bg-slate-200 text-slate-700'
-          : 'bg-amber-100 text-amber-800'
+      : status ===
+          'awaiting_payment'
+        ? 'bg-amber-100 text-amber-900'
+        : status === 'rejected'
+          ? 'bg-red-100 text-red-800'
+          : status === 'cancelled'
+            ? 'bg-slate-200 text-slate-700'
+            : 'bg-amber-100 text-amber-800'
 
   return (
     <span
@@ -387,6 +523,98 @@ function StatusBadge({
       {label}
     </span>
   )
+}
+
+function PaymentStatusBadge({
+  required,
+  status,
+}: {
+  required: boolean
+  status: string
+}) {
+  if (!required) {
+    return (
+      <span className="inline-flex w-fit rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800">
+        Gratuit
+      </span>
+    )
+  }
+
+  const label =
+    status === 'paid'
+      ? 'Payé'
+      : status === 'waived'
+        ? 'Exonéré'
+        : 'À payer'
+
+  const style =
+    status === 'paid'
+      ? 'bg-emerald-100 text-emerald-800'
+      : status === 'waived'
+        ? 'bg-blue-100 text-blue-800'
+        : 'bg-amber-100 text-amber-900'
+
+  return (
+    <span
+      className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-black ${style}`}
+    >
+      {label}
+    </span>
+  )
+}
+
+function feePaymentMessage(
+  status: string
+) {
+  switch (status) {
+    case 'paid':
+      return 'Le droit d’adhésion a été confirmé comme payé.'
+
+    case 'waived':
+      return 'Le paiement du droit d’adhésion a été exonéré par une personne autorisée.'
+
+    default:
+      return 'Le droit d’adhésion n’est pas encore réglé. Aucun membre ne doit être créé avant sa confirmation ou une exonération autorisée.'
+  }
+}
+
+function normalizeAmount(
+  value:
+    | number
+    | string
+    | null
+    | undefined
+) {
+  const parsed =
+    Number(
+      value ??
+      0
+    )
+
+  if (
+    !Number.isFinite(
+      parsed
+    )
+  ) {
+    return 0
+  }
+
+  return Math.max(
+    0,
+    Math.trunc(
+      parsed
+    )
+  )
+}
+
+function formatXof(
+  amount: number
+) {
+  return `${new Intl.NumberFormat(
+    'fr-FR'
+  ).format(
+    amount
+  )} FCFA`
 }
 
 function errorMessage(

@@ -97,6 +97,40 @@ export type PaymentMethodBreakdown = {
   paymentCount: number
 }
 
+export type MembershipFeeReportRow = {
+  applicationId: string
+  applicantName: string
+  amount: number
+  applicationStatus: string
+  feeStatus: string
+  submittedAt: string
+  reviewedAt: string | null
+  paidAt: string | null
+  waivedAt: string | null
+}
+
+type MembershipFeeReportRpc = {
+  accepted_amount?: MoneyValue
+  collected_amount?: MoneyValue
+  outstanding_amount?: MoneyValue
+  waived_amount?: MoneyValue
+  accepted_count?: MoneyValue
+  paid_count?: MoneyValue
+  outstanding_count?: MoneyValue
+  waived_count?: MoneyValue
+  rows?: Array<{
+    application_id?: string | null
+    applicant_name?: string | null
+    amount_xof?: MoneyValue
+    application_status?: string | null
+    fee_status?: string | null
+    submitted_at?: string | null
+    reviewed_at?: string | null
+    paid_at?: string | null
+    waived_at?: string | null
+  }>
+}
+
 export type FinancialReport = {
   period: {
     start: string
@@ -141,6 +175,19 @@ export type FinancialReport = {
       PaymentMethodBreakdown[]
     rows:
       FinancialReportPayment[]
+  }
+
+  membershipFees: {
+    accepted: number
+    collected: number
+    outstanding: number
+    waived: number
+    acceptedCount: number
+    paidCount: number
+    outstandingCount: number
+    waivedCount: number
+    rows:
+      MembershipFeeReportRow[]
   }
 
   treasury: {
@@ -737,6 +784,113 @@ export async function buildFinancialReport({
       )
 
   // ==========================================================
+  // DROITS D'ADHESION
+  //
+  // Important :
+  // - "accepted" = droits liés aux demandes acceptées par le bureau
+  //   pendant la période ;
+  // - "collected" = droits effectivement confirmés comme payés
+  //   pendant la période ;
+  // - "outstanding" = droits actuellement en attente de paiement
+  //   à la date de fin du rapport ;
+  // - "waived" = droits exonérés pendant la période.
+  //
+  // Les droits en attente ne sont jamais ajoutés aux encaissements
+  // ni à la trésorerie.
+  // ==========================================================
+
+  const {
+    data:
+      membershipFeeRaw,
+
+    error:
+      membershipFeeError,
+  } =
+    await supabase
+      .rpc(
+        'get_organization_membership_fee_report',
+        {
+          target_organization_id:
+            organizationId,
+
+          target_start_date:
+            startDate,
+
+          target_end_date:
+            endDate,
+        }
+      )
+
+  if (
+    membershipFeeError ||
+    !membershipFeeRaw
+  ) {
+    throw new Error(
+      'Impossible de charger les droits d’adhésion de la période.'
+    )
+  }
+
+  const membershipFeeSource =
+    membershipFeeRaw as MembershipFeeReportRpc
+
+  const membershipFeeRows =
+    (
+      membershipFeeSource
+        .rows ??
+      []
+    )
+      .map(
+        (
+          row
+        ): MembershipFeeReportRow => ({
+          applicationId:
+            row.application_id ??
+            '',
+
+          applicantName:
+            row.applicant_name ??
+            'Candidat',
+
+          amount:
+            money(
+              row.amount_xof ??
+              null
+            ),
+
+          applicationStatus:
+            row.application_status ??
+            '',
+
+          feeStatus:
+            row.fee_status ??
+            '',
+
+          submittedAt:
+            row.submitted_at ??
+            '',
+
+          reviewedAt:
+            row.reviewed_at ??
+            null,
+
+          paidAt:
+            row.paid_at ??
+            null,
+
+          waivedAt:
+            row.waived_at ??
+            null,
+        })
+      )
+      .filter(
+        (
+          row
+        ) =>
+          row.applicationId !==
+          ''
+      )
+
+  // ==========================================================
   // TRESORERIE
   // ==========================================================
 
@@ -877,6 +1031,67 @@ export async function buildFinancialReport({
 
       rows:
         payments,
+    },
+
+    membershipFees: {
+      accepted:
+        money(
+          membershipFeeSource
+            .accepted_amount ??
+          null
+        ),
+
+      collected:
+        money(
+          membershipFeeSource
+            .collected_amount ??
+          null
+        ),
+
+      outstanding:
+        money(
+          membershipFeeSource
+            .outstanding_amount ??
+          null
+        ),
+
+      waived:
+        money(
+          membershipFeeSource
+            .waived_amount ??
+          null
+        ),
+
+      acceptedCount:
+        integerValue(
+          membershipFeeSource
+            .accepted_count ??
+          null
+        ),
+
+      paidCount:
+        integerValue(
+          membershipFeeSource
+            .paid_count ??
+          null
+        ),
+
+      outstandingCount:
+        integerValue(
+          membershipFeeSource
+            .outstanding_count ??
+          null
+        ),
+
+      waivedCount:
+        integerValue(
+          membershipFeeSource
+            .waived_count ??
+          null
+        ),
+
+      rows:
+        membershipFeeRows,
     },
 
     treasury: {
@@ -1145,6 +1360,20 @@ export function money(
     )
       ? parsed
       : 0
+}
+
+function integerValue(
+  value:
+    MoneyValue
+) {
+  return Math.max(
+    0,
+    Math.trunc(
+      money(
+        value
+      )
+    )
+  )
 }
 
 export function formatMoney(

@@ -23,6 +23,19 @@ type PublicMutual = {
   online_membership_enabled: boolean
 }
 
+type PublicMembershipOffer = {
+  organization_id: string
+  organization_name: string
+  short_name: string | null
+  public_slug: string
+  membership_fee_enabled: boolean
+  membership_fee_amount_xof:
+    | number
+    | string
+    | null
+  payment_timing: string
+}
+
 export default async function JoinPage({
   params,
   searchParams,
@@ -36,6 +49,10 @@ export default async function JoinPage({
   const supabase =
     await createClient()
 
+  // ==========================================================
+  // ESPACE PUBLIC DE L'ORGANISATION
+  // ==========================================================
+
   const {
     data,
     error,
@@ -47,7 +64,10 @@ export default async function JoinPage({
       }
     )
 
-  if (error || !data) {
+  if (
+    error ||
+    !data
+  ) {
     notFound()
   }
 
@@ -59,6 +79,61 @@ export default async function JoinPage({
   ) {
     notFound()
   }
+
+  // ==========================================================
+  // OFFRE D'ADHESION PUBLIQUE
+  // ==========================================================
+  //
+  // Important :
+  // - le montant affiché vient du serveur ;
+  // - aucun montant n'est envoyé par le navigateur lors du dépôt ;
+  // - la RPC submit_membership_application fige elle-même le tarif
+  //   applicable au moment de la demande.
+  // ==========================================================
+
+  const {
+    data: membershipOfferData,
+    error: membershipOfferError,
+  } =
+    await supabase.rpc(
+      'get_public_membership_offer',
+      {
+        target_slug: slug,
+      }
+    )
+
+  if (
+    membershipOfferError ||
+    !membershipOfferData
+  ) {
+    notFound()
+  }
+
+  const membershipOffer =
+    membershipOfferData as PublicMembershipOffer
+
+  const membershipFeeEnabled =
+    membershipOffer
+      .membership_fee_enabled ===
+    true
+
+  const membershipFeeAmount =
+    normalizeAmount(
+      membershipOffer
+        .membership_fee_amount_xof
+    )
+
+  if (
+    membershipFeeEnabled &&
+    membershipFeeAmount <= 0
+  ) {
+    notFound()
+  }
+
+  const membershipFeeLabel =
+    formatXof(
+      membershipFeeAmount
+    )
 
   const requestKey =
     randomUUID()
@@ -103,6 +178,60 @@ export default async function JoinPage({
       </section>
 
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+
+        {/* ================================================== */}
+        {/* CONDITIONS FINANCIERES DE L'ADHESION              */}
+        {/* ================================================== */}
+
+        {membershipFeeEnabled ? (
+          <section className="mb-6 overflow-hidden rounded-3xl border border-amber-200 bg-white shadow-sm">
+
+            <div className="border-b border-amber-100 bg-amber-50 px-6 py-5">
+
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
+                Droit d&apos;adhésion
+              </p>
+
+              <p className="mt-2 text-3xl font-black text-slate-950">
+                {membershipFeeLabel}
+              </p>
+
+            </div>
+
+            <div className="px-6 py-5">
+
+              <p className="font-black text-slate-900">
+                Aucun paiement n&apos;est demandé maintenant.
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Vous paierez ce droit d&apos;adhésion uniquement
+                si votre demande est acceptée par le bureau.
+                Le montant applicable à votre demande sera conservé
+                au moment de son dépôt.
+              </p>
+
+            </div>
+
+          </section>
+        ) : (
+          <section className="mb-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
+              Adhésion gratuite
+            </p>
+
+            <p className="mt-2 font-black text-emerald-950">
+              Aucun droit d&apos;adhésion n&apos;est demandé.
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-emerald-800">
+              Vous pouvez transmettre votre demande sans effectuer
+              de paiement.
+            </p>
+
+          </section>
+        )}
 
         {query.error && (
           <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700">
@@ -278,6 +407,15 @@ export default async function JoinPage({
               formulaire.
             </p>
 
+            {membershipFeeEnabled && (
+              <p className="mt-3 text-sm font-bold leading-6 text-emerald-900">
+                Si votre demande est acceptée,
+                le paiement du droit d&apos;adhésion de{' '}
+                {membershipFeeLabel}{' '}
+                vous sera alors demandé.
+              </p>
+            )}
+
           </div>
 
           <div className="flex justify-end">
@@ -327,6 +465,45 @@ function Field({
 
     </div>
   )
+}
+
+function normalizeAmount(
+  value:
+    | number
+    | string
+    | null
+    | undefined
+) {
+  const parsed =
+    Number(
+      value ??
+      0
+    )
+
+  if (
+    !Number.isFinite(
+      parsed
+    )
+  ) {
+    return 0
+  }
+
+  return Math.max(
+    0,
+    Math.trunc(
+      parsed
+    )
+  )
+}
+
+function formatXof(
+  amount: number
+) {
+  return `${new Intl.NumberFormat(
+    'fr-FR'
+  ).format(
+    amount
+  )} FCFA`
 }
 
 function errorMessage(
