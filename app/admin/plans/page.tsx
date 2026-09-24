@@ -19,11 +19,13 @@ import {
 //   Jusqu'à 20 membres
 //
 // Standard
-//   5 000 FCFA / mois
+//   5 250 FCFA / mois
+//   52 500 FCFA / an
 //   21 à 50 membres
 //
 // Pro
-//   10 000 FCFA / mois
+//   10 500 FCFA / mois
+//   105 000 FCFA / an
 //   51 à 500 membres
 //
 // Entreprise
@@ -403,9 +405,9 @@ export default async function AdminPlansPage() {
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Répartition recommandée selon le
-              nombre de membres de
-              l&apos;organisation.
+              Répartition recommandée selon le nombre de membres de
+              l&apos;organisation. Standard et Pro sont disponibles en
+              paiement mensuel ou annuel.
             </p>
 
           </div>
@@ -427,7 +429,11 @@ export default async function AdminPlansPage() {
                   </TableHeading>
 
                   <TableHeading align="right">
-                    Tarif mensuel
+                    Mensuel
+                  </TableHeading>
+
+                  <TableHeading align="right">
+                    Annuel
                   </TableHeading>
 
                   <TableHeading>
@@ -443,28 +449,32 @@ export default async function AdminPlansPage() {
                 <PricingRow
                   plan="Gratuit"
                   members="0 à 20 membres"
-                  price="0 FCFA"
+                  monthlyPrice="0 FCFA"
+                  yearlyPrice="0 FCFA"
                   description="Découverte et petites organisations"
                 />
 
                 <PricingRow
                   plan="Standard"
                   members="21 à 50 membres"
-                  price="5 000 FCFA"
+                  monthlyPrice="5 250 FCFA"
+                  yearlyPrice="52 500 FCFA"
                   description="Associations et mutuelles de petite taille"
                 />
 
                 <PricingRow
                   plan="Pro"
                   members="51 à 500 membres"
-                  price="10 000 FCFA"
+                  monthlyPrice="10 500 FCFA"
+                  yearlyPrice="105 000 FCFA"
                   description="Organisations en croissance et grandes mutuelles"
                 />
 
                 <PricingRow
                   plan="Entreprise"
                   members="501 membres et plus"
-                  price="Sur devis"
+                  monthlyPrice="Sur devis"
+                  yearlyPrice="Sur devis"
                   description="Fédérations, réseaux et grandes structures"
                 />
 
@@ -481,26 +491,39 @@ export default async function AdminPlansPage() {
             <MobilePricing
               plan="Gratuit"
               members="0 à 20 membres"
-              price="0 FCFA"
+              monthlyPrice="0 FCFA"
+              yearlyPrice="0 FCFA"
             />
 
             <MobilePricing
               plan="Standard"
               members="21 à 50 membres"
-              price="5 000 FCFA / mois"
+              monthlyPrice="5 250 FCFA"
+              yearlyPrice="52 500 FCFA"
             />
 
             <MobilePricing
               plan="Pro"
               members="51 à 500 membres"
-              price="10 000 FCFA / mois"
+              monthlyPrice="10 500 FCFA"
+              yearlyPrice="105 000 FCFA"
             />
 
             <MobilePricing
               plan="Entreprise"
               members="501 membres et plus"
-              price="Sur devis"
+              monthlyPrice="Sur devis"
+              yearlyPrice="Sur devis"
             />
+
+          </div>
+
+          <div className="border-t border-emerald-100 bg-emerald-50 px-6 py-4">
+
+            <p className="text-center text-xs font-black leading-5 text-emerald-800 sm:text-sm">
+              Standard et Pro en annuel : 12 mois d&apos;utilisation pour
+              le prix de 10 mois, soit 2 mois offerts.
+            </p>
 
           </div>
 
@@ -594,9 +617,14 @@ function PlanCard({
 }: {
   plan: PlanRow
 }) {
-  const price =
+  const monthlyPrice =
     numberValue(
       plan.monthly_price_xof
+    )
+
+  const yearlyPrice =
+    numberValue(
+      plan.yearly_price_xof
     )
 
   const organizations =
@@ -677,16 +705,14 @@ function PlanCard({
 
             </div>
 
-          ) : (
+          ) : monthlyPrice === 0 ? (
 
             <div>
 
               <div className="flex flex-wrap items-end gap-1">
 
                 <span className="text-3xl font-black text-slate-950">
-                  {formatMoney(
-                    price
-                  )}
+                  0
                 </span>
 
                 <span className="pb-1 text-sm font-bold text-slate-400">
@@ -696,11 +722,55 @@ function PlanCard({
               </div>
 
               <p className="mt-1 text-xs font-semibold text-slate-400">
-                {price ===
-                0
-                  ? 'Gratuit'
-                  : 'par mois'}
+                Gratuit
               </p>
+
+            </div>
+
+          ) : (
+
+            <div className="space-y-3">
+
+              <div>
+
+                <div className="flex flex-wrap items-end gap-1">
+
+                  <span className="text-3xl font-black text-slate-950">
+                    {formatMoney(
+                      monthlyPrice
+                    )}
+                  </span>
+
+                  <span className="pb-1 text-sm font-bold text-slate-400">
+                    FCFA
+                  </span>
+
+                </div>
+
+                <p className="mt-1 text-xs font-semibold text-slate-400">
+                  par mois
+                </p>
+
+              </div>
+
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+
+                <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700">
+                  Formule annuelle
+                </p>
+
+                <p className="mt-1 text-sm font-black text-slate-950">
+                  {formatMoney(
+                    yearlyPrice
+                  )}{' '}
+                  FCFA / an
+                </p>
+
+                <p className="mt-1 text-[11px] font-bold text-emerald-700">
+                  2 mois offerts
+                </p>
+
+              </div>
 
             </div>
 
@@ -968,12 +1038,14 @@ function TableHeading({
 function PricingRow({
   plan,
   members,
-  price,
+  monthlyPrice,
+  yearlyPrice,
   description,
 }: {
   plan: string
   members: string
-  price: string
+  monthlyPrice: string
+  yearlyPrice: string
   description: string
 }) {
   return (
@@ -993,7 +1065,13 @@ function PricingRow({
 
       <td className="whitespace-nowrap px-6 py-5 text-right font-black text-slate-900">
         {
-          price
+          monthlyPrice
+        }
+      </td>
+
+      <td className="whitespace-nowrap px-6 py-5 text-right font-black text-emerald-700">
+        {
+          yearlyPrice
         }
       </td>
 
@@ -1010,36 +1088,60 @@ function PricingRow({
 function MobilePricing({
   plan,
   members,
-  price,
+  monthlyPrice,
+  yearlyPrice,
 }: {
   plan: string
   members: string
-  price: string
+  monthlyPrice: string
+  yearlyPrice: string
 }) {
   return (
     <div className="p-5">
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-start justify-between gap-3">
 
-        <p className="font-black text-slate-900">
-          {
-            plan
-          }
-        </p>
+        <div>
 
-        <p className="text-sm font-black text-emerald-700">
-          {
-            price
-          }
-        </p>
+          <p className="font-black text-slate-900">
+            {
+              plan
+            }
+          </p>
+
+          <p className="mt-2 text-sm font-semibold text-slate-500">
+            {
+              members
+            }
+          </p>
+
+        </div>
+
+        <div className="text-right">
+
+          <p className="text-sm font-black text-slate-900">
+            {
+              monthlyPrice
+            }
+          </p>
+
+          <p className="mt-1 text-xs font-bold text-slate-500">
+            par mois
+          </p>
+
+          <p className="mt-3 text-sm font-black text-emerald-700">
+            {
+              yearlyPrice
+            }
+          </p>
+
+          <p className="mt-1 text-xs font-bold text-emerald-700">
+            par an
+          </p>
+
+        </div>
 
       </div>
-
-      <p className="mt-2 text-sm font-semibold text-slate-500">
-        {
-          members
-        }
-      </p>
 
     </div>
   )
