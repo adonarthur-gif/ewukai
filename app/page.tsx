@@ -81,7 +81,8 @@ export default async function HomePage({
                 alt="Symbole EWUKAI"
                 width={48}
                 height={48}
-                priority
+                loading="eager"
+                fetchPriority="high"
                 className="h-full w-full object-contain"
               />
             </div>
