@@ -10,6 +10,7 @@ import {
   Building2,
   CheckCircle2,
   CircleDollarSign,
+  CreditCard,
   Globe2,
   HandCoins,
   HeartHandshake,
@@ -23,13 +24,6 @@ import {
   Wallet,
 } from 'lucide-react'
 
-const PAYMENT_LOGOS = {
-  orangeMoney: '/payment-logos/orange-money.png',
-  wave: '/payment-logos/wave.png',
-  mtnMomo: '/payment-logos/mtn-mobile-money.png',
-  moovMoney: '/payment-logos/moov-money.png',
-  mastercard: '/payment-logos/mastercard.png',
-} as const
 
 // ============================================================
 // PAGE D'ACCUEIL EWUKAI - PREMIUM BILINGUE
@@ -49,9 +43,6 @@ export default async function HomePage({
   const isEn = locale === 'en'
   const t = (fr: string, en: string) => (isEn ? en : fr)
 
-  const capabilities = isEn
-    ? ['Members', 'Contributions', 'Payments', 'Treasury', 'Reports']
-    : ['Membres', 'Cotisations', 'Paiements', 'Trésorerie', 'Rapports']
 
   const organizationFamilies = isEn
     ? ['NGO', 'Mutual', 'Association', 'Savings group', 'Cooperative', 'Foundation', 'Community group', 'Social club']
@@ -206,20 +197,7 @@ export default async function HomePage({
         <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:px-8 lg:py-20">
 
           <div className="relative z-10">
-            <div className="afri-enter-up inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-xs font-black uppercase tracking-[0.17em] text-emerald-300 backdrop-blur">
-              <span className="flex h-5 w-5 items-center justify-center overflow-hidden rounded-full bg-white/95 ring-1 ring-white/20">
-                <Image
-                  src="/branding/ewukai-mark.png"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="h-full w-full object-contain"
-                />
-              </span>
-              {t('EWUKAI · La plateforme des organisations', 'EWUKAI · The platform for organizations')}
-            </div>
-
-            <h1 className="afri-enter-up mt-7 max-w-3xl text-4xl font-black leading-[1.02] tracking-[-0.04em] [animation-delay:120ms] sm:text-5xl lg:text-[3.65rem]">
+            <h1 className="afri-enter-up max-w-3xl text-4xl font-black leading-[1.02] tracking-[-0.04em] sm:text-5xl lg:text-[3.65rem]">
               {t('Pilotez votre organisation.', 'Run your organization.')}
               <br />
               <span className="bg-gradient-to-r from-emerald-300 via-cyan-300 to-amber-200 bg-[length:200%_auto] bg-clip-text text-transparent afri-gradient-text">
@@ -228,20 +206,20 @@ export default async function HomePage({
               {t('de vos fonds.', 'of your funds.')}
             </h1>
 
-            <p className="afri-enter-up mt-5 max-w-2xl text-lg leading-8 text-slate-300 [animation-delay:220ms] sm:text-xl">
+            <p className="afri-enter-up mt-5 max-w-2xl text-lg leading-8 text-slate-300 [animation-delay:120ms] sm:text-xl">
               {t(
                 'Membres, cotisations, paiements, trésorerie, reçus et rapports réunis dans une seule plateforme moderne.',
                 'Members, contributions, payments, treasury, receipts and reports brought together in one modern platform.'
               )}
             </p>
 
-            <div className="afri-enter-up mt-5 [animation-delay:260ms]">
+            <div className="afri-enter-up mt-6 [animation-delay:200ms]">
               <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-300">
                 {t('Pensé pour', 'Built for')}
               </p>
 
               <div className="mt-3 flex max-w-2xl flex-wrap gap-2">
-                {organizationFamilies.map((item) => (
+                {organizationFamilies.slice(0, 6).map((item) => (
                   <span
                     key={item}
                     className="rounded-full border border-emerald-300/15 bg-emerald-300/[0.08] px-3 py-1.5 text-xs font-black text-white/90 backdrop-blur"
@@ -252,25 +230,7 @@ export default async function HomePage({
               </div>
             </div>
 
-            <div className="afri-enter-up mt-5 [animation-delay:320ms]">
-              <p className="text-sm font-black text-slate-200 sm:text-base">
-                {t('Un seul espace pour tout piloter.', 'One space to manage everything.')}
-              </p>
-
-              <div className="mt-3 flex max-w-2xl flex-wrap gap-2">
-                {capabilities.map((item, index) => (
-                  <span
-                    key={item}
-                    className="afri-capability-chip rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-black text-emerald-200 backdrop-blur"
-                    style={{ animationDelay: `${index * 160}ms` }}
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="afri-enter-up mt-6 flex flex-col gap-3 [animation-delay:380ms] sm:flex-row">
+            <div className="afri-enter-up mt-7 flex flex-col gap-3 [animation-delay:280ms] sm:flex-row">
               <Link
                 href="/register"
                 className="afri-primary-cta group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 px-6 py-4 font-black text-slate-950 shadow-xl shadow-emerald-950/20 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
@@ -287,63 +247,23 @@ export default async function HomePage({
               </Link>
             </div>
 
-            <div className="afri-enter-up mt-6 grid max-w-2xl gap-2.5 [animation-delay:460ms] sm:grid-cols-3">
-              <HeroCheck text={t('Aucun fonds détenu par la plateforme', 'The platform does not hold your funds')} />
-              <HeroCheck text={t('Paiement vers votre organisation', 'Payments go to your organization')} />
-              <HeroCheck text={t('Reçus et suivi automatiques', 'Automatic receipts and tracking')} />
-            </div>
-
-            <div className="afri-enter-up mt-5 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.07] p-3.5 [animation-delay:540ms] backdrop-blur">
-              <p className="text-sm font-black text-white">
-                {t('Votre argent reste à votre organisation.', 'Your money stays with your organization.')}
-              </p>
-              <p className="mt-1 text-sm leading-6 text-slate-300">
-                {t(
-                  'La plateforme fournit le canal technologique, la traçabilité et les outils de gestion.',
-                  'The platform provides the technology channel, traceability and management tools.'
-                )}
-              </p>
+            <div className="afri-enter-up mt-7 grid max-w-2xl gap-3 [animation-delay:360ms] sm:grid-cols-3">
+              <HeroCheck text={t('Votre argent reste à votre organisation', 'Your money stays with your organization')} />
+              <HeroCheck text={t('Paiements sécurisés et traçables', 'Secure and traceable payments')} />
+              <HeroCheck text={t('Gestion simple et transparente', 'Simple and transparent management')} />
             </div>
           </div>
 
-          {/* DASHBOARD DEMO VIVANT */}
+          {/* DASHBOARD DEMO */}
 
           <div className="relative">
-
             <div className="absolute inset-[8%] rounded-full bg-emerald-400/10 blur-3xl" />
 
-            <div className="relative z-30 mx-auto mb-3 grid w-full max-w-[650px] gap-2 sm:grid-cols-3">
-              <ActivityCard
-                icon={<CheckCircle2 className="h-4 w-4" />}
-                title={t('Paiement confirmé', 'Payment confirmed')}
-                subtitle={t('Transaction vérifiée automatiquement', 'Transaction verified automatically')}
-                tone="emerald"
-                delay="0s"
-              />
-
-              <ActivityCard
-                icon={<Users className="h-4 w-4" />}
-                title={t('Nouveau membre', 'New member')}
-                subtitle={t('Dossier ajouté à l’organisation', 'Profile added to the organization')}
-                tone="blue"
-                delay=".5s"
-              />
-
-              <ActivityCard
-                icon={<ReceiptText className="h-4 w-4" />}
-                title={t('Reçu disponible', 'Receipt available')}
-                subtitle={t('Justificatif généré automatiquement', 'Receipt generated automatically')}
-                tone="amber"
-                delay="1s"
-              />
-            </div>
-
-            <div className="afri-dashboard-float relative z-20 mx-auto w-full max-w-[485px]">
+            <div className="afri-dashboard-float relative z-20 mx-auto w-full max-w-[680px]">
               <div className="absolute -inset-10 rounded-full bg-emerald-400/10 blur-3xl" />
 
               <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white/95 p-3 shadow-[0_35px_90px_rgba(0,0,0,.30)] backdrop-blur">
                 <div className="rounded-[1.6rem] bg-[#F6F8FB] p-4 text-slate-950 sm:p-5">
-
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
@@ -359,7 +279,7 @@ export default async function HomePage({
                     </div>
                   </div>
 
-                  <div className="mt-5 grid grid-cols-2 gap-3">
+                  <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <PreviewStat
                       label={t('Membres', 'Members')}
                       value="248"
@@ -390,48 +310,52 @@ export default async function HomePage({
                     />
                   </div>
 
-                  <div className="mt-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-[11px] font-black uppercase tracking-wide text-slate-400">
-                          {t('Évolution', 'Trend')}
-                        </p>
-                        <p className="mt-1 font-black">
-                          {t('Recouvrement sur 6 mois', 'Collection over 6 months')}
-                        </p>
+                  <div className="mt-4 grid gap-4 lg:grid-cols-[1.12fr_0.88fr]">
+                    <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+                            {t('Évolution', 'Trend')}
+                          </p>
+                          <p className="mt-1 font-black">
+                            {t('Recouvrement sur 6 mois', 'Collection over 6 months')}
+                          </p>
+                        </div>
+
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                          <BarChart3 className="h-5 w-5" />
+                        </div>
                       </div>
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
-                        <BarChart3 className="h-5 w-5" />
+
+                      <div className="mt-6 flex h-32 items-end gap-3">
+                        <AnimatedBar label={monthLabels[0]} height="42%" delay="0ms" tone="blue" />
+                        <AnimatedBar label={monthLabels[1]} height="55%" delay="90ms" tone="teal" />
+                        <AnimatedBar label={monthLabels[2]} height="63%" delay="180ms" tone="emerald" />
+                        <AnimatedBar label={monthLabels[3]} height="74%" delay="270ms" tone="emerald" />
+                        <AnimatedBar label={monthLabels[4]} height="84%" delay="360ms" tone="cyan" />
+                        <AnimatedBar label={monthLabels[5]} height="94%" delay="450ms" tone="gold" />
                       </div>
                     </div>
 
-                    <div className="mt-6 flex h-32 items-end gap-3">
-                      <AnimatedBar label={monthLabels[0]} height="42%" delay="0ms" tone="blue" />
-                      <AnimatedBar label={monthLabels[1]} height="55%" delay="90ms" tone="teal" />
-                      <AnimatedBar label={monthLabels[2]} height="63%" delay="180ms" tone="emerald" />
-                      <AnimatedBar label={monthLabels[3]} height="74%" delay="270ms" tone="emerald" />
-                      <AnimatedBar label={monthLabels[4]} height="84%" delay="360ms" tone="cyan" />
-                      <AnimatedBar label={monthLabels[5]} height="94%" delay="450ms" tone="gold" />
-                    </div>
-                  </div>
+                    <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+                            {t('Recouvrement', 'Collection')}
+                          </p>
+                          <p className="mt-1 font-black">
+                            {t('Situation mensuelle', 'Monthly status')}
+                          </p>
+                        </div>
 
-                  <div className="mt-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-[11px] font-black uppercase tracking-wide text-slate-400">
-                          {t('Recouvrement', 'Collection')}
-                        </p>
-                        <p className="mt-1 font-black">
-                          {t('Situation mensuelle', 'Monthly status')}
-                        </p>
+                        <BadgeCheck className="h-6 w-6 text-emerald-600" />
                       </div>
-                      <BadgeCheck className="h-6 w-6 text-emerald-600" />
-                    </div>
 
-                    <div className="mt-5 space-y-4">
-                      <ProgressRow label={t('Cotisations payées', 'Paid contributions')} value="92%" width="92%" tone="green" delay="100ms" />
-                      <ProgressRow label={t('Partiellement réglées', 'Partially paid')} value="5%" width="55%" tone="gold" delay="250ms" />
-                      <ProgressRow label={t('À régulariser', 'Outstanding')} value="3%" width="32%" tone="blue" delay="400ms" />
+                      <div className="mt-5 space-y-4">
+                        <ProgressRow label={t('Cotisations payées', 'Paid contributions')} value="92%" width="92%" tone="green" delay="100ms" />
+                        <ProgressRow label={t('Partiellement réglées', 'Partially paid')} value="5%" width="55%" tone="gold" delay="250ms" />
+                        <ProgressRow label={t('À régulariser', 'Outstanding')} value="3%" width="32%" tone="blue" delay="400ms" />
+                      </div>
                     </div>
                   </div>
 
@@ -443,6 +367,54 @@ export default async function HomePage({
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================================================== */}
+      {/* ESPACES PARTENAIRES */}
+      {/* ==================================================== */}
+
+      <section
+        aria-label={t('Espace partenaires EWUKAI', 'EWUKAI partner area')}
+        className="border-b border-slate-200 bg-white py-10 sm:py-12"
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
+              {t('Partenaires & sponsors', 'Partners & sponsors')}
+            </p>
+
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+              {t('Espace partenaires EWUKAI', 'EWUKAI partner area')}
+            </h2>
+
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+              {t(
+                'Des emplacements sobres sont réservés aux partenaires et sponsors de la plateforme, sans perturber l’expérience de gestion.',
+                'Discreet spaces are reserved for platform partners and sponsors without disrupting the management experience.'
+              )}
+            </p>
+          </div>
+
+          <div className="mt-7 grid gap-4 md:grid-cols-3">
+            <PartnerSlot
+              icon={<Landmark className="h-5 w-5" />}
+              title={t('Banque / Institution financière', 'Bank / Financial institution')}
+              subtitle={t('Emplacement partenaire', 'Partner placement')}
+            />
+
+            <PartnerSlot
+              icon={<Smartphone className="h-5 w-5" />}
+              title="Mobile Money"
+              subtitle={t('Emplacement partenaire', 'Partner placement')}
+            />
+
+            <PartnerSlot
+              icon={<ShieldCheck className="h-5 w-5" />}
+              title={t('Assurance / Autre partenaire', 'Insurance / Other partner')}
+              subtitle={t('Emplacement partenaire', 'Partner placement')}
+            />
           </div>
         </div>
       </section>
@@ -661,7 +633,10 @@ export default async function HomePage({
                 visual={
                   <PaymentProviderCloud
                     secureLabel={t('Paiement sécurisé', 'Secure payment')}
-                    ariaLabel={t('Mobile Money et cartes bancaires', 'Mobile Money and bank cards')}
+                    ariaLabel={t('Canaux de paiement disponibles', 'Available payment channels')}
+                    mobileMoneyLabel="Mobile Money"
+                    cardLabel={t('Carte bancaire', 'Bank card')}
+                    bankLabel={t('Virement bancaire', 'Bank transfer')}
                   />
                 }
                 eyebrow={t('Étape 2', 'Step 2')}
@@ -729,29 +704,12 @@ export default async function HomePage({
                 </p>
                 <div className="grid grid-cols-2 gap-2 text-xs font-black text-slate-700 sm:grid-cols-3">
                   <PaymentMethodBadge
-                    imageSrc={PAYMENT_LOGOS.wave}
-                    imageAlt="Wave"
-                    label="Wave"
+                    icon={<Smartphone className="h-4 w-4" />}
+                    label="Mobile Money"
                   />
                   <PaymentMethodBadge
-                    imageSrc={PAYMENT_LOGOS.orangeMoney}
-                    imageAlt="Orange Money"
-                    label="Orange Money"
-                  />
-                  <PaymentMethodBadge
-                    imageSrc={PAYMENT_LOGOS.mtnMomo}
-                    imageAlt="MTN Mobile Money"
-                    label="MTN MoMo"
-                  />
-                  <PaymentMethodBadge
-                    imageSrc={PAYMENT_LOGOS.moovMoney}
-                    imageAlt="Moov Money"
-                    label="Moov Money"
-                  />
-                  <PaymentMethodBadge
-                    imageSrc={PAYMENT_LOGOS.mastercard}
-                    imageAlt="Mastercard"
-                    label="Mastercard"
+                    icon={<CreditCard className="h-4 w-4" />}
+                    label={t('Carte bancaire', 'Bank card')}
                   />
                   <PaymentMethodBadge
                     icon={<Landmark className="h-4 w-4" />}
@@ -1352,15 +1310,7 @@ export default async function HomePage({
           50% { background-position: 100% center; }
         }
 
-        @keyframes afriCapabilityChip {
-          0%, 100% { transform: translateY(0); border-color: rgba(255,255,255,.10); }
-          50% { transform: translateY(-3px); border-color: rgba(110,231,183,.28); }
-        }
 
-        @keyframes afriActivityCard {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
-        }
 
         @keyframes afriWordCycle {
           0%, 15% { opacity: 1; transform: translateY(0); }
@@ -1423,8 +1373,6 @@ export default async function HomePage({
 
         .afri-gradient-text { animation: afriGradientText 5s ease-in-out infinite; }
 
-        .afri-capability-chip { animation: afriCapabilityChip 4.2s ease-in-out infinite; }
-        .afri-activity-card { animation: afriActivityCard 5s ease-in-out infinite; }
 
         .afri-word-cycle {
           position: relative;
@@ -1477,8 +1425,6 @@ export default async function HomePage({
           .afri-particle,
           .afri-enter-up,
           .afri-gradient-text,
-          .afri-capability-chip,
-          .afri-activity-card,
           .afri-word,
           .afri-float-card,
           .afri-logo-pulse,
@@ -1500,82 +1446,21 @@ export default async function HomePage({
 }
 
 // ============================================================
-// ACTIVITE HERO
-// ============================================================
-
-function ActivityCard({
-  icon,
-  title,
-  subtitle,
-  tone,
-  delay,
-}: {
-  icon: ReactNode
-  title: string
-  subtitle: string
-  tone: 'emerald' | 'blue' | 'amber'
-  delay: string
-}) {
-  const styles = {
-    emerald: 'border-emerald-300/15 bg-emerald-300/[0.09] text-emerald-200',
-    blue: 'border-cyan-300/15 bg-cyan-300/[0.08] text-cyan-200',
-    amber: 'border-amber-300/15 bg-amber-300/[0.08] text-amber-200',
-  }
-
-  return (
-    <div
-      className={`afri-activity-card min-h-[64px] rounded-2xl border px-3 py-2.5 shadow-xl backdrop-blur-xl ${styles[tone]}`}
-      style={{ animationDelay: delay }}
-    >
-      <div className="flex items-center gap-2">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/10">
-          {icon}
-        </span>
-        <div className="min-w-0">
-          <p className="text-[11px] font-black leading-4 text-white">
-            {title}
-          </p>
-          <p className="mt-0.5 text-[10px] font-semibold leading-4 text-slate-300">
-            {subtitle}
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================
 // MOYENS DE PAIEMENT - LANDING PAGE
 // ============================================================
 
 function PaymentMethodBadge({
   icon,
-  imageSrc,
-  imageAlt = '',
   label,
 }: {
-  icon?: ReactNode
-  imageSrc?: string
-  imageAlt?: string
+  icon: ReactNode
   label: string
 }) {
   return (
     <span className="flex min-h-11 items-center gap-2 rounded-xl border border-white bg-white px-3 py-2 shadow-sm">
-      {imageSrc ? (
-        <span className="flex h-7 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
-          <Image
-            src={imageSrc}
-            alt={imageAlt}
-            width={48}
-            height={32}
-            className="max-h-7 w-auto max-w-9 object-contain"
-          />
-        </span>
-      ) : (
-        <span className="text-emerald-700">
-          {icon}
-        </span>
-      )}
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+        {icon}
+      </span>
       <span>{label}</span>
     </span>
   )
@@ -1595,6 +1480,39 @@ function HeroCheck({
       <CheckCircle2 className="h-4 w-4 text-emerald-400" />
       {text}
     </span>
+  )
+}
+
+// ============================================================
+// ESPACE PARTENAIRE
+// ============================================================
+
+function PartnerSlot({
+  icon,
+  title,
+  subtitle,
+}: {
+  icon: ReactNode
+  title: string
+  subtitle: string
+}) {
+  return (
+    <div className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50/70 px-5 py-4 transition hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-white hover:shadow-md">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm ring-1 ring-slate-200 transition group-hover:ring-emerald-200">
+        {icon}
+      </span>
+
+      <div className="min-w-0">
+        <p className="font-black text-slate-900">
+          {title}
+        </p>
+        <p className="mt-0.5 text-xs font-semibold text-slate-500">
+          {subtitle}
+        </p>
+      </div>
+
+      <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-emerald-700" />
+    </div>
   )
 }
 
@@ -1910,40 +1828,31 @@ function PaymentNode({
 function PaymentProviderCloud({
   secureLabel,
   ariaLabel,
+  mobileMoneyLabel,
+  cardLabel,
+  bankLabel,
 }: {
   secureLabel: string
   ariaLabel: string
+  mobileMoneyLabel: string
+  cardLabel: string
+  bankLabel: string
 }) {
-  const providers = [
+  const channels = [
     {
-      title: 'Orange Money',
-      src: PAYMENT_LOGOS.orangeMoney,
-      tone: 'orange' as const,
-      imageClass: 'max-h-7 max-w-[92px]',
-    },
-    {
-      title: 'Wave',
-      src: PAYMENT_LOGOS.wave,
-      tone: 'cyan' as const,
-      imageClass: 'max-h-8 max-w-[76px]',
-    },
-    {
-      title: 'MTN Mobile Money',
-      src: PAYMENT_LOGOS.mtnMomo,
-      tone: 'yellow' as const,
-      imageClass: 'max-h-8 max-w-[96px]',
-    },
-    {
-      title: 'Moov Money',
-      src: PAYMENT_LOGOS.moovMoney,
+      title: mobileMoneyLabel,
+      icon: <Smartphone className="h-5 w-5" />,
       tone: 'emerald' as const,
-      imageClass: 'max-h-8 max-w-[92px]',
     },
     {
-      title: 'Mastercard',
-      src: PAYMENT_LOGOS.mastercard,
+      title: cardLabel,
+      icon: <CreditCard className="h-5 w-5" />,
+      tone: 'blue' as const,
+    },
+    {
+      title: bankLabel,
+      icon: <Landmark className="h-5 w-5" />,
       tone: 'violet' as const,
-      imageClass: 'max-h-7 max-w-[100px]',
     },
   ]
 
@@ -1953,21 +1862,19 @@ function PaymentProviderCloud({
       aria-label={ariaLabel}
     >
       <div className="rounded-[1.65rem] border border-emerald-100 bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FFFC_100%)] p-3 shadow-sm shadow-emerald-100/60">
-        <div className="grid grid-cols-2 gap-2">
-          {providers.map((provider) => (
+        <div className="grid gap-2">
+          {channels.map((channel) => (
             <ProviderMiniBadge
-              key={provider.title}
-              title={provider.title}
-              tone={provider.tone}
-              className="justify-center"
+              key={channel.title}
+              title={channel.title}
+              tone={channel.tone}
             >
-              <Image
-                src={provider.src}
-                alt={provider.title}
-                width={110}
-                height={44}
-                className={`h-auto w-auto object-contain ${provider.imageClass}`}
-              />
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm">
+                {channel.icon}
+              </span>
+              <span className="text-xs font-black text-slate-700">
+                {channel.title}
+              </span>
             </ProviderMiniBadge>
           ))}
         </div>
@@ -1991,18 +1898,13 @@ function PaymentProviderCloud({
 function ProviderMiniBadge({
   title,
   tone,
-  className = '',
   children,
 }: {
   title: string
-  tone: 'orange' | 'cyan' | 'yellow' | 'emerald' | 'blue' | 'violet'
-  className?: string
+  tone: 'emerald' | 'blue' | 'violet'
   children: ReactNode
 }) {
   const tones = {
-    orange: 'border-orange-100 bg-orange-50/90',
-    cyan: 'border-cyan-100 bg-cyan-50/90',
-    yellow: 'border-yellow-200 bg-yellow-50/90',
     emerald: 'border-emerald-100 bg-emerald-50/90',
     blue: 'border-blue-100 bg-blue-50/90',
     violet: 'border-violet-100 bg-violet-50/90',
@@ -2011,7 +1913,7 @@ function ProviderMiniBadge({
   return (
     <span
       title={title}
-      className={`inline-flex h-12 min-w-0 items-center gap-1.5 overflow-hidden rounded-2xl border px-2.5 shadow-sm ${tones[tone]} ${className}`}
+      className={`inline-flex min-h-12 items-center gap-2 rounded-2xl border px-3 shadow-sm ${tones[tone]}`}
     >
       {children}
     </span>
