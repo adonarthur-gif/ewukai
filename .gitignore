@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Paquets temporaires EWUKAI
 /*.zip
+
+# Supabase CLI - fichiers locaux temporaires
+/supabase/.temp/

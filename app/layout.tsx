@@ -10,6 +10,7 @@ import {
 import './globals.css'
 
 import AppNavigationServer from '@/components/app-navigation-server'
+import ServiceWorkerRegister from '@/components/pwa/service-worker-register'
 
 const geistSans =
   Geist({
@@ -58,6 +59,8 @@ export default function RootLayout({
     >
 
       <body className="flex min-h-full flex-col bg-slate-50 text-slate-900">
+
+        <ServiceWorkerRegister />
 
         <AppNavigationServer />
 
