@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.ewukai",
+        "sha256_cert_fingerprints": ["8D:74:FD:E4:91:63:4E:03:62:2A:69:5E:75:6E:9D:2A:9C:C8:BC:05:4E:56:2A:DB:B2:43:0F:33:B6:CE:4B:B0"]
+      }
+    }]
