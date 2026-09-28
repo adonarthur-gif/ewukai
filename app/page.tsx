@@ -60,13 +60,13 @@ export default async function HomePage({
       {/* ==================================================== */}
 
       <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-3.5 lg:px-8">
 
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-3"
+            className="flex shrink-0 items-center gap-2 sm:gap-3"
           >
-            <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white p-0.5 shadow-lg shadow-slate-950/10 ring-1 ring-slate-200/80">
+            <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-white p-0.5 shadow-lg shadow-slate-950/10 ring-1 ring-slate-200/80 sm:h-12 sm:w-12">
               <Image
                 src="/branding/ewukai-mark.png"
                 alt="Symbole EWUKAI"
@@ -79,7 +79,7 @@ export default async function HomePage({
             </div>
 
             <div>
-              <p className="text-lg font-black tracking-tight text-slate-950">
+              <p className="text-base font-black tracking-tight text-slate-950 sm:text-lg">
                 EWUKAI
               </p>
 
@@ -163,7 +163,7 @@ export default async function HomePage({
 
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-gradient-to-r from-emerald-700 to-teal-600 px-3.5 py-2.5 text-[13px] font-black text-white shadow-lg shadow-emerald-950/10 transition hover:-translate-y-0.5 hover:shadow-xl"
+              className="hidden items-center gap-2 whitespace-nowrap rounded-xl bg-gradient-to-r from-emerald-700 to-teal-600 px-3.5 py-2.5 text-[13px] font-black text-white shadow-lg shadow-emerald-950/10 transition hover:-translate-y-0.5 hover:shadow-xl md:inline-flex"
             >
               {t('Créer mon organisation', 'Create my organization')}
               <ArrowRight className="h-4 w-4" />
