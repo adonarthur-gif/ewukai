@@ -902,113 +902,267 @@ export default async function MySpacePage({
       {/* HEADER */}
       {/* ==================================================== */}
 
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur">
 
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+        {/* ==================================================== */}
+        {/* IDENTITE DE L'ORGANISATION */}
+        {/* ==================================================== */}
 
-          <div className="flex min-w-0 items-center gap-3">
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4">
 
-            {logoUrl ? (
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="flex min-w-0 items-center justify-between gap-3">
 
-                <img
-                  src={logoUrl}
-                  alt={
-                    organization.name
-                  }
-                  className="h-full w-full object-contain p-1"
-                />
+            <div className="flex min-w-0 flex-1 items-center gap-3">
 
-              </div>
-            ) : (
-              <div
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-sm font-black text-white"
-                style={{
-                  backgroundColor:
-                    primaryColor,
-                }}
-              >
-                {organizationInitials(
-                  organization.short_name ||
-                    organization.name
-                )}
-              </div>
-            )}
+              {logoUrl ? (
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white sm:h-12 sm:w-12">
 
-            <div className="min-w-0">
+                  <img
+                    src={logoUrl}
+                    alt={
+                      organization.name
+                    }
+                    className="h-full w-full object-contain p-1"
+                  />
 
-              <p
-                className="truncate text-lg font-black"
-                style={{
-                  color:
-                    secondaryColor,
-                }}
-              >
-                {organization.short_name ||
-                  organization.name}
-              </p>
-
-              {organization.short_name && (
-                <p className="truncate text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  {
-                    organization.name
-                  }
-                </p>
+                </div>
+              ) : (
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-black text-white sm:h-12 sm:w-12"
+                  style={{
+                    backgroundColor:
+                      primaryColor,
+                  }}
+                >
+                  {organizationInitials(
+                    organization.short_name ||
+                      organization.name
+                  )}
+                </div>
               )}
+
+              <div className="min-w-0 flex-1">
+
+                <p
+                  className="truncate text-base font-black sm:text-lg"
+                  style={{
+                    color:
+                      secondaryColor,
+                  }}
+                >
+                  {organization.short_name ||
+                    organization.name}
+                </p>
+
+                {organization.short_name && (
+                  <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-500 sm:text-xs">
+                    {
+                      organization.name
+                    }
+                  </p>
+                )}
+
+                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-400 sm:hidden">
+                  Espace membre
+                </p>
+
+              </div>
 
             </div>
 
-          </div>
+            {/* ACTIONS DESKTOP */}
 
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            <div className="hidden shrink-0 items-center gap-2 sm:flex">
 
-            {memberSpaces.length >
-              1 && (
-              <Link
-                href="/my-space"
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+              {memberSpaces.length >
+                1 && (
+                <Link
+                  href="/my-space"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+                >
+                  Changer d&apos;espace
+                </Link>
+              )}
+
+              {canManageOrganization && (
+                <Link
+                  href="/dashboard"
+                  className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-black text-white transition hover:bg-slate-800"
+                >
+                  Espace de gestion
+                </Link>
+              )}
+
+              {organization.public_slug && (
+                <Link
+                  href={`/m/${organization.public_slug}`}
+                  className="hidden rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 lg:inline-flex"
+                >
+                  Voir l&apos;organisation
+                </Link>
+              )}
+
+              <form
+                action="/signout"
+                method="post"
               >
-                Changer d&apos;espace
-              </Link>
-            )}
+                <button
+                  type="submit"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+                >
+                  Déconnexion
+                </button>
+              </form>
 
-            {canManageOrganization && (
-              <Link
-                href="/dashboard"
-                className="hidden rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-black text-white transition hover:bg-slate-800 sm:inline-flex"
-              >
-                Espace de gestion
-              </Link>
-            )}
+            </div>
 
-            {organization.public_slug && (
-              <Link
-                href={`/m/${organization.public_slug}`}
-                className="hidden rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 lg:inline-flex"
-              >
-                Voir l&apos;organisation
-              </Link>
-            )}
+            {/* DECONNEXION MOBILE */}
 
             <form
               action="/signout"
               method="post"
+              className="shrink-0 sm:hidden"
             >
               <button
                 type="submit"
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700"
               >
-                Déconnexion
+                Sortir
               </button>
             </form>
 
           </div>
 
+          {/* ACTIONS MOBILE */}
+
+          {(memberSpaces.length > 1 ||
+            canManageOrganization) && (
+            <div className="mt-3 flex gap-2 sm:hidden">
+
+              {memberSpaces.length >
+                1 && (
+                <Link
+                  href="/my-space"
+                  className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-center text-xs font-black text-slate-700"
+                >
+                  Changer d&apos;espace
+                </Link>
+              )}
+
+              {canManageOrganization && (
+                <Link
+                  href="/dashboard"
+                  className="flex-1 rounded-xl bg-slate-900 px-3 py-2.5 text-center text-xs font-black text-white"
+                >
+                  Espace de gestion
+                </Link>
+              )}
+
+            </div>
+          )}
+
         </div>
 
-        {/* NAVIGATION MEMBRE */}
+        {/* ==================================================== */}
+        {/* NAVIGATION MOBILE */}
+        {/* ==================================================== */}
 
-        <div className="border-t border-slate-100">
+        <div className="border-t border-slate-100 sm:hidden">
+
+          <details className="group">
+
+            <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-black text-slate-800">
+
+              <span className="flex items-center gap-2">
+                <span aria-hidden="true">
+                  ☰
+                </span>
+
+                Navigation
+              </span>
+
+              <span
+                aria-hidden="true"
+                className="text-slate-400 transition group-open:rotate-180"
+              >
+                ▼
+              </span>
+
+            </summary>
+
+            <nav
+              className="grid grid-cols-2 gap-2 border-t border-slate-100 bg-slate-50 p-3"
+              aria-label="Navigation de l'espace membre"
+            >
+
+              <a
+                href={`${currentSpaceUrl}#accueil`}
+                className="rounded-xl bg-white px-3 py-3 text-sm font-black shadow-sm ring-1 ring-slate-200"
+                style={{
+                  color:
+                    primaryColor,
+                }}
+              >
+                Accueil
+              </a>
+
+              <a
+                href={`${currentSpaceUrl}#cotisations`}
+                className="rounded-xl bg-white px-3 py-3 text-sm font-black text-slate-700 shadow-sm ring-1 ring-slate-200"
+              >
+                Mes cotisations
+              </a>
+
+              {automationReminders.length > 0 && (
+                <a
+                  href={`${currentSpaceUrl}#rappels`}
+                  className="rounded-xl bg-white px-3 py-3 text-sm font-black text-slate-700 shadow-sm ring-1 ring-slate-200"
+                >
+                  Mes rappels
+                </a>
+              )}
+
+              <a
+                href={`${currentSpaceUrl}#reglement`}
+                className="rounded-xl bg-white px-3 py-3 text-sm font-black text-slate-700 shadow-sm ring-1 ring-slate-200"
+              >
+                Payer
+              </a>
+
+              <a
+                href={`${currentSpaceUrl}#paiements`}
+                className="rounded-xl bg-white px-3 py-3 text-sm font-black text-slate-700 shadow-sm ring-1 ring-slate-200"
+              >
+                Mes paiements
+              </a>
+
+              <a
+                href={`${currentSpaceUrl}#profil`}
+                className="rounded-xl bg-white px-3 py-3 text-sm font-black text-slate-700 shadow-sm ring-1 ring-slate-200"
+              >
+                Mon profil
+              </a>
+
+              {organization.public_slug && (
+                <Link
+                  href={`/m/${organization.public_slug}`}
+                  className="col-span-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-center text-sm font-black text-slate-600"
+                >
+                  Voir l&apos;organisation
+                </Link>
+              )}
+
+            </nav>
+
+          </details>
+
+        </div>
+
+        {/* ==================================================== */}
+        {/* NAVIGATION TABLETTE / DESKTOP */}
+        {/* ==================================================== */}
+
+        <div className="hidden border-t border-slate-100 sm:block">
 
           <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 sm:px-6">
 

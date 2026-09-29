@@ -243,7 +243,7 @@ export default async function NewMemberPage({
                 <select
                   id="gender"
                   name="gender"
-                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-medium text-slate-950 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
                 >
                   <option value="">
                     Non renseigné
@@ -451,7 +451,7 @@ function Field({
         required={required}
         defaultValue={defaultValue}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-medium text-slate-950 caret-slate-950 placeholder:text-slate-400 placeholder:opacity-100 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
       />
 
     </div>
