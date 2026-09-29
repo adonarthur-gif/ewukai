@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   ReactNode,
 } from 'react'
 
@@ -21,6 +21,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 import EwukaiBrand from '@/components/branding/ewukai-brand'
+
+import OnboardingBrandingConfigurator from './onboarding-branding-configurator'
 
 import {
   createOrganization,
@@ -654,7 +656,7 @@ export default async function OnboardingPage({
                       id="ownerLastName"
                       name="ownerLastName"
                       maxLength={100}
-                      placeholder="Ex. ADON"
+                      placeholder="Ex. KOUASSI"
                       className="onboarding-input uppercase"
                     />
 
@@ -673,7 +675,7 @@ export default async function OnboardingPage({
                       id="ownerFirstName"
                       name="ownerFirstName"
                       maxLength={100}
-                      placeholder="Ex. Krist"
+                      placeholder="Ex. Jean Marc"
                       className="onboarding-input"
                     />
 
@@ -873,6 +875,293 @@ export default async function OnboardingPage({
           </section>
 
           {/* ================================================= */}
+          {/* ETAPE 7 - IDENTITE VISUELLE */}
+          {/* ================================================= */}
+
+          <section className="border-b border-slate-200 bg-slate-50/60 p-6 sm:p-8">
+
+            <SectionTitle
+              eyebrow="Étape 7"
+              title="Logo, couleurs et aperçu"
+              description="Choisissez dès maintenant l’identité visuelle de votre organisation et vérifiez son rendu sur mobile et ordinateur."
+            />
+
+            <OnboardingBrandingConfigurator />
+
+          </section>
+
+          {/* ================================================= */}
+          {/* ETAPE 8 - VITRINE PUBLIQUE */}
+          {/* ================================================= */}
+
+          <section className="border-b border-slate-200 p-6 sm:p-8">
+
+            <SectionTitle
+              eyebrow="Étape 8"
+              title="Préparez votre page publique"
+              description="Ces informations présenteront votre organisation aux membres, futurs adhérents et partenaires. Tout est modifiable plus tard."
+            />
+
+            <div className="mt-7 grid gap-5 sm:grid-cols-2">
+
+              <div className="sm:col-span-2">
+
+                <Label
+                  htmlFor="publicSlug"
+                >
+                  Adresse publique souhaitée
+                </Label>
+
+                <div className="flex overflow-hidden rounded-xl border border-slate-300 bg-white">
+
+                  <span className="flex items-center bg-slate-100 px-4 text-sm font-bold text-slate-500">
+                    /m/
+                  </span>
+
+                  <input
+                    id="publicSlug"
+                    name="publicSlug"
+                    maxLength={80}
+                    placeholder="ex. mudesak"
+                    className="min-w-0 flex-1 border-0 bg-white px-4 py-3 outline-none"
+                  />
+
+                </div>
+
+                <p className="mt-2 text-xs leading-5 text-slate-500">
+                  Si vous laissez ce champ vide, EWUKAI préparera une adresse à partir de votre sigle.
+                </p>
+
+              </div>
+
+              <div className="sm:col-span-2">
+
+                <Label
+                  htmlFor="shortDescription"
+                >
+                  Description courte
+                </Label>
+
+                <textarea
+                  id="shortDescription"
+                  name="shortDescription"
+                  rows={3}
+                  maxLength={600}
+                  placeholder="Présentez votre organisation en quelques lignes."
+                  className="onboarding-textarea"
+                />
+
+              </div>
+
+              <div className="sm:col-span-2">
+
+                <Label
+                  htmlFor="about"
+                >
+                  À propos
+                </Label>
+
+                <textarea
+                  id="about"
+                  name="about"
+                  rows={5}
+                  maxLength={10000}
+                  placeholder="Qui êtes-vous ? À qui s’adresse l’organisation ?"
+                  className="onboarding-textarea"
+                />
+
+              </div>
+
+              <div>
+
+                <Label
+                  htmlFor="history"
+                >
+                  Histoire
+                </Label>
+
+                <textarea
+                  id="history"
+                  name="history"
+                  rows={5}
+                  maxLength={10000}
+                  placeholder="Origine et grandes étapes de l’organisation."
+                  className="onboarding-textarea"
+                />
+
+              </div>
+
+              <div>
+
+                <Label
+                  htmlFor="valuesText"
+                >
+                  Valeurs
+                </Label>
+
+                <textarea
+                  id="valuesText"
+                  name="valuesText"
+                  rows={5}
+                  maxLength={5000}
+                  placeholder="Ex. Solidarité, transparence, responsabilité, engagement."
+                  className="onboarding-textarea"
+                />
+
+              </div>
+
+              <div className="sm:col-span-2">
+
+                <Label
+                  htmlFor="presidentMessage"
+                >
+                  Mot du responsable / président
+                </Label>
+
+                <textarea
+                  id="presidentMessage"
+                  name="presidentMessage"
+                  rows={5}
+                  maxLength={10000}
+                  placeholder="Message institutionnel facultatif."
+                  className="onboarding-textarea"
+                />
+
+              </div>
+
+              <div>
+
+                <Label
+                  htmlFor="publicPhone"
+                >
+                  Téléphone public
+                </Label>
+
+                <input
+                  id="publicPhone"
+                  name="publicPhone"
+                  type="tel"
+                  maxLength={50}
+                  placeholder="Laisser vide pour reprendre le téléphone de l’organisation"
+                  className="onboarding-input"
+                />
+
+              </div>
+
+              <div>
+
+                <Label
+                  htmlFor="publicEmail"
+                >
+                  E-mail public
+                </Label>
+
+                <input
+                  id="publicEmail"
+                  name="publicEmail"
+                  type="email"
+                  maxLength={200}
+                  placeholder="Laisser vide pour reprendre l’e-mail de l’organisation"
+                  className="onboarding-input"
+                />
+
+              </div>
+
+              <div className="sm:col-span-2">
+
+                <Label
+                  htmlFor="locationLabel"
+                >
+                  Localisation publique
+                </Label>
+
+                <input
+                  id="locationLabel"
+                  name="locationLabel"
+                  maxLength={250}
+                  placeholder="Laisser vide pour reprendre la ville et le pays"
+                  className="onboarding-input"
+                />
+
+              </div>
+
+            </div>
+
+          </section>
+
+          {/* ================================================= */}
+          {/* ETAPE 9 - OPTIONS */}
+          {/* ================================================= */}
+
+          <section className="border-b border-slate-200 bg-slate-50/60 p-6 sm:p-8">
+
+            <SectionTitle
+              eyebrow="Étape 9"
+              title="Choisissez ce qui sera visible"
+              description="Activez uniquement ce que vous souhaitez publier. Ces réglages restent accessibles dans l’espace dirigeant."
+            />
+
+            <div className="mt-7 grid gap-4 md:grid-cols-2">
+
+              <OnboardingOption
+                name="publicPageEnabled"
+                label="Activer la page publique"
+                description="Votre organisation pourra être consultée depuis son adresse publique."
+                defaultChecked
+              />
+
+              <OnboardingOption
+                name="onlineMembershipEnabled"
+                label="Activer l’adhésion en ligne"
+                description="Les visiteurs pourront déposer une demande d’adhésion."
+                defaultChecked
+              />
+
+              <OnboardingOption
+                name="showMemberCount"
+                label="Afficher le nombre de membres"
+                description="Le nombre de membres actifs pourra apparaître sur la page publique."
+                defaultChecked
+              />
+
+              <OnboardingOption
+                name="showLeadership"
+                label="Informations institutionnelles"
+                description="Prépare l’affichage des responsables et informations institutionnelles."
+              />
+
+              <OnboardingOption
+                name="showProjects"
+                label="Afficher les projets"
+                description="Prépare la rubrique consacrée aux projets et actions."
+              />
+
+              <OnboardingOption
+                name="showNews"
+                label="Afficher les actualités"
+                description="Prépare la rubrique des actualités et communications."
+              />
+
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+
+              <p className="font-black text-blue-950">
+                Vous n&apos;êtes pas obligé de tout remplir aujourd&apos;hui.
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-blue-900/80">
+                Après la création, EWUKAI vous conduira dans l&apos;espace dirigeant.
+                Vous pourrez reprendre exactement ces réglages dans Paramètres,
+                puis configurer les cotisations, l&apos;adhésion, les paiements,
+                la trésorerie et les autres fonctions à votre rythme.
+              </p>
+
+            </div>
+
+          </section>
+
+          {/* ================================================= */}
           {/* RECAPITULATIF */}
           {/* ================================================= */}
 
@@ -881,7 +1170,7 @@ export default async function OnboardingPage({
             <SectionTitle
               eyebrow="Prêt à commencer"
               title="EWUKAI prépare votre espace"
-              description="La création de l'organisation et de votre accès initial se fera automatiquement."
+              description="Les informations essentielles seront créées immédiatement. Les réglages facultatifs pourront être poursuivis dans votre espace dirigeant."
             />
 
             <div className="mt-7 grid gap-4 lg:grid-cols-3">
@@ -916,12 +1205,9 @@ export default async function OnboardingPage({
                   </p>
 
                   <p className="mt-1 text-sm leading-6 text-emerald-800">
-                    Après la création, vous pourrez
-                    ajouter d&apos;autres membres,
-                    configurer les cotisations,
-                    préparer la trésorerie,
-                    compléter la vitrine publique
-                    et définir les moyens de paiement.
+                    Après la création, EWUKAI ouvrira les Paramètres de votre espace dirigeant.
+                    Vous pourrez y vérifier le logo, les couleurs, la page publique et poursuivre
+                    les réglages avancés sans perdre ce que vous avez déjà saisi.
                   </p>
 
                 </div>
@@ -942,14 +1228,12 @@ export default async function OnboardingPage({
               type="submit"
               className="w-full rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 px-6 py-4 text-base font-black text-slate-950 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
             >
-              Créer mon organisation
+              Créer mon organisation et continuer
             </button>
 
-            <p className="mt-3 text-center text-xs text-slate-400">
-              La création de l&apos;organisation,
-              du compte Responsable et du
-              premier membre est sécurisée
-              dans une seule opération.
+            <p className="mt-3 text-center text-xs leading-5 text-slate-400">
+              Les champs facultatifs peuvent rester vides.
+              Vous pourrez compléter la configuration plus tard dans l&apos;espace dirigeant.
             </p>
 
           </div>
@@ -1197,6 +1481,49 @@ function InfoCard({
       </p>
 
     </div>
+  )
+}
+
+// ============================================================
+// OPTION D'ONBOARDING
+// ============================================================
+
+function OnboardingOption({
+  name,
+  label,
+  description,
+  defaultChecked = false,
+}: {
+  name: string
+  label: string
+  description: string
+  defaultChecked?: boolean
+}) {
+  return (
+    <label className="flex cursor-pointer gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-slate-300">
+
+      <input
+        type="checkbox"
+        name={name}
+        defaultChecked={
+          defaultChecked
+        }
+        className="mt-1 h-5 w-5 shrink-0 accent-emerald-700"
+      />
+
+      <span>
+
+        <span className="block font-black text-slate-900">
+          {label}
+        </span>
+
+        <span className="mt-1 block text-sm leading-6 text-slate-500">
+          {description}
+        </span>
+
+      </span>
+
+    </label>
   )
 }
 

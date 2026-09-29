@@ -331,7 +331,7 @@ export default async function RegisterPage({
                 type="text"
                 required
                 autoComplete="name"
-                placeholder="Ex. ADON Krist Arthur"
+                placeholder="Ex. KOUASSI Jean Marc"
                 className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-sm font-semibold text-slate-950 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
               />
 

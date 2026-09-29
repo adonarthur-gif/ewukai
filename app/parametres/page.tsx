@@ -18,6 +18,9 @@ type ParametresPageProps = {
     error?: string
     brandingSuccess?: string
     brandingError?: string
+    created?: string
+    setup?: string
+    setupWarning?: string
   }>
 }
 
@@ -241,6 +244,44 @@ export default async function ParametresPage({
         {/* ================================================== */}
         {/* MESSAGES */}
         {/* ================================================== */}
+
+        {query.created ===
+          '1' && (
+          <SuccessMessage
+            title="Organisation créée"
+            description="Votre espace dirigeant est prêt. Vérifiez maintenant les réglages ci-dessous. Vous pourrez revenir dans Paramètres à tout moment pour terminer ou modifier la configuration."
+          />
+        )}
+
+        {query.setup ===
+          'continue' && (
+          <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+
+            <p className="font-black text-blue-950">
+              Configuration initiale
+            </p>
+
+            <p className="mt-1 text-sm leading-6 text-blue-900/80">
+              Le logo, les couleurs, la page publique et les informations institutionnelles restent modifiables ici.
+              Les réglages avancés d&apos;adhésion, de paiement, d&apos;abonnement et de trésorerie peuvent être complétés progressivement depuis l&apos;espace dirigeant.
+            </p>
+
+          </div>
+        )}
+
+        {query.setupWarning && (
+          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+
+            <p className="font-black text-amber-950">
+              Une partie de la configuration reste à compléter
+            </p>
+
+            <p className="mt-1 text-sm leading-6 text-amber-900/80">
+              {query.setupWarning}
+            </p>
+
+          </div>
+        )}
 
         {query.success ===
           '1' && (
@@ -831,7 +872,7 @@ Engagement`}
               </p>
 
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Les vœux de nouvel an,
+                Les vÅ“ux de nouvel an,
                 fêtes, anniversaires de la
                 mutuelle, assemblées
                 générales et autres
