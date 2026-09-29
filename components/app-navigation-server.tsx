@@ -35,36 +35,17 @@ type ManagementMembershipRow = {
 
 type OrganizationRow = {
   id: string
-
   name: string
-
-  short_name:
-    | string
-    | null
-
-  logo_url:
-    | string
-    | null
+  short_name: string | null
+  logo_url: string | null
 }
 
 type OrganizationBrandingRow = {
   organization_id: string
-
-  logo_path:
-    | string
-    | null
-
-  primary_color:
-    | string
-    | null
-
-  secondary_color:
-    | string
-    | null
-
-  accent_color:
-    | string
-    | null
+  logo_path: string | null
+  primary_color: string | null
+  secondary_color: string | null
+  accent_color: string | null
 }
 
 type MemberRow = {
@@ -72,31 +53,27 @@ type MemberRow = {
 }
 
 // ============================================================
-// COULEURS PAR DEFAUT
+// COULEURS PAR DÉFAUT
 // ============================================================
 
-const DEFAULT_PRIMARY =
-  '#047857'
-
-const DEFAULT_SECONDARY =
-  '#0F172A'
-
-const DEFAULT_ACCENT =
-  '#ECFDF5'
+const DEFAULT_PRIMARY = '#047857'
+const DEFAULT_SECONDARY = '#0F172A'
+const DEFAULT_ACCENT = '#ECFDF5'
 
 // ============================================================
-// BUCKET DES LOGOS
+// STOCKAGE DES LOGOS
 //
-// Si une variable d'environnement existe,
-// elle est prioritaire.
+// Le branding actuel d'EWUKAI utilise le bucket
+// `organization-branding`.
 //
-// Sinon EWUKAI utilisera organization-logos.
+// L'ancien champ organizations.logo_url reste pris en charge
+// pour assurer la compatibilité avec les anciennes données.
 // ============================================================
 
-const ORGANIZATION_LOGO_BUCKET =
-  process.env
-    .NEXT_PUBLIC_ORGANIZATION_LOGO_BUCKET
-    ?.trim() ||
+const ORGANIZATION_BRANDING_BUCKET = 'organization-branding'
+
+const LEGACY_ORGANIZATION_LOGO_BUCKET =
+  process.env.NEXT_PUBLIC_ORGANIZATION_LOGO_BUCKET?.trim() ||
   'organization-logos'
 
 // ============================================================
@@ -111,15 +88,13 @@ export default async function AppNavigationServer() {
   const [
     currentOrganizationContext,
     platformAdmin,
-  ] =
-    await Promise.all([
-      getCurrentOrganization(),
-      getPlatformAdmin(),
-    ])
+  ] = await Promise.all([
+    getCurrentOrganization(),
+    getPlatformAdmin(),
+  ])
 
   const isPlatformAdmin =
-    platformAdmin?.role ===
-    'super_admin'
+    platformAdmin?.role === 'super_admin'
 
   // ==========================================================
   // 2. AUCUNE ORGANISATION DE GESTION
@@ -131,57 +106,27 @@ export default async function AppNavigationServer() {
   //   n'ayant pas d'organisation à gérer
   // ==========================================================
 
-  if (
-    !currentOrganizationContext
-  ) {
+  if (!currentOrganizationContext) {
     return (
       <>
         <BrandStyle
-          primaryColor={
-            DEFAULT_PRIMARY
-          }
-          secondaryColor={
-            DEFAULT_SECONDARY
-          }
-          accentColor={
-            DEFAULT_ACCENT
-          }
+          primaryColor={DEFAULT_PRIMARY}
+          secondaryColor={DEFAULT_SECONDARY}
+          accentColor={DEFAULT_ACCENT}
         />
 
         <AppNavigation
-          organizationId={
-            null
-          }
-          organizationName={
-            null
-          }
-          organizationShortName={
-            null
-          }
-          role={
-            null
-          }
-          logoUrl={
-            null
-          }
-          primaryColor={
-            DEFAULT_PRIMARY
-          }
-          secondaryColor={
-            DEFAULT_SECONDARY
-          }
-          accentColor={
-            DEFAULT_ACCENT
-          }
-          memberSpaceOrganizationId={
-            null
-          }
-          managementOrganizations={
-            []
-          }
-          isPlatformAdmin={
-            isPlatformAdmin
-          }
+          organizationId={null}
+          organizationName={null}
+          organizationShortName={null}
+          role={null}
+          logoUrl={null}
+          primaryColor={DEFAULT_PRIMARY}
+          secondaryColor={DEFAULT_SECONDARY}
+          accentColor={DEFAULT_ACCENT}
+          memberSpaceOrganizationId={null}
+          managementOrganizations={[]}
+          isPlatformAdmin={isPlatformAdmin}
         />
       </>
     )
@@ -196,54 +141,30 @@ export default async function AppNavigationServer() {
     userId,
     organizationId,
     role,
-  } =
-    currentOrganizationContext
+  } = currentOrganizationContext
 
   // ==========================================================
-  // 4. ORGANISATIONS GEREES PAR L'UTILISATEUR
+  // 4. ORGANISATIONS GÉRÉES PAR L'UTILISATEUR
   // ==========================================================
 
   const {
-    data:
-      membershipsData,
+    data: membershipsData,
+    error: membershipsError,
+  } = await supabase
+    .from('organization_users')
+    .select(`
+      organization_id,
+      role,
+      created_at
+    `)
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .in('role', [...MANAGEMENT_ROLES])
+    .order('created_at', {
+      ascending: true,
+    })
 
-    error:
-      membershipsError,
-  } =
-    await supabase
-      .from(
-        'organization_users'
-      )
-      .select(`
-        organization_id,
-        role,
-        created_at
-      `)
-      .eq(
-        'user_id',
-        userId
-      )
-      .eq(
-        'is_active',
-        true
-      )
-      .in(
-        'role',
-        [
-          ...MANAGEMENT_ROLES,
-        ]
-      )
-      .order(
-        'created_at',
-        {
-          ascending:
-            true,
-        }
-      )
-
-  if (
-    membershipsError
-  ) {
+  if (membershipsError) {
     console.error(
       'EWUKAI - navigation - management memberships:',
       membershipsError
@@ -251,80 +172,52 @@ export default async function AppNavigationServer() {
   }
 
   const memberships =
-    (
-      membershipsData ??
-      []
-    ) as ManagementMembershipRow[]
+    (membershipsData ?? []) as ManagementMembershipRow[]
 
   // ==========================================================
   // 5. IDENTIFIANTS DES ORGANISATIONS
   // ==========================================================
 
-  const organizationIds =
-    Array.from(
-      new Set(
-        memberships.map(
-          (
-            membership
-          ) =>
-            membership
-              .organization_id
-        )
+  const organizationIds = Array.from(
+    new Set(
+      memberships.map(
+        (membership) =>
+          membership.organization_id
       )
     )
+  )
 
   // ==========================================================
   // 6. INFORMATIONS DE BASE DES ORGANISATIONS
   //
-  // IMPORTANT :
-  // logo_url appartient bien à organizations.
-  //
-  // Les couleurs et logo_path ne sont PAS ici.
+  // `logo_url` appartient à `organizations`.
+  // Les couleurs et `logo_path` appartiennent au profil public.
   // ==========================================================
 
-  let organizations:
-    OrganizationRow[] =
-    []
+  let organizations: OrganizationRow[] = []
 
-  if (
-    organizationIds.length >
-    0
-  ) {
+  if (organizationIds.length > 0) {
     const {
-      data:
-        organizationsData,
+      data: organizationsData,
+      error: organizationsError,
+    } = await supabase
+      .from('organizations')
+      .select(`
+        id,
+        name,
+        short_name,
+        logo_url
+      `)
+      .in('id', organizationIds)
 
-      error:
-        organizationsError,
-    } =
-      await supabase
-        .from(
-          'organizations'
-        )
-        .select(`
-          id,
-          name,
-          short_name,
-          logo_url
-        `)
-        .in(
-          'id',
-          organizationIds
-        )
-
-    if (
-      organizationsError
-    ) {
+    if (organizationsError) {
       console.error(
         'EWUKAI - navigation - organizations:',
         organizationsError
       )
     } else {
       organizations =
-        (
-          organizationsData ??
-          []
-        ) as OrganizationRow[]
+        (organizationsData ?? []) as OrganizationRow[]
     }
   }
 
@@ -333,15 +226,9 @@ export default async function AppNavigationServer() {
   // ==========================================================
 
   const organizationById =
-    new Map<
-      string,
-      OrganizationRow
-    >()
+    new Map<string, OrganizationRow>()
 
-  for (
-    const organization of
-    organizations
-  ) {
+  for (const organization of organizations) {
     organizationById.set(
       organization.id,
       organization
@@ -352,58 +239,39 @@ export default async function AppNavigationServer() {
   // 8. ORGANISATION ACTIVE
   // ==========================================================
 
-  let activeOrganization:
-    OrganizationRow | null =
-    organizationById.get(
-      organizationId
-    ) ??
-    null
+  let activeOrganization: OrganizationRow | null =
+    organizationById.get(organizationId) ?? null
 
   // ==========================================================
-  // SECURITE :
+  // SÉCURITÉ / ROBUSTESSE
   //
   // Si l'organisation active n'était pas dans la requête
   // précédente, on la récupère directement.
   // ==========================================================
 
-  if (
-    !activeOrganization
-  ) {
+  if (!activeOrganization) {
     const {
-      data:
-        activeOrganizationData,
+      data: activeOrganizationData,
+      error: activeOrganizationError,
+    } = await supabase
+      .from('organizations')
+      .select(`
+        id,
+        name,
+        short_name,
+        logo_url
+      `)
+      .eq('id', organizationId)
+      .maybeSingle()
 
-      error:
-        activeOrganizationError,
-    } =
-      await supabase
-        .from(
-          'organizations'
-        )
-        .select(`
-          id,
-          name,
-          short_name,
-          logo_url
-        `)
-        .eq(
-          'id',
-          organizationId
-        )
-        .maybeSingle()
-
-    if (
-      activeOrganizationError
-    ) {
+    if (activeOrganizationError) {
       console.error(
         'EWUKAI - navigation - active organization:',
         activeOrganizationError
       )
     }
 
-    if (
-      activeOrganizationData
-    ) {
+    if (activeOrganizationData) {
       const recoveredOrganization =
         activeOrganizationData as OrganizationRow
 
@@ -420,92 +288,63 @@ export default async function AppNavigationServer() {
   // ==========================================================
   // 9. BRANDING DE L'ORGANISATION ACTIVE
   //
-  // logo_path + couleurs sont dans :
-  //
-  // organization_public_profiles
+  // `logo_path` + couleurs sont dans :
+  // `organization_public_profiles`
   // ==========================================================
 
-  let branding:
-    OrganizationBrandingRow | null =
+  let branding: OrganizationBrandingRow | null =
     null
 
   const {
-    data:
-      brandingData,
+    data: brandingData,
+    error: brandingError,
+  } = await supabase
+    .from('organization_public_profiles')
+    .select(`
+      organization_id,
+      logo_path,
+      primary_color,
+      secondary_color,
+      accent_color
+    `)
+    .eq('organization_id', organizationId)
+    .maybeSingle()
 
-    error:
-      brandingError,
-  } =
-    await supabase
-      .from(
-        'organization_public_profiles'
-      )
-      .select(`
-        organization_id,
-        logo_path,
-        primary_color,
-        secondary_color,
-        accent_color
-      `)
-      .eq(
-        'organization_id',
-        organizationId
-      )
-      .maybeSingle()
-
-  if (
-    brandingError
-  ) {
+  if (brandingError) {
     console.error(
       'EWUKAI - navigation - branding:',
       brandingError
     )
-  } else if (
-    brandingData
-  ) {
+  } else if (brandingData) {
     branding =
       brandingData as OrganizationBrandingRow
   }
 
   // ==========================================================
-  // 10. SELECTEUR MULTI-ORGANISATION
+  // 10. SÉLECTEUR MULTI-ORGANISATION
   // ==========================================================
 
   const managementOrganizations =
-    memberships.flatMap(
-      (
-        membership
-      ) => {
-        const organization =
-          organizationById.get(
-            membership
-              .organization_id
-          )
+    memberships.flatMap((membership) => {
+      const organization =
+        organizationById.get(
+          membership.organization_id
+        )
 
-        if (
-          !organization
-        ) {
-          return []
-        }
-
-        return [
-          {
-            id:
-              organization.id,
-
-            name:
-              organization.name,
-
-            shortName:
-              organization
-                .short_name,
-
-            role:
-              membership.role,
-          },
-        ]
+      if (!organization) {
+        return []
       }
-    )
+
+      return [
+        {
+          id: organization.id,
+          name: organization.name,
+          shortName:
+            organization.short_name,
+          role: membership.role,
+        },
+      ]
+    })
 
   // ==========================================================
   // 11. ESPACE MEMBRE DANS L'ORGANISATION ACTIVE
@@ -515,39 +354,20 @@ export default async function AppNavigationServer() {
   // ==========================================================
 
   const {
-    data:
-      memberData,
+    data: memberData,
+    error: memberError,
+  } = await supabase
+    .from('members')
+    .select(`
+      organization_id
+    `)
+    .eq('organization_id', organizationId)
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .limit(1)
+    .maybeSingle()
 
-    error:
-      memberError,
-  } =
-    await supabase
-      .from(
-        'members'
-      )
-      .select(`
-        organization_id
-      `)
-      .eq(
-        'organization_id',
-        organizationId
-      )
-      .eq(
-        'user_id',
-        userId
-      )
-      .eq(
-        'status',
-        'active'
-      )
-      .limit(
-        1
-      )
-      .maybeSingle()
-
-  if (
-    memberError
-  ) {
+  if (memberError) {
     console.error(
       'EWUKAI - navigation - member space:',
       memberError
@@ -556,126 +376,108 @@ export default async function AppNavigationServer() {
 
   const member =
     memberData
-      ? (
-          memberData as MemberRow
-        )
+      ? (memberData as MemberRow)
       : null
 
   const memberSpaceOrganizationId =
-    member
-      ?.organization_id ??
-    null
+    member?.organization_id ?? null
 
   // ==========================================================
   // 12. COULEURS
   // ==========================================================
 
-  const primaryColor =
-    safeColor(
-      branding
-        ?.primary_color,
-      DEFAULT_PRIMARY
-    )
+  const primaryColor = safeColor(
+    branding?.primary_color,
+    DEFAULT_PRIMARY
+  )
 
-  const secondaryColor =
-    safeColor(
-      branding
-        ?.secondary_color,
-      DEFAULT_SECONDARY
-    )
+  const secondaryColor = safeColor(
+    branding?.secondary_color,
+    DEFAULT_SECONDARY
+  )
 
-  const accentColor =
-    safeColor(
-      branding
-        ?.accent_color,
-      DEFAULT_ACCENT
-    )
+  const accentColor = safeColor(
+    branding?.accent_color,
+    DEFAULT_ACCENT
+  )
 
   // ==========================================================
   // 13. LOGO
   //
-  // Priorité :
+  // Ordre de priorité :
   //
-  // 1. logo_path du profil public
-  // 2. logo_url historique de organizations
+  // 1. organization_public_profiles.logo_path
+  //    -> bucket officiel `organization-branding`
+  //
+  // 2. organizations.logo_url
+  //    -> URL absolue historique ou ancien bucket
+  //
+  // Cette logique évite qu'un chemin de Storage soit utilisé
+  // directement comme attribut `src`, ce qui provoquait
+  // l'icône d'image cassée dans le header dirigeant.
   // ==========================================================
 
-  let logoUrl:
-    string | null =
-    null
+  const resolveStorageLogoUrl = (
+    bucket: string,
+    rawPath: string | null | undefined
+  ): string | null => {
+    const candidate = rawPath?.trim()
 
-  const brandingLogoPath =
-    branding
-      ?.logo_path
-      ?.trim() ??
-    ''
-
-  // ==========================================================
-  // LOGO DU PROFIL PUBLIC
-  // ==========================================================
-
-  if (
-    brandingLogoPath
-  ) {
-    // --------------------------------------------------------
-    // URL COMPLETE
-    // --------------------------------------------------------
+    if (!candidate) {
+      return null
+    }
 
     if (
-      brandingLogoPath.startsWith(
-        'https://'
-      ) ||
-      brandingLogoPath.startsWith(
-        'http://'
+      candidate.startsWith('https://') ||
+      candidate.startsWith('http://')
+    ) {
+      return candidate
+    }
+
+    let storagePath =
+      candidate.replace(/^\/+/, '')
+
+    const bucketPrefix =
+      `${bucket}/`
+
+    if (
+      storagePath.startsWith(
+        bucketPrefix
       )
     ) {
-      logoUrl =
-        brandingLogoPath
-    } else {
-      // ------------------------------------------------------
-      // CHEMIN SUPABASE STORAGE
-      // ------------------------------------------------------
-
-      const {
-        data:
-          publicUrlData,
-      } =
-        supabase.storage
-          .from(
-            ORGANIZATION_LOGO_BUCKET
-          )
-          .getPublicUrl(
-            brandingLogoPath
-          )
-
-      logoUrl =
-        publicUrlData
-          ?.publicUrl ??
-        null
+      storagePath =
+        storagePath.slice(
+          bucketPrefix.length
+        )
     }
+
+    if (!storagePath) {
+      return null
+    }
+
+    const { data } =
+      supabase.storage
+        .from(bucket)
+        .getPublicUrl(storagePath)
+
+    return data?.publicUrl || null
   }
 
-  // ==========================================================
-  // FALLBACK :
-  // ancien champ organizations.logo_url
-  // ==========================================================
+  const brandingLogoUrl =
+    resolveStorageLogoUrl(
+      ORGANIZATION_BRANDING_BUCKET,
+      branding?.logo_path
+    )
 
-  if (
-    !logoUrl
-  ) {
-    const legacyLogoUrl =
-      activeOrganization
-        ?.logo_url
-        ?.trim() ??
-      ''
+  const legacyLogoUrl =
+    resolveStorageLogoUrl(
+      LEGACY_ORGANIZATION_LOGO_BUCKET,
+      activeOrganization?.logo_url
+    )
 
-    if (
-      legacyLogoUrl
-    ) {
-      logoUrl =
-        legacyLogoUrl
-    }
-  }
+  const logoUrl =
+    brandingLogoUrl ??
+    legacyLogoUrl
 
   // ==========================================================
   // 14. RENDU
@@ -683,55 +485,26 @@ export default async function AppNavigationServer() {
 
   return (
     <>
-      {/* ==================================================== */}
-      {/* VARIABLES CSS DU BRANDING */}
-      {/* ==================================================== */}
-
       <BrandStyle
-        primaryColor={
-          primaryColor
-        }
-        secondaryColor={
-          secondaryColor
-        }
-        accentColor={
-          accentColor
-        }
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
+        accentColor={accentColor}
       />
 
-      {/* ==================================================== */}
-      {/* NAVIGATION */}
-      {/* ==================================================== */}
-
       <AppNavigation
-        organizationId={
-          organizationId
-        }
+        organizationId={organizationId}
         organizationName={
-          activeOrganization
-            ?.name ??
-          null
+          activeOrganization?.name ?? null
         }
         organizationShortName={
-          activeOrganization
-            ?.short_name ??
+          activeOrganization?.short_name ??
           null
         }
-        role={
-          role
-        }
-        logoUrl={
-          logoUrl
-        }
-        primaryColor={
-          primaryColor
-        }
-        secondaryColor={
-          secondaryColor
-        }
-        accentColor={
-          accentColor
-        }
+        role={role}
+        logoUrl={logoUrl}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
+        accentColor={accentColor}
         memberSpaceOrganizationId={
           memberSpaceOrganizationId
         }
@@ -777,19 +550,12 @@ function BrandStyle({
 // ============================================================
 
 function safeColor(
-  value:
-    | string
-    | null
-    | undefined,
-
-  fallback:
-    string
+  value: string | null | undefined,
+  fallback: string
 ) {
   if (
     value &&
-    /^#[0-9A-Fa-f]{6}$/.test(
-      value
-    )
+    /^#[0-9A-Fa-f]{6}$/.test(value)
   ) {
     return value
   }

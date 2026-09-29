@@ -955,14 +955,14 @@ export default async function MySpacePage({
                 </p>
 
                 {organization.short_name && (
-                  <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-500 sm:text-xs">
+                  <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-600 sm:text-xs">
                     {
                       organization.name
                     }
                   </p>
                 )}
 
-                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-400 sm:hidden">
+                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 sm:hidden">
                   Espace membre
                 </p>
 
@@ -1027,7 +1027,7 @@ export default async function MySpacePage({
                 type="submit"
                 className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700"
               >
-                Sortir
+                Déconnexion
               </button>
             </form>
 
@@ -1083,7 +1083,7 @@ export default async function MySpacePage({
 
               <span
                 aria-hidden="true"
-                className="text-slate-400 transition group-open:rotate-180"
+                className="text-slate-600 transition group-open:rotate-180"
               >
                 ▼
               </span>
@@ -1292,7 +1292,7 @@ export default async function MySpacePage({
 
           <div className="p-7 sm:p-9">
 
-            <p className="text-sm font-bold text-white/75">
+            <p className="text-sm font-bold text-white/90">
               Bienvenue dans votre
               espace personnel
             </p>
@@ -1302,12 +1302,12 @@ export default async function MySpacePage({
               {member.first_name}
             </h1>
 
-            <p className="mt-3 text-base font-bold text-white/85 sm:text-lg">
+            <p className="mt-3 text-base font-bold text-white/90 sm:text-lg">
               {organization.name}
             </p>
 
             {profile?.slogan && (
-              <p className="mt-2 max-w-2xl text-sm text-white/70">
+              <p className="mt-2 max-w-2xl text-sm text-white/85">
                 {profile.slogan}
               </p>
             )}
@@ -1359,7 +1359,7 @@ export default async function MySpacePage({
               Situation de mes cotisations
             </h2>
 
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-600">
               Consultez votre
               situation financière
               auprès de votre
@@ -1464,12 +1464,12 @@ export default async function MySpacePage({
               </p>
 
               <h2 className="mt-1 text-2xl font-black text-slate-950">
-                Cotisations À régulariser
+                Cotisations à régulariser
               </h2>
 
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Ces rappels sont générés automatiquement par votre organisation
-                À partir des échéances qui présentent encore un solde À payer.
+                à partir des échéances qui présentent encore un solde à payer.
               </p>
 
             </div>
@@ -1497,7 +1497,7 @@ export default async function MySpacePage({
                             )}
                           </span>
 
-                          <span className="text-xs font-bold text-slate-400">
+                          <span className="text-xs font-bold text-slate-600">
                             Échéance{' '}
                             {formatDate(
                               reminder.due_date
@@ -1518,8 +1518,8 @@ export default async function MySpacePage({
 
                       <div className="shrink-0 sm:text-right">
 
-                        <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                          Reste À payer
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
+                          Reste à payer
                         </p>
 
                         <p className="mt-1 text-xl font-black text-amber-700">
@@ -1601,7 +1601,7 @@ export default async function MySpacePage({
 
             <div className="shrink-0">
 
-              <p className="text-xs font-bold uppercase text-slate-500">
+              <p className="text-xs font-bold uppercase text-slate-600">
                 Reste exigible
               </p>
 
@@ -1635,7 +1635,7 @@ export default async function MySpacePage({
                   actuellement affiché.
                 </p>
 
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="mt-2 text-sm text-slate-600">
                   Contactez votre
                   organisation pour
                   connaître les
@@ -1810,7 +1810,7 @@ export default async function MySpacePage({
 
               <table className="w-full text-left">
 
-                <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
 
                   <tr>
 
@@ -1890,7 +1890,7 @@ export default async function MySpacePage({
                               }
                             </Link>
                           ) : (
-                            <span className="text-slate-400">
+                            <span className="text-slate-600">
                               —
                             </span>
                           )}
@@ -2178,11 +2178,11 @@ export default async function MySpacePage({
 
         <footer className="py-10 text-center">
 
-          <p className="text-sm font-bold text-slate-500">
+          <p className="text-sm font-bold text-slate-600">
             {organization.name}
           </p>
 
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-slate-600">
             Espace personnel sécurisé
           </p>
 
@@ -2458,7 +2458,7 @@ function PaymentMethodCard({
         {method.instructions && (
           <div className="rounded-xl bg-slate-50 p-4">
 
-            <p className="text-xs font-black uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-black uppercase tracking-wide text-slate-600">
               Instructions
             </p>
 
@@ -2626,7 +2626,7 @@ function ObligationsTable({
 
       <table className="w-full text-left">
 
-        <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+        <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
 
           <tr>
 
@@ -2764,7 +2764,7 @@ function ObligationsTable({
                         Payer
                       </Link>
                     ) : (
-                      <span className="text-sm text-slate-400">
+                      <span className="text-sm text-slate-600">
                         —
                       </span>
                     )}
@@ -2839,7 +2839,7 @@ function HeroInfo({
   return (
     <div className="rounded-2xl bg-white/10 px-5 py-4 backdrop-blur-sm">
 
-      <p className="text-xs font-bold uppercase tracking-wide text-white/60">
+      <p className="text-xs font-bold uppercase tracking-wide text-white/80">
         {label}
       </p>
 
@@ -2886,7 +2886,7 @@ function FinancialCard({
       className={`rounded-2xl border p-5 shadow-sm ${classes}`}
     >
 
-      <p className="text-sm font-bold text-slate-500">
+      <p className="text-sm font-bold text-slate-600">
         {label}
       </p>
 
@@ -2946,7 +2946,7 @@ function EmptyState({
   return (
     <div className="p-8 text-center">
 
-      <p className="text-sm leading-6 text-slate-500">
+      <p className="text-sm leading-6 text-slate-600">
         {text}
       </p>
 
@@ -2974,7 +2974,7 @@ function ProfileField({
   return (
     <label className="block">
 
-      <span className="text-xs font-black uppercase tracking-wide text-slate-500">
+      <span className="text-xs font-black uppercase tracking-wide text-slate-600">
         {label}
       </span>
 
@@ -3006,7 +3006,7 @@ function ProfileItem({
   return (
     <div className="rounded-2xl bg-slate-50 p-5">
 
-      <p className="text-xs font-black uppercase tracking-wide text-slate-400">
+      <p className="text-xs font-black uppercase tracking-wide text-slate-600">
         {label}
       </p>
 
@@ -3034,7 +3034,7 @@ function PaymentInfo({
   return (
     <div>
 
-      <p className="text-xs font-black uppercase tracking-wide text-slate-400">
+      <p className="text-xs font-black uppercase tracking-wide text-slate-600">
         {label}
       </p>
 
@@ -3121,7 +3121,7 @@ function StatusBadge({
     'cancelled'
   ) {
     return (
-      <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-500">
+      <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">
         Annulé
       </span>
     )
