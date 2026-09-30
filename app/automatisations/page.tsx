@@ -265,8 +265,8 @@ export default async function AutomationsPage({
             </h1>
 
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              PrÃ©parez automatiquement les relances liÃ©es aux cotisations
-              avant l&apos;Ã©chÃ©ance, le jour prÃ©vu et aprÃ¨s retard.
+              Préparez automatiquement les relances liées aux cotisations
+              avant l&apos;échéance, le jour prévu et après retard.
             </p>
           </div>
 
@@ -281,10 +281,10 @@ export default async function AutomationsPage({
         {query.saved === '1' && (
           <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
             <p className="font-black">
-              Configuration enregistrÃ©e.
+              Configuration enregistrée.
             </p>
             <p className="mt-1 leading-6 text-emerald-800">
-              Les prochaines exÃ©cutions utiliseront ces rÃ¨gles.
+              Les prochaines exécutions utiliseront ces règles.
             </p>
           </div>
         )}
@@ -292,12 +292,12 @@ export default async function AutomationsPage({
         {query.run === '1' && (
           <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
             <p className="font-black">
-              Automatisation exÃ©cutÃ©e.
+              Automatisation exécutée.
             </p>
             <p className="mt-1 leading-6 text-blue-800">
               {generatedNow} nouvelle
               {generatedNow !== 1 ? 's' : ''} relance
-              {generatedNow !== 1 ? 's' : ''} gÃ©nÃ©rÃ©e
+              {generatedNow !== 1 ? 's' : ''} générée
               {generatedNow !== 1 ? 's' : ''} aujourd&apos;hui.
             </p>
           </div>
@@ -306,7 +306,7 @@ export default async function AutomationsPage({
         {query.error && (
           <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
             <p className="font-black">
-              OpÃ©ration impossible
+              Opération impossible
             </p>
             <p className="mt-1 leading-6 text-red-800">
               {query.error}
@@ -328,13 +328,13 @@ export default async function AutomationsPage({
           <MetricCard
             label="Relances ouvertes"
             value={String(generatedOpen)}
-            note="Encore liÃ©es Ã  un solde dÃ»"
+            note="Encore liées à un solde dû"
           />
 
           <MetricCard
-            label="Relances rÃ©solues"
+            label="Relances résolues"
             value={String(resolved)}
-            note="Dette soldÃ©e ou devenue non applicable"
+            note="Dette soldée ou devenue non applicable"
           />
         </section>
 
@@ -347,11 +347,11 @@ export default async function AutomationsPage({
                 </p>
 
                 <h2 className="mt-2 text-2xl font-black text-slate-950">
-                  RÃ¨gles de rappel
+                  Règles de rappel
                 </h2>
 
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Cette fonctionnalitÃ© est incluse dans les formules
+                  Cette fonctionnalité est incluse dans les formules
                   Pro et Entreprise.
                 </p>
               </div>
@@ -379,16 +379,16 @@ export default async function AutomationsPage({
                     Activer les relances de cotisations
                   </span>
 
-                  <span className="mt-1 block text-xs leading-5 text-slate-500">
-                    EWUKAI gÃ©nÃ©rera les rappels correspondant aux jours
-                    sÃ©lectionnÃ©s lorsque le cycle automatique sera exÃ©cutÃ©.
+                  <span className="mt-1 block text-xs leading-5 text-slate-600">
+                    EWUKAI générera les rappels correspondant aux jours
+                    sélectionnés lorsque le cycle automatique sera exécuté.
                   </span>
                 </span>
               </label>
 
               <div>
                 <p className="text-sm font-black text-slate-950">
-                  Avant l&apos;Ã©chÃ©ance
+                  Avant l&apos;échéance
                 </p>
 
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -420,13 +420,13 @@ export default async function AutomationsPage({
                 />
 
                 <span className="font-bold text-slate-800">
-                  GÃ©nÃ©rer Ã©galement un rappel le jour de l&apos;Ã©chÃ©ance
+                  Générer également un rappel le jour de l&apos;échéance
                 </span>
               </label>
 
               <div>
                 <p className="text-sm font-black text-slate-950">
-                  AprÃ¨s l&apos;Ã©chÃ©ance
+                  Après l&apos;échéance
                 </p>
 
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -453,11 +453,11 @@ export default async function AutomationsPage({
                   type="submit"
                   className="inline-flex w-full justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:bg-slate-800"
                 >
-                  Enregistrer les rÃ¨gles
+                  Enregistrer les règles
                 </button>
               ) : (
-                <p className="rounded-2xl bg-slate-50 p-4 text-xs font-semibold leading-5 text-slate-500">
-                  Votre rÃ´le permet de consulter cette configuration,
+                <p className="rounded-2xl bg-slate-50 p-4 text-xs font-semibold leading-5 text-slate-600">
+                  Votre rôle permet de consulter cette configuration,
                   mais pas de la modifier.
                 </p>
               )}
@@ -465,13 +465,13 @@ export default async function AutomationsPage({
 
             <div className="mt-6 border-t border-slate-100 pt-6">
               <p className="text-sm font-black text-slate-950">
-                ExÃ©cution de contrÃ´le
+                Exécution de contrôle
               </p>
 
-              <p className="mt-1 text-xs leading-5 text-slate-500">
-                Utilisez ce bouton pour exÃ©cuter immÃ©diatement le moteur
-                sur les Ã©chÃ©ances du jour. L&apos;idempotence empÃªche de crÃ©er
-                deux fois la mÃªme relance.
+              <p className="mt-1 text-xs leading-5 text-slate-600">
+                Utilisez ce bouton pour exécuter immédiatement le moteur
+                sur les échéances du jour. L&apos;idempotence empêche de créer
+                deux fois la même relance.
               </p>
 
               {canManage && (
@@ -483,20 +483,20 @@ export default async function AutomationsPage({
                     type="submit"
                     className="inline-flex rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800 transition hover:bg-slate-50"
                   >
-                    ExÃ©cuter maintenant
+                    Exécuter maintenant
                   </button>
                 </form>
               )}
 
               <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-xs leading-5 text-blue-900">
                 <p className="font-black">
-                  Canal V1 : gÃ©nÃ©ration interne
+                  Canal V1 : génération interne
                 </p>
 
                 <p className="mt-1 text-blue-800">
-                  Cette Ã©tape crÃ©e et historise les relances dans EWUKAI.
+                  Cette étape crée et historise les relances dans EWUKAI.
                   L&apos;affichage dans l&apos;espace membre puis les canaux
-                  e-mail, SMS ou WhatsApp seront raccordÃ©s sÃ©parÃ©ment.
+                  e-mail, SMS ou WhatsApp seront raccordés séparément.
                 </p>
               </div>
             </div>
@@ -509,23 +509,23 @@ export default async function AutomationsPage({
               </p>
 
               <h2 className="mt-2 text-2xl font-black text-slate-950">
-                DerniÃ¨res relances gÃ©nÃ©rÃ©es
+                Dernières relances générées
               </h2>
 
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Jusqu&apos;aux 100 Ã©vÃ©nements les plus rÃ©cents.
+                Jusqu&apos;aux 100 événements les plus récents.
               </p>
             </div>
 
             {reminders.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="font-black text-slate-800">
-                  Aucune relance gÃ©nÃ©rÃ©e
+                  Aucune relance générée
                 </p>
 
-                <p className="mt-2 text-sm leading-6 text-slate-500">
-                  Activez les rÃ¨gles puis exÃ©cutez le moteur lorsqu&apos;une
-                  Ã©chÃ©ance correspond Ã  vos critÃ¨res.
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Activez les règles puis exécutez le moteur lorsqu&apos;une
+                  échéance correspond à vos critères.
                 </p>
               </div>
             ) : (
@@ -548,8 +548,8 @@ export default async function AutomationsPage({
         </section>
 
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">
-            DerniÃ¨re exÃ©cution
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
+            Dernière exécution
           </p>
 
           <div className="mt-3 grid gap-4 sm:grid-cols-3">
@@ -562,7 +562,7 @@ export default async function AutomationsPage({
                     )
                   : 'Jamais'
               }
-              note="Date mÃ©tier du dernier cycle"
+              note="Date métier du dernier cycle"
             />
 
             <MetricCard
@@ -573,7 +573,7 @@ export default async function AutomationsPage({
                   0
                 ) || 0
               )}
-              note="CrÃ©Ã©es au dernier cycle"
+              note="Créées au dernier cycle"
             />
 
             <MetricCard
@@ -585,7 +585,7 @@ export default async function AutomationsPage({
                     )
                   : 'Non disponible'
               }
-              note="DerniÃ¨re exÃ©cution enregistrÃ©e"
+              note="Dernière exécution enregistrée"
             />
           </div>
         </section>
@@ -663,7 +663,7 @@ function ReminderItem({
             >
               {reminder.status ===
               'resolved'
-                ? 'RÃ©solue'
+                ? 'Résolue'
                 : 'Ouverte'}
             </span>
           </div>
@@ -672,7 +672,7 @@ function ReminderItem({
             {reminder.title}
           </p>
 
-          <p className="mt-1 text-xs leading-5 text-slate-500">
+          <p className="mt-1 text-xs leading-5 text-slate-600">
             {reminder.message}
           </p>
         </div>
@@ -684,8 +684,8 @@ function ReminderItem({
             )}
           </p>
 
-          <p className="mt-1 text-xs font-semibold text-slate-500">
-            Ã‰chÃ©ance{' '}
+          <p className="mt-1 text-xs font-semibold text-slate-600">
+            échéance{' '}
             {formatDate(
               reminder.due_date
             )}
@@ -693,8 +693,8 @@ function ReminderItem({
         </div>
       </div>
 
-      <p className="mt-3 text-[11px] font-semibold text-slate-400">
-        GÃ©nÃ©rÃ©e le{' '}
+      <p className="mt-3 text-[11px] font-semibold text-slate-600">
+        Générée le{' '}
         {formatDateTime(
           reminder.generated_at
         )}
@@ -714,7 +714,7 @@ function MetricCard({
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-[11px] font-black uppercase tracking-wide text-slate-500">
+      <p className="text-[11px] font-black uppercase tracking-wide text-slate-600">
         {label}
       </p>
 
@@ -722,7 +722,7 @@ function MetricCard({
         {value}
       </p>
 
-      <p className="mt-1 text-xs font-semibold text-slate-500">
+      <p className="mt-1 text-xs font-semibold text-slate-600">
         {note}
       </p>
     </div>
@@ -734,7 +734,7 @@ function formatReminderType(
 ) {
   switch (value) {
     case 'before_due':
-      return 'Avant Ã©chÃ©ance'
+      return 'Avant échéance'
 
     case 'due_today':
       return 'Jour J'

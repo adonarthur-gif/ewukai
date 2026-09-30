@@ -216,7 +216,7 @@ export default async function NewContributionCallPage({
                   Informations de l&apos;appel
                 </h2>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-slate-600">
                   Donnez un intitulé suffisamment précis pour distinguer
                   cet appel des autres collectes.
                 </p>
@@ -295,7 +295,7 @@ export default async function NewContributionCallPage({
 
                   </div>
 
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-slate-600">
                     Ce montant sera dû par chaque membre concerné par
                     l&apos;appel.
                   </p>
@@ -316,7 +316,7 @@ export default async function NewContributionCallPage({
                   Bénéficiaire
                 </h2>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-slate-600">
                   Facultatif. Le bénéficiaire peut être un membre de la
                   mutuelle ou une personne extérieure.
                 </p>
@@ -413,7 +413,7 @@ export default async function NewContributionCallPage({
                   Période de l&apos;appel
                 </h2>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-slate-600">
                   Définissez la date de lancement et la date limite de
                   règlement.
                 </p>
@@ -480,7 +480,7 @@ export default async function NewContributionCallPage({
                   Membres concernés
                 </h2>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-slate-600">
                   L&apos;appel peut concerner tous les membres actifs ou
                   seulement certains adhérents.
                 </p>
@@ -510,7 +510,7 @@ export default async function NewContributionCallPage({
                         Tous les membres actifs
                       </p>
 
-                      <p className="mt-1 text-sm leading-5 text-slate-500">
+                      <p className="mt-1 text-sm leading-5 text-slate-600">
                         Tous les adhérents actifs et déjà membres à la date
                         limite seront concernés lors de l&apos;activation.
                       </p>
@@ -540,7 +540,7 @@ export default async function NewContributionCallPage({
                         Membres sélectionnés
                       </p>
 
-                      <p className="mt-1 text-sm leading-5 text-slate-500">
+                      <p className="mt-1 text-sm leading-5 text-slate-600">
                         Seuls les adhérents cochés dans la liste ci-dessous
                         seront concernés.
                       </p>
@@ -568,13 +568,13 @@ export default async function NewContributionCallPage({
                         Sélection manuelle
                       </p>
 
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 text-xs text-slate-600">
                         Cochez les membres uniquement si vous choisissez
                         « Membres sélectionnés ».
                       </p>
                     </div>
 
-                    <span className="mt-2 text-sm font-semibold text-slate-500 sm:mt-0">
+                    <span className="mt-2 text-sm font-semibold text-slate-600 sm:mt-0">
                       {
                         activeMembers.length
                       }{' '}
@@ -602,7 +602,7 @@ export default async function NewContributionCallPage({
                       Aucun membre actif
                     </p>
 
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-slate-600">
                       Ajoutez ou réactivez des membres avant de créer cet
                       appel.
                     </p>
@@ -649,7 +649,7 @@ export default async function NewContributionCallPage({
                           </div>
 
                           {member.phone && (
-                            <p className="hidden shrink-0 text-sm text-slate-500 sm:block">
+                            <p className="hidden shrink-0 text-sm text-slate-600 sm:block">
                               {
                                 member.phone
                               }

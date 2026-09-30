@@ -93,7 +93,7 @@ export default async function NewExpensePage({
               Nouvelle dépense
             </h1>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-slate-600">
               Enregistrer un décaissement
               réel de la mutuelle.
             </p>
@@ -110,7 +110,7 @@ export default async function NewExpensePage({
 
         <section className="mt-6 rounded-2xl bg-slate-900 p-6 text-white">
 
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-600">
             Solde disponible avant opération
           </p>
 

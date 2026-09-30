@@ -1518,7 +1518,7 @@ export default async function DashboardPage() {
                   )}
                 </p>
 
-                <p className="mt-4 max-w-xl text-sm leading-6 text-slate-400">
+                <p className="mt-4 max-w-xl text-sm leading-6 text-slate-600">
                   Ce solde correspond
                   uniquement aux
                   opérations enregistrées
@@ -1839,7 +1839,7 @@ export default async function DashboardPage() {
                             }
                           </p>
 
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="mt-1 text-xs text-slate-600">
                             {
                               member.member_number
                             }
@@ -1908,7 +1908,7 @@ export default async function DashboardPage() {
                             }
                           </p>
 
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="mt-1 text-xs text-slate-600">
 
                             {formatShortDate(
                               entry.entry_date
@@ -2194,7 +2194,7 @@ function SectionTitle({
       </h2>
 
       {description && (
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-600">
           {description}
         </p>
       )}
@@ -2285,7 +2285,7 @@ function KpiCard({
 
   const content = (
     <>
-      <p className="text-sm font-bold text-slate-500">
+      <p className="text-sm font-bold text-slate-600">
         {label}
       </p>
 
@@ -2295,7 +2295,7 @@ function KpiCard({
         {value}
       </p>
 
-      <p className="mt-2 text-sm leading-5 text-slate-500">
+      <p className="mt-2 text-sm leading-5 text-slate-600">
         {description}
       </p>
 
@@ -2373,7 +2373,7 @@ function MoneyMetric({
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
 
-      <p className="text-sm font-bold text-slate-500">
+      <p className="text-sm font-bold text-slate-600">
         {label}
       </p>
 
@@ -2407,7 +2407,7 @@ function CollectionRateCard({
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
 
-      <p className="text-sm font-bold text-slate-500">
+      <p className="text-sm font-bold text-slate-600">
         Taux de recouvrement
       </p>
 
@@ -2443,7 +2443,7 @@ function CollectionRateCard({
 
         </div>
       ) : (
-        <p className="mt-3 text-sm font-semibold text-slate-400">
+        <p className="mt-3 text-sm font-semibold text-slate-600">
           Aucune échéance
         </p>
       )}
@@ -2509,7 +2509,7 @@ function DarkMetric({
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
 
-      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
         {label}
       </p>
 
@@ -2608,7 +2608,7 @@ function PanelHeader({
           {title}
         </h2>
 
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-600">
           {description}
         </p>
 
@@ -2635,7 +2635,7 @@ function EmptyState({
   text: string
 }) {
   return (
-    <div className="p-8 text-center text-sm text-slate-500">
+    <div className="p-8 text-center text-sm text-slate-600">
       {text}
     </div>
   )
@@ -2664,7 +2664,7 @@ function ModuleCard({
         {title}
       </h3>
 
-      <p className="mt-3 text-sm leading-6 text-slate-500">
+      <p className="mt-3 text-sm leading-6 text-slate-600">
         {description}
       </p>
 

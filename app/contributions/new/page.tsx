@@ -178,7 +178,7 @@ export default async function NewContributionPage({
                 className="w-full rounded-lg border px-3 py-2"
               />
 
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-600">
                 Entre le 1er et le 28 du mois.
               </p>
             </div>
@@ -231,7 +231,7 @@ export default async function NewContributionPage({
                 Cotisation obligatoire
               </span>
 
-              <span className="mt-1 block text-sm text-slate-500">
+              <span className="mt-1 block text-sm text-slate-600">
                 Les membres concernés seront considérés
                 comme redevables de cette cotisation.
               </span>

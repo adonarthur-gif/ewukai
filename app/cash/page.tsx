@@ -412,7 +412,7 @@ export default async function CashPage({
               Trésorerie
             </h1>
 
-            <p className="mt-2 max-w-2xl text-slate-500">
+            <p className="mt-2 max-w-2xl text-slate-600">
               Suivez les fonds
               comptabilisés de la
               mutuelle, les entrées,
@@ -480,7 +480,7 @@ export default async function CashPage({
 
                 <label
                   htmlFor="year"
-                  className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600"
                 >
                   Année
                 </label>
@@ -529,7 +529,7 @@ export default async function CashPage({
 
                 <label
                   htmlFor="period"
-                  className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600"
                 >
                   Mois
                 </label>
@@ -592,7 +592,7 @@ export default async function CashPage({
 
               <div>
 
-                <p className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+                <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">
                   Solde de trésorerie enregistré
                 </p>
 
@@ -602,7 +602,7 @@ export default async function CashPage({
                   )}
                 </p>
 
-                <p className="mt-3 max-w-xl text-sm text-slate-400">
+                <p className="mt-3 max-w-xl text-sm text-slate-600">
                   Solde calculé à partir
                   de toutes les entrées et
                   sorties comptabilisées
@@ -648,7 +648,7 @@ export default async function CashPage({
               {selectedYear}
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-600">
               Situation globale de la
               trésorerie comptabilisée
               pour l&apos;année.
@@ -721,7 +721,7 @@ export default async function CashPage({
               {selectedYear}
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-600">
               Solde d&apos;ouverture,
               entrées, sorties et
               solde de clôture pour
@@ -734,7 +734,7 @@ export default async function CashPage({
 
             <table className="w-full text-left">
 
-              <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
 
                 <tr>
 
@@ -881,7 +881,7 @@ export default async function CashPage({
               )}
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-600">
               Mouvements comptabilisés
               pendant le mois sélectionné.
             </p>
@@ -923,7 +923,7 @@ export default async function CashPage({
 
             <div className="rounded-2xl border bg-white p-5 shadow-sm">
 
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-600">
                 Nombre de mouvements
               </p>
 
@@ -954,7 +954,7 @@ export default async function CashPage({
               )}
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-600">
               Détail chronologique des
               opérations enregistrées.
             </p>
@@ -968,7 +968,7 @@ export default async function CashPage({
                 Aucun mouvement
               </p>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-600">
                 Aucune entrée ou sortie
                 n&apos;a été comptabilisée
                 pour cette période.
@@ -980,7 +980,7 @@ export default async function CashPage({
 
               <table className="w-full text-left">
 
-                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
 
                   <tr>
 
@@ -1027,7 +1027,7 @@ export default async function CashPage({
                             )}
                           </p>
 
-                          <p className="mt-1 text-xs text-slate-400">
+                          <p className="mt-1 text-xs text-slate-600">
                             Saisi le{' '}
                             {formatDateTime(
                               movement.created_at
@@ -1045,7 +1045,7 @@ export default async function CashPage({
                           </p>
 
                           {movement.reference_type && (
-                            <p className="mt-1 text-xs text-slate-400">
+                            <p className="mt-1 text-xs text-slate-600">
                               Type :{' '}
                               {
                                 movement.reference_type
@@ -1151,7 +1151,7 @@ function DarkStat({
   return (
     <div>
 
-      <p className="text-xs uppercase tracking-wide text-slate-400">
+      <p className="text-xs uppercase tracking-wide text-slate-600">
         {label}
       </p>
 
@@ -1194,7 +1194,7 @@ function FinanceCard({
   return (
     <div className="rounded-2xl border bg-white p-5 shadow-sm">
 
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-600">
         {label}
       </p>
 

@@ -1173,7 +1173,7 @@ export default async function CollectionPage({
                 Aucune situation trouvée
               </p>
 
-              <p className="mx-auto mt-2 max-w-xl text-sm text-slate-500">
+              <p className="mx-auto mt-2 max-w-xl text-sm text-slate-600">
                 Vérifiez les
                 cotisations actives ou
                 générez les échéances
@@ -1203,7 +1203,7 @@ export default async function CollectionPage({
 
                       <div>
 
-                        <p className="text-xs uppercase tracking-wide text-slate-400">
+                        <p className="text-xs uppercase tracking-wide text-slate-600">
                           Matricule
                         </p>
 
@@ -1218,7 +1218,7 @@ export default async function CollectionPage({
 
                       <div>
 
-                        <p className="text-xs uppercase tracking-wide text-slate-400">
+                        <p className="text-xs uppercase tracking-wide text-slate-600">
                           Membre
                         </p>
 
@@ -1257,7 +1257,7 @@ export default async function CollectionPage({
 
                       <div>
 
-                        <p className="text-xs uppercase tracking-wide text-slate-400">
+                        <p className="text-xs uppercase tracking-wide text-slate-600">
                           Statut
                         </p>
 
@@ -1285,7 +1285,7 @@ export default async function CollectionPage({
 
                     <table className="w-full text-left">
 
-                      <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                      <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
 
                         <tr>
 
@@ -1472,7 +1472,7 @@ export default async function CollectionPage({
                                         ) >
                                           0
                                       ) && (
-                                        <span className="py-2 text-sm text-slate-400">
+                                        <span className="py-2 text-sm text-slate-600">
                                           —
                                         </span>
                                       )}
@@ -1507,7 +1507,7 @@ export default async function CollectionPage({
           1 && (
           <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-600">
 
               Page{' '}
 
@@ -1615,7 +1615,7 @@ function SummaryCard({
   return (
     <div className="rounded-2xl border bg-white p-5 shadow-sm">
 
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-600">
         {
           title
         }
@@ -1641,7 +1641,7 @@ function SmallStat({
   return (
     <div className="rounded-xl border bg-white px-5 py-4">
 
-      <p className="text-xs uppercase tracking-wide text-slate-500">
+      <p className="text-xs uppercase tracking-wide text-slate-600">
         {
           label
         }
@@ -1667,7 +1667,7 @@ function MemberAmount({
   return (
     <div>
 
-      <p className="text-xs uppercase tracking-wide text-slate-400">
+      <p className="text-xs uppercase tracking-wide text-slate-600">
         {
           label
         }
@@ -1813,7 +1813,7 @@ function PaginationLink({
     disabled
   ) {
     return (
-      <span className="rounded-lg border px-4 py-2 text-sm text-slate-400">
+      <span className="rounded-lg border px-4 py-2 text-sm text-slate-600">
         {
           children
         }

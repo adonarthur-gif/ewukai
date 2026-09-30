@@ -171,7 +171,7 @@ export default async function ContributionCallsPage({
               Appels de cotisations
             </h1>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-slate-600">
               Gérez les cotisations exceptionnelles et les collectes
               ponctuelles de la mutuelle.
             </p>
@@ -227,7 +227,7 @@ export default async function ContributionCallsPage({
                 Aucun appel de cotisation
               </p>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-600">
                 Créez votre premier appel exceptionnel.
               </p>
 
@@ -246,7 +246,7 @@ export default async function ContributionCallsPage({
 
               <table className="w-full text-left">
 
-                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
                   <tr>
                     <th className="px-5 py-4">
                       Appel
@@ -302,12 +302,12 @@ export default async function ContributionCallsPage({
                             </p>
 
                             {call.description && (
-                              <p className="mt-1 max-w-md text-sm text-slate-500">
+                              <p className="mt-1 max-w-md text-sm text-slate-600">
                                 {call.description}
                               </p>
                             )}
 
-                            <p className="mt-2 text-xs text-slate-400">
+                            <p className="mt-2 text-xs text-slate-600">
                               Lancé le{' '}
                               {formatDate(
                                 call.launch_date
@@ -374,7 +374,7 @@ export default async function ContributionCallsPage({
                                 </button>
                               </form>
                             ) : (
-                              <span className="text-sm text-slate-400">
+                              <span className="text-sm text-slate-600">
                                 —
                               </span>
                             )}

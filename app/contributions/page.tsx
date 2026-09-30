@@ -119,7 +119,7 @@ export default async function ContributionsPage({
               Aucune cotisation configurée
             </h2>
 
-            <p className="mx-auto mt-2 max-w-lg text-sm text-slate-500">
+            <p className="mx-auto mt-2 max-w-lg text-sm text-slate-600">
               Créez la première cotisation de votre
               mutuelle afin de commencer le suivi
               des paiements.
@@ -148,7 +148,7 @@ export default async function ContributionsPage({
                         {item.name}
                       </h2>
 
-                      <p className="mt-1 text-sm text-slate-500">
+                      <p className="mt-1 text-sm text-slate-600">
                         {
                           frequencyLabels[
                             item.frequency
@@ -162,7 +162,7 @@ export default async function ContributionsPage({
                       className={
                         item.is_active
                           ? 'rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700'
-                          : 'rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500'
+                          : 'rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600'
                       }
                     >
                       {item.is_active
@@ -237,7 +237,7 @@ function InfoLine({
 }) {
   return (
     <div className="flex justify-between gap-4">
-      <span className="text-slate-500">
+      <span className="text-slate-600">
         {label}
       </span>
 

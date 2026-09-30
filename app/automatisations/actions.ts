@@ -148,7 +148,7 @@ export async function runAutomationNow() {
   ) {
     redirect(
       automationErrorUrl(
-        "Vous n'avez pas l'autorisation d'exÃ©cuter les automatisations."
+        "Vous n'avez pas l'autorisation d'exécuter les automatisations."
       )
     )
   }
@@ -265,7 +265,7 @@ function friendlyAutomationError(
       'feature not available'
     )
   ) {
-    return 'Cette fonctionnalitÃ© nÃ©cessite la formule Pro ou Entreprise.'
+    return 'Cette fonctionnalité nécessite la formule Pro ou Entreprise.'
   }
 
   if (
@@ -273,8 +273,8 @@ function friendlyAutomationError(
       'not authorized'
     )
   ) {
-    return "Vous n'avez pas l'autorisation d'effectuer cette opÃ©ration."
+    return "Vous n'avez pas l'autorisation d'effectuer cette opération."
   }
 
-  return "L'opÃ©ration d'automatisation n'a pas pu Ãªtre effectuÃ©e."
+  return "L'opération d'automatisation n'a pas pu être effectuée."
 }

@@ -215,7 +215,7 @@ export default async function ReportsPage({
 
             <label className="block">
 
-              <span className="text-xs font-black uppercase tracking-wide text-slate-500">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-600">
                 Date de début
               </span>
 
@@ -230,7 +230,7 @@ export default async function ReportsPage({
 
             <label className="block">
 
-              <span className="text-xs font-black uppercase tracking-wide text-slate-500">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-600">
                 Date de fin
               </span>
 
@@ -330,7 +330,7 @@ export default async function ReportsPage({
                   </h2>
 
                   {report.organization.location && (
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-slate-600">
                       {report.organization.location}
                     </p>
                   )}
@@ -341,7 +341,7 @@ export default async function ReportsPage({
 
               <div className="sm:text-right">
 
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-600">
                   Document financier
                 </p>
 
@@ -474,7 +474,7 @@ export default async function ReportsPage({
                         <tr>
                           <td
                             colSpan={4}
-                            className="px-4 py-8 text-center text-slate-500"
+                            className="px-4 py-8 text-center text-slate-600"
                           >
                             Aucune cotisation exigible sur cette période.
                           </td>
@@ -523,7 +523,7 @@ export default async function ReportsPage({
 
                 <div className="report-avoid-break rounded-2xl border border-slate-200 bg-slate-50 p-5">
 
-                  <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                  <p className="text-xs font-black uppercase tracking-wide text-slate-600">
                     Situation des membres concernés
                   </p>
 
@@ -609,7 +609,7 @@ export default async function ReportsPage({
                       <tr>
                         <td
                           colSpan={3}
-                          className="px-4 py-8 text-center text-slate-500"
+                          className="px-4 py-8 text-center text-slate-600"
                         >
                           Aucun paiement confirmé sur cette période.
                         </td>
@@ -638,7 +638,7 @@ export default async function ReportsPage({
 
               </div>
 
-              <p className="mt-3 text-xs leading-5 text-slate-500">
+              <p className="mt-3 text-xs leading-5 text-slate-600">
                 Les encaissements de cette section correspondent aux paiements confirmés
                 pendant la période. Ils sont distincts du montant affecté aux échéances :
                 un paiement anticipé peut financer une période future.
@@ -721,7 +721,7 @@ export default async function ReportsPage({
                       <tr>
                         <td
                           colSpan={4}
-                          className="px-4 py-8 text-center text-slate-500"
+                          className="px-4 py-8 text-center text-slate-600"
                         >
                           Aucun droit d&apos;adhésion dans le périmètre du rapport.
                         </td>
@@ -757,7 +757,7 @@ export default async function ReportsPage({
 
               </div>
 
-              <p className="mt-3 text-xs leading-5 text-slate-500">
+              <p className="mt-3 text-xs leading-5 text-slate-600">
                 Les droits en attente ne constituent pas un encaissement et ne sont pas
                 ajoutés à la trésorerie. Seuls les paiements effectivement confirmés
                 sont comptabilisés comme encaissés. Une exonération est suivie
@@ -863,7 +863,7 @@ export default async function ReportsPage({
                       <tr>
                         <td
                           colSpan={5}
-                          className="px-4 py-8 text-center text-slate-500"
+                          className="px-4 py-8 text-center text-slate-600"
                         >
                           Aucun mouvement de trésorerie sur cette période.
                         </td>
@@ -961,7 +961,7 @@ export default async function ReportsPage({
 
           {/* FOOTER */}
 
-          <footer className="border-t border-slate-200 bg-slate-50 px-6 py-5 text-center text-xs text-slate-500">
+          <footer className="border-t border-slate-200 bg-slate-50 px-6 py-5 text-center text-xs text-slate-600">
             Rapport généré électroniquement par la mutuelle via EWUKAI.
             La plateforme ne détient pas les fonds de la mutuelle.
           </footer>
@@ -1027,7 +1027,7 @@ function DocumentMeta({
 }) {
   return (
     <div className="bg-white px-6 py-4">
-      <div className="flex items-center gap-2 text-slate-400">
+      <div className="flex items-center gap-2 text-slate-600">
         {icon}
         <p className="text-[10px] font-black uppercase tracking-wide">
           {label}
@@ -1112,7 +1112,7 @@ function SmallStat({
 
   return (
     <div className="report-avoid-break rounded-2xl border border-slate-200 bg-white p-5">
-      <p className="text-xs font-black uppercase tracking-wide text-slate-400">
+      <p className="text-xs font-black uppercase tracking-wide text-slate-600">
         {label}
       </p>
       <p className={`mt-2 text-lg font-black ${valueClass}`}>
@@ -1254,7 +1254,7 @@ function CategoryTable({
             <tr>
               <td
                 colSpan={3}
-                className="px-4 py-8 text-center text-slate-500"
+                className="px-4 py-8 text-center text-slate-600"
               >
                 Aucun mouvement.
               </td>
@@ -1293,7 +1293,7 @@ function SignatureBox({
         <p className="font-black text-slate-800">
           {title}
         </p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-slate-600">
           Nom, signature et cachet
         </p>
       </div>

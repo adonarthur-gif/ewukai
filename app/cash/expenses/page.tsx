@@ -126,7 +126,7 @@ export default async function ExpensesPage({
               Dépenses
             </h1>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-slate-600">
               Historique des décaissements
               de la mutuelle.
             </p>
@@ -186,7 +186,7 @@ export default async function ExpensesPage({
                 Aucune dépense
               </p>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-600">
                 Les décaissements apparaîtront
                 ici après leur enregistrement.
               </p>
@@ -197,7 +197,7 @@ export default async function ExpensesPage({
 
               <table className="w-full text-left">
 
-                <thead className="border-b bg-slate-50 text-xs uppercase text-slate-500">
+                <thead className="border-b bg-slate-50 text-xs uppercase text-slate-600">
 
                   <tr>
                     <th className="px-5 py-4">

@@ -113,7 +113,7 @@ export default function MemberAccessCard({
             Espace membre
           </h2>
 
-          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
+          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
             Le membre utilise cet accès
             pour consulter uniquement sa
             situation personnelle, ses
@@ -233,7 +233,7 @@ export default function MemberAccessCard({
             )}
         </>
       ) : (
-        <p className="mt-5 text-sm text-slate-500">
+        <p className="mt-5 text-sm text-slate-600">
           Vous pouvez consulter le
           statut de l&apos;accès, mais
           vous n&apos;êtes pas autorisé

@@ -100,7 +100,7 @@ export default async function EditMemberPage({
             Modifier le membre
           </h1>
 
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-slate-600">
             Corrigez le nom, le
             prénom ou le numéro de
             téléphone.
@@ -184,7 +184,7 @@ export default async function EditMemberPage({
 
             <div className="rounded-xl bg-slate-50 p-4">
 
-              <p className="text-xs uppercase tracking-wide text-slate-500">
+              <p className="text-xs uppercase tracking-wide text-slate-600">
                 Matricule
               </p>
 
@@ -194,7 +194,7 @@ export default async function EditMemberPage({
                 }
               </p>
 
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-slate-600">
                 Le matricule n&apos;est
                 pas modifiable afin de
                 préserver la traçabilité

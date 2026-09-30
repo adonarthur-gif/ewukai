@@ -186,7 +186,7 @@ export default async function MemberDetailPage({
 
         <Link
           href="/members"
-          className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 transition hover:text-slate-900"
+          className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 transition hover:text-slate-900"
         >
           ← Retour aux membres
         </Link>
@@ -622,7 +622,7 @@ export default async function MemberDetailPage({
             {canManageMemberStatus && (
               <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
                   GESTION DU MEMBRE
                 </p>
 
@@ -630,7 +630,7 @@ export default async function MemberDetailPage({
                   Activation et suppression
                 </h2>
 
-                <p className="mt-3 text-sm leading-6 text-slate-500">
+                <p className="mt-3 text-sm leading-6 text-slate-600">
                   La désactivation conserve le matricule, les cotisations, les paiements et l&apos;historique du membre.
                 </p>
 
@@ -679,7 +679,7 @@ export default async function MemberDetailPage({
                       Suppression définitive
                     </p>
 
-                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                    <p className="mt-2 text-xs leading-5 text-slate-600">
                       EWUKAI refusera automatiquement la suppression si ce membre possède un compte lié, des cotisations, des paiements ou tout autre historique.
                     </p>
 
@@ -698,7 +698,7 @@ export default async function MemberDetailPage({
                       />
 
                       <label className="block">
-                        <span className="text-xs font-black uppercase tracking-wide text-slate-500">
+                        <span className="text-xs font-black uppercase tracking-wide text-slate-600">
                           Confirmer avec SUPPRIMER
                         </span>
 
@@ -739,7 +739,7 @@ export default async function MemberDetailPage({
                 Situation financière
               </h2>
 
-              <p className="mt-3 text-sm leading-6 text-slate-500">
+              <p className="mt-3 text-sm leading-6 text-slate-600">
                 Consultez les cotisations
                 dues, les paiements déjà
                 comptabilisés, les avances
@@ -808,7 +808,7 @@ function SummaryItem({
   return (
     <div className="bg-white p-5">
 
-      <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+      <p className="text-xs font-black uppercase tracking-wide text-slate-600">
         {label}
       </p>
 
@@ -836,7 +836,7 @@ function Info({
   return (
     <div>
 
-      <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+      <p className="text-xs font-black uppercase tracking-wide text-slate-600">
         {label}
       </p>
 

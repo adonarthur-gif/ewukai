@@ -224,7 +224,7 @@ export default async function MembersPage({
                 Aucun membre trouvé
               </p>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-600">
                 Commencez par enregistrer le
                 premier adhérent.
               </p>
@@ -416,7 +416,7 @@ function PaginationLink({
 }) {
   if (disabled) {
     return (
-      <span className="rounded-lg border px-4 py-2 text-sm text-slate-400">
+      <span className="rounded-lg border px-4 py-2 text-sm text-slate-600">
         {children}
       </span>
     )

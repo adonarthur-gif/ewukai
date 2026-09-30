@@ -169,7 +169,7 @@ export default async function MembershipsPage({
               Adhésions
             </h1>
 
-            <p className="mt-2 max-w-2xl text-slate-500">
+            <p className="mt-2 max-w-2xl text-slate-600">
               Examinez les demandes reçues
               depuis la vitrine publique
               de votre mutuelle.
@@ -259,7 +259,7 @@ export default async function MembershipsPage({
                 Aucune demande
               </p>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-600">
                 Aucune demande ne correspond
                 au filtre sélectionné.
               </p>
@@ -270,7 +270,7 @@ export default async function MembershipsPage({
 
               <table className="w-full text-left">
 
-                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
 
                   <tr>
                     <th className="px-5 py-4">
@@ -329,7 +329,7 @@ export default async function MembershipsPage({
                           </p>
 
                           {application.email && (
-                            <p className="mt-1 text-xs text-slate-500">
+                            <p className="mt-1 text-xs text-slate-600">
                               {application.email}
                             </p>
                           )}
@@ -406,7 +406,7 @@ function StatCard({
           : 'bg-white'
       }`}
     >
-      <p className="text-sm font-semibold text-slate-500">
+      <p className="text-sm font-semibold text-slate-600">
         {label}
       </p>
 

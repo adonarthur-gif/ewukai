@@ -632,7 +632,7 @@ export default async function PaymentPage({
 
               <div className="md:text-right">
 
-                <p className="text-xs uppercase tracking-wide text-slate-400">
+                <p className="text-xs uppercase tracking-wide text-slate-600">
                   Situation
                 </p>
 
@@ -716,7 +716,7 @@ export default async function PaymentPage({
           {contributionDescription && (
             <div className="border-t bg-slate-50 px-6 py-4">
 
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">
                 Description
               </p>
 
@@ -848,7 +848,7 @@ export default async function PaymentPage({
               }
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-600">
               {
                 isExceptional
                   ? 'Cet appel exceptionnel est traité indépendamment des cotisations régulières.'
@@ -867,7 +867,7 @@ export default async function PaymentPage({
                 disponible.
               </p>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-600">
                 Aucune obligation
                 payable n&apos;est
                 actuellement disponible
@@ -880,7 +880,7 @@ export default async function PaymentPage({
 
               <table className="w-full text-left">
 
-                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
 
                   <tr>
 
@@ -1064,7 +1064,7 @@ function InfoItem({
   return (
     <div>
 
-      <p className="text-xs uppercase tracking-wide text-slate-500">
+      <p className="text-xs uppercase tracking-wide text-slate-600">
         {
           label
         }
@@ -1109,7 +1109,7 @@ function Summary({
   return (
     <div className="rounded-2xl border bg-white p-5 shadow-sm">
 
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-600">
         {
           title
         }
@@ -1143,7 +1143,7 @@ function PercentageSummary({
   return (
     <div className="rounded-2xl border bg-white p-5 shadow-sm">
 
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-600">
         {
           title
         }

@@ -192,7 +192,7 @@ export default function PaymentForm({
             Enregistrer un paiement
           </h2>
 
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-slate-600">
             Le versement sera
             automatiquement affecté
             aux périodes les plus
@@ -269,7 +269,7 @@ export default function PaymentForm({
 
             <div className="mt-3 flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
 
-              <p className="text-slate-500">
+              <p className="text-slate-600">
                 Reste total à
                 recouvrer
               </p>
@@ -369,7 +369,7 @@ export default function PaymentForm({
               className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
             />
 
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-600">
               Facultatif pour les
               paiements en espèces.
             </p>
@@ -410,7 +410,7 @@ export default function PaymentForm({
             Valider le paiement
           </button>
 
-          <p className="text-center text-xs text-slate-500">
+          <p className="text-center text-xs text-slate-600">
             La validation créera un
             reçu et enregistrera
             automatiquement
@@ -436,14 +436,14 @@ export default function PaymentForm({
                     Affectation prévue
                   </h2>
 
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-slate-600">
                     Aperçu avant
                     validation.
                   </p>
                 </div>
 
                 <div className="text-left sm:text-right">
-                  <p className="text-xs uppercase tracking-wide text-slate-500">
+                  <p className="text-xs uppercase tracking-wide text-slate-600">
                     Montant affecté
                   </p>
 
@@ -463,7 +463,7 @@ export default function PaymentForm({
             <div className="overflow-x-auto">
               <table className="w-full text-left">
 
-                <thead className="border-b bg-white text-xs uppercase tracking-wide text-slate-500">
+                <thead className="border-b bg-white text-xs uppercase tracking-wide text-slate-600">
                   <tr>
                     <th className="px-5 py-3">
                       Période

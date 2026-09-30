@@ -204,7 +204,7 @@ export default async function TreasuryAccountsPage({
               Comptes de réception
             </h1>
 
-            <p className="mt-2 max-w-2xl text-slate-500">
+            <p className="mt-2 max-w-2xl text-slate-600">
               Numéros Mobile Money,
               comptes bancaires et
               autres lieux où les fonds
@@ -255,7 +255,7 @@ export default async function TreasuryAccountsPage({
 
         <section className="mt-6 rounded-3xl bg-slate-900 p-7 text-white">
 
-          <p className="text-sm uppercase tracking-wide text-slate-400">
+          <p className="text-sm uppercase tracking-wide text-slate-600">
             Solde de trésorerie enregistré
           </p>
 
@@ -265,7 +265,7 @@ export default async function TreasuryAccountsPage({
             )}
           </p>
 
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm text-slate-600">
             Total calculé à partir des opérations comptabilisées par votre mutuelle.
           </p>
 
@@ -278,7 +278,7 @@ export default async function TreasuryAccountsPage({
               Aucun compte configuré
             </h2>
 
-            <p className="mx-auto mt-2 max-w-xl text-slate-500">
+            <p className="mx-auto mt-2 max-w-xl text-slate-600">
               Commencez par enregistrer
               le numéro Wave, Orange
               Money, MTN, Moov, le compte
@@ -335,7 +335,7 @@ export default async function TreasuryAccountsPage({
                           }
                         </h2>
 
-                        <p className="mt-1 text-sm text-slate-500">
+                        <p className="mt-1 text-sm text-slate-600">
                           Titulaire :{' '}
                           {
                             account.account_holder
@@ -361,7 +361,7 @@ export default async function TreasuryAccountsPage({
                     {account.phone_number && (
                       <div className="mt-5 rounded-xl bg-slate-50 p-4">
 
-                        <p className="text-xs uppercase text-slate-500">
+                        <p className="text-xs uppercase text-slate-600">
                           Numéro
                         </p>
 
@@ -524,7 +524,7 @@ function MiniStat({
   return (
     <div className="rounded-xl border p-3">
 
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-slate-600">
         {label}
       </p>
 

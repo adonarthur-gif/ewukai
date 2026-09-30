@@ -97,7 +97,7 @@ export default async function ReverseExpensePage({
 
         <Link
           href="/cash/expenses"
-          className="font-semibold text-slate-500"
+          className="font-semibold text-slate-600"
         >
           ← Retour
         </Link>

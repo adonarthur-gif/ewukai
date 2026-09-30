@@ -130,7 +130,7 @@ export default async function MembershipApplicationPage({
 
         <Link
           href="/memberships"
-          className="font-bold text-slate-500 hover:text-slate-800"
+          className="font-bold text-slate-600 hover:text-slate-800"
         >
           ← Retour aux adhésions
         </Link>
@@ -269,7 +269,7 @@ export default async function MembershipApplicationPage({
 
                 <div>
 
-                  <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                  <p className="text-xs font-black uppercase tracking-wide text-slate-600">
                     Droit d&apos;adhésion
                   </p>
 
@@ -312,7 +312,7 @@ export default async function MembershipApplicationPage({
 
             <div className="mt-7">
 
-              <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+              <p className="text-xs font-black uppercase tracking-wide text-slate-600">
                 Motivation
               </p>
 
@@ -326,7 +326,7 @@ export default async function MembershipApplicationPage({
             {application.review_note && (
               <div className="mt-7">
 
-                <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                <p className="text-xs font-black uppercase tracking-wide text-slate-600">
                   Observation du bureau
                 </p>
 
@@ -476,7 +476,7 @@ function Info({
 }) {
   return (
     <div>
-      <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+      <p className="text-xs font-black uppercase tracking-wide text-slate-600">
         {label}
       </p>
 

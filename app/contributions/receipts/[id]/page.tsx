@@ -355,7 +355,7 @@ export default async function ReceiptPage({
                 </h1>
 
                 {organization.short_name && (
-                  <p className="mt-1 text-sm font-semibold text-slate-500">
+                  <p className="mt-1 text-sm font-semibold text-slate-600">
                     {
                       organization.short_name
                     }
@@ -366,7 +366,7 @@ export default async function ReceiptPage({
 
               <div className="sm:text-right">
 
-                <p className="text-sm font-medium text-slate-500">
+                <p className="text-sm font-medium text-slate-600">
                   {
                     hasExceptional
                       ? 'REÇU DE COTISATION EXCEPTIONNELLE'
@@ -380,7 +380,7 @@ export default async function ReceiptPage({
                   }
                 </p>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-slate-600">
                   {
                     formatDateTime(
                       paymentDate
@@ -413,7 +413,7 @@ export default async function ReceiptPage({
 
             <div>
 
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
                 Membre
               </p>
 
@@ -433,7 +433,7 @@ export default async function ReceiptPage({
               </p>
 
               {member.phone && (
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="mt-2 text-sm text-slate-600">
                   {
                     member.phone
                   }
@@ -444,7 +444,7 @@ export default async function ReceiptPage({
 
             <div className="sm:text-right">
 
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
                 Montant reçu
               </p>
 
@@ -498,7 +498,7 @@ export default async function ReceiptPage({
               {payment.payment_reference && (
                 <div>
 
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
                     Référence
                   </p>
 
@@ -514,7 +514,7 @@ export default async function ReceiptPage({
               {payment.notes && (
                 <div>
 
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
                     Observation
                   </p>
 
@@ -542,7 +542,7 @@ export default async function ReceiptPage({
                 Détail de l&apos;affectation
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-600">
                 {
                   hasExceptional
                     ? 'Affectation du versement à l’appel exceptionnel concerné.'
@@ -562,7 +562,7 @@ export default async function ReceiptPage({
 
                 <table className="w-full text-left">
 
-                  <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
 
                     <tr>
 
@@ -613,7 +613,7 @@ export default async function ReceiptPage({
                             }
                           </td>
 
-                          <td className="px-4 py-4 text-sm text-slate-500">
+                          <td className="px-4 py-4 text-sm text-slate-600">
                             {
                               frequencyLabel(
                                 line.frequency
@@ -698,7 +698,7 @@ export default async function ReceiptPage({
                 Le membre
               </p>
 
-              <div className="mt-16 border-t border-slate-300 pt-2 text-xs text-slate-400">
+              <div className="mt-16 border-t border-slate-300 pt-2 text-xs text-slate-600">
                 Signature
               </div>
 
@@ -710,7 +710,7 @@ export default async function ReceiptPage({
                 Le Trésorier / Caissier
               </p>
 
-              <div className="mt-16 border-t border-slate-300 pt-2 text-xs text-slate-400">
+              <div className="mt-16 border-t border-slate-300 pt-2 text-xs text-slate-600">
                 Signature et cachet
               </div>
 
@@ -722,7 +722,7 @@ export default async function ReceiptPage({
           {/* FOOTER */}
           {/* ================================================= */}
 
-          <footer className="border-t bg-slate-50 px-8 py-4 text-center text-xs text-slate-500">
+          <footer className="border-t bg-slate-50 px-8 py-4 text-center text-xs text-slate-600">
 
             Reçu généré électroniquement par la mutuelle.
             Conservez ce document comme justificatif de paiement.

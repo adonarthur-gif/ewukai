@@ -60,7 +60,7 @@ export default async function NewTreasuryAccountPage({
               Nouveau compte de réception
             </h1>
 
-            <p className="mt-2 max-w-2xl text-slate-500">
+            <p className="mt-2 max-w-2xl text-slate-600">
               Indiquez le compte réel
               utilisé par la mutuelle
               pour recevoir ou effectuer
@@ -106,7 +106,7 @@ export default async function NewTreasuryAccountPage({
               className="w-full rounded-xl border px-4 py-3"
             />
 
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-600">
               Choisissez un nom facilement
               identifiable par le trésorier.
             </p>
@@ -183,7 +183,7 @@ export default async function NewTreasuryAccountPage({
               Mobile Money
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-600">
               À renseigner pour Wave,
               Orange Money, MTN MoMo
               ou Moov Money.
@@ -212,7 +212,7 @@ export default async function NewTreasuryAccountPage({
               Informations bancaires
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-600">
               À renseigner uniquement
               pour un compte bancaire.
             </p>
@@ -295,7 +295,7 @@ export default async function NewTreasuryAccountPage({
                   Peut recevoir
                 </span>
 
-                <span className="mt-1 block text-sm text-slate-500">
+                <span className="mt-1 block text-sm text-slate-600">
                   Afficher ce compte lors
                   de la comptabilisation
                   des cotisations.
@@ -320,7 +320,7 @@ export default async function NewTreasuryAccountPage({
                   Peut servir aux dépenses
                 </span>
 
-                <span className="mt-1 block text-sm text-slate-500">
+                <span className="mt-1 block text-sm text-slate-600">
                   Ce compte pourra être
                   sélectionné lors d&apos;un
                   décaissement.
