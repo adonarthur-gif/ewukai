@@ -121,7 +121,7 @@ export default async function ReportsPage({
     )}`
 
   return (
-    <main className="report-page min-h-screen bg-slate-50">
+    <main className="report-page min-h-screen bg-slate-50 text-slate-900">
 
       <style>{`
         @media print {
@@ -151,15 +151,134 @@ export default async function ReportsPage({
 
           .report-break-before {
             break-before: page;
+            page-break-before: always;
           }
 
           .report-avoid-break {
             break-inside: avoid;
+            page-break-inside: avoid;
+          }
+
+
+          html,
+          body {
+            width: 100% !important;
+            min-width: 0 !important;
+            overflow: visible !important;
+            background: white !important;
+          }
+
+          body {
+            margin: 0 !important;
+          }
+
+          .report-page,
+          .report-container,
+          .report-sheet {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            overflow: visible !important;
+          }
+
+          .report-sheet {
+            print-color-adjust: exact !important;
+            -webkit-print-color-adjust: exact !important;
+          }
+
+          .report-sheet .overflow-x-auto {
+            overflow: visible !important;
+          }
+
+          .report-sheet table {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+          }
+
+          .report-sheet th,
+          .report-sheet td {
+            white-space: normal !important;
+            overflow-wrap: anywhere !important;
+          }
+
+          .report-sheet thead {
+            display: table-header-group;
+          }
+
+          .report-sheet tfoot {
+            display: table-footer-group;
+          }
+
+          .report-sheet tr {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+
+          .report-sheet img {
+            max-width: 100% !important;
+            height: auto !important;
+          }
+
+          .report-section-title {
+            break-after: avoid;
+            page-break-after: avoid;
+          }
+
+          .report-membership-table {
+            width: 100% !important;
+            min-width: 0 !important;
+            table-layout: fixed !important;
+            font-size: 9px !important;
+          }
+
+          .report-membership-table th,
+          .report-membership-table td {
+            padding: 6px 5px !important;
+            line-height: 1.3 !important;
+          }
+
+          .report-journal-table {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            table-layout: fixed !important;
+            font-size: 8px !important;
+          }
+
+          .report-journal-table th,
+          .report-journal-table td {
+            padding: 5px 4px !important;
+            line-height: 1.3 !important;
+          }
+
+          .report-journal-table th:nth-child(1),
+          .report-journal-table td:nth-child(1) {
+            width: 15%;
+          }
+
+          .report-journal-table th:nth-child(2),
+          .report-journal-table td:nth-child(2) {
+            width: 18%;
+          }
+
+          .report-journal-table th:nth-child(3),
+          .report-journal-table td:nth-child(3) {
+            width: 31%;
+          }
+
+          .report-journal-table th:nth-child(4),
+          .report-journal-table td:nth-child(4),
+          .report-journal-table th:nth-child(5),
+          .report-journal-table td:nth-child(5) {
+            width: 18%;
           }
 
           @page {
-            size: A4;
-            margin: 12mm;
+            size: A4 portrait;
+            margin: 8mm;
           }
         }
       `}</style>
@@ -702,9 +821,9 @@ export default async function ReportsPage({
 
               </div>
 
-              <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-200">
+              <div className="-mx-6 mt-5 overflow-x-auto border-y border-slate-200 sm:mx-0 sm:rounded-2xl sm:border">
 
-                <table className="min-w-[720px] w-full text-sm">
+                <table className="report-membership-table min-w-[720px] w-full text-sm">
 
                   <thead className="bg-slate-900 text-white">
                     <tr>
@@ -843,9 +962,9 @@ export default async function ReportsPage({
                 title="Journal financier de la période"
               />
 
-              <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-200">
+              <div className="-mx-6 mt-5 overflow-x-auto border-y border-slate-200 sm:mx-0 sm:rounded-2xl sm:border">
 
-                <table className="min-w-[760px] w-full text-xs">
+                <table className="report-journal-table w-full min-w-[640px] text-xs sm:min-w-[760px]">
 
                   <thead className="bg-slate-900 text-white">
                     <tr>
@@ -1005,7 +1124,7 @@ function ReportSectionTitle({
   title: string
 }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="report-section-title flex items-center gap-3">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-sm font-black text-white">
         {number}
       </div>
@@ -1079,7 +1198,7 @@ function MetricCard({
       <p className="mt-4 text-xl font-black">
         {value}
       </p>
-      <p className="mt-1 text-xs font-semibold opacity-70">
+      <p className="mt-1 text-xs font-semibold opacity-90">
         {caption}
       </p>
     </div>

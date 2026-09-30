@@ -176,17 +176,19 @@ export default async function HomePage({
       {/* HERO PREMIUM - VERSION ANIMEE */}
       {/* ==================================================== */}
 
-      <section className="relative isolate overflow-hidden bg-[linear-gradient(120deg,#030711_0%,#071827_45%,#064E4B_100%)] text-white">
+      <section className="relative isolate overflow-hidden bg-[linear-gradient(135deg,#064e3b_0%,#0f766e_55%,#0e7490_100%)] text-white lg:bg-[linear-gradient(120deg,#030711_0%,#071827_45%,#064E4B_100%)]">
 
-        <div className="afri-aurora afri-aurora-one absolute -left-48 top-10 h-[520px] w-[520px] rounded-full bg-emerald-400/20 blur-3xl" />
-        <div className="afri-aurora afri-aurora-two absolute -right-52 top-[-120px] h-[680px] w-[680px] rounded-full bg-cyan-400/15 blur-3xl" />
-        <div className="afri-aurora afri-aurora-three absolute bottom-[-260px] left-[35%] h-[520px] w-[520px] rounded-full bg-amber-300/10 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 bg-[#0f766e] lg:hidden" />
 
-        <div className="afri-grid-drift absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.8)_1px,transparent_1px)] [background-size:56px_56px]" />
+        <div className="afri-aurora afri-aurora-one absolute -left-48 top-10 hidden h-[520px] w-[520px] rounded-full bg-emerald-400/20 blur-3xl lg:block" />
+        <div className="afri-aurora afri-aurora-two absolute -right-52 top-[-120px] hidden h-[680px] w-[680px] rounded-full bg-cyan-400/15 blur-3xl lg:block" />
+        <div className="afri-aurora afri-aurora-three absolute bottom-[-260px] left-[35%] hidden h-[520px] w-[520px] rounded-full bg-amber-300/10 blur-3xl lg:block" />
 
-        <div className="afri-light-sweep pointer-events-none absolute inset-y-0 left-[-30%] w-[28%] rotate-12 bg-gradient-to-r from-transparent via-white/[0.055] to-transparent blur-xl" />
+        <div className="afri-grid-drift absolute inset-0 hidden opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.8)_1px,transparent_1px)] [background-size:56px_56px] lg:block" />
 
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="afri-light-sweep pointer-events-none absolute inset-y-0 left-[-30%] hidden w-[28%] rotate-12 bg-gradient-to-r from-transparent via-white/[0.055] to-transparent blur-xl lg:block" />
+
+        <div className="absolute inset-0 hidden overflow-hidden lg:block">
           <span className="afri-particle left-[8%] top-[18%]" />
           <span className="afri-particle left-[17%] top-[68%] [animation-delay:1.2s]" />
           <span className="afri-particle left-[46%] top-[12%] [animation-delay:2.1s]" />
@@ -257,10 +259,10 @@ export default async function HomePage({
           {/* DASHBOARD DEMO */}
 
           <div className="relative">
-            <div className="absolute inset-[8%] rounded-full bg-emerald-400/10 blur-3xl" />
+            <div className="absolute inset-[8%] hidden rounded-full bg-emerald-400/10 blur-3xl lg:block" />
 
             <div className="afri-dashboard-float relative z-20 mx-auto w-full max-w-[680px]">
-              <div className="absolute -inset-10 rounded-full bg-emerald-400/10 blur-3xl" />
+              <div className="absolute -inset-10 hidden rounded-full bg-emerald-400/10 blur-3xl lg:block" />
 
               <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white/95 p-3 shadow-[0_35px_90px_rgba(0,0,0,.30)] backdrop-blur">
                 <div className="rounded-[1.6rem] bg-[#F6F8FB] p-4 text-slate-950 sm:p-5">

@@ -152,7 +152,7 @@ export default async function MembershipsPage({
     (data ?? []) as Application[]
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
 
@@ -165,7 +165,7 @@ export default async function MembershipsPage({
               ESPACE MUTUELLE
             </p>
 
-            <h1 className="mt-1 text-3xl font-black text-slate-900">
+            <h1 className="mt-1 text-3xl font-black text-slate-950">
               Adhésions
             </h1>
 
@@ -178,7 +178,7 @@ export default async function MembershipsPage({
 
           <Link
             href="/members"
-            className="rounded-xl border bg-white px-5 py-3 font-bold text-slate-700"
+            className="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 font-black text-slate-800 shadow-sm transition hover:bg-slate-50 sm:w-auto"
           >
             Voir les membres
           </Link>
@@ -220,7 +220,7 @@ export default async function MembershipsPage({
 
         {/* FILTRES */}
 
-        <div className="mt-7 flex flex-wrap gap-2">
+        <div className="-mx-4 mt-7 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
 
           <FilterLink
             href="/memberships?status=pending"
@@ -250,7 +250,7 @@ export default async function MembershipsPage({
 
         {/* LISTE */}
 
-        <section className="mt-5 overflow-hidden rounded-2xl border bg-white shadow-sm">
+        <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
           {applications.length === 0 ? (
             <div className="p-12 text-center">
@@ -266,11 +266,11 @@ export default async function MembershipsPage({
 
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overscroll-x-contain">
 
-              <table className="w-full text-left">
+              <table className="w-full min-w-[920px] text-left">
 
-                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
+                <thead className="border-b border-slate-200 bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-700">
 
                   <tr>
                     <th className="px-5 py-4">
@@ -310,7 +310,7 @@ export default async function MembershipsPage({
                     (application) => (
                       <tr
                         key={application.id}
-                        className="border-b last:border-0 hover:bg-slate-50"
+                        className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
                       >
 
                         <td className="px-5 py-4">
@@ -324,7 +324,7 @@ export default async function MembershipsPage({
 
                         <td className="px-5 py-4">
 
-                          <p className="font-semibold">
+                          <p className="font-bold text-slate-900">
                             {application.phone}
                           </p>
 
@@ -360,7 +360,7 @@ export default async function MembershipsPage({
 
                           <Link
                             href={`/memberships/${application.id}`}
-                            className="font-bold text-emerald-700 hover:underline"
+                            className="inline-flex rounded-lg px-2 py-1 font-black text-emerald-700 transition hover:bg-emerald-50 hover:underline"
                           >
                             Examiner
                           </Link>
@@ -400,17 +400,17 @@ function StatCard({
   return (
     <Link
       href={href}
-      className={`rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 ${
+      className={`rounded-2xl border p-5 text-slate-900 shadow-sm transition hover:-translate-y-0.5 ${
         highlight
-          ? 'border-emerald-200 bg-emerald-50'
-          : 'bg-white'
+          ? 'border-emerald-300 bg-emerald-50'
+          : 'border-slate-200 bg-white'
       }`}
     >
-      <p className="text-sm font-semibold text-slate-600">
+      <p className="text-sm font-bold text-slate-700">
         {label}
       </p>
 
-      <p className="mt-2 text-3xl font-black text-slate-900">
+      <p className="mt-2 text-3xl font-black text-slate-950">
         {value}
       </p>
     </Link>
@@ -432,7 +432,7 @@ function FilterLink({
       className={`rounded-full px-4 py-2 text-sm font-bold ${
         active
           ? 'bg-slate-900 text-white'
-          : 'border bg-white text-slate-600'
+          : 'border border-slate-300 bg-white text-slate-700'
       }`}
     >
       {label}
@@ -470,7 +470,7 @@ function StatusBadge({
 
   return (
     <span
-      className={`rounded-full px-3 py-1 text-xs font-black ${styles[status]}`}
+      className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-black ${styles[status]}`}
     >
       {labels[status]}
     </span>

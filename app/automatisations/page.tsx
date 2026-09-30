@@ -251,7 +251,7 @@ export default async function AutomationsPage({
     ).length
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -264,7 +264,7 @@ export default async function AutomationsPage({
               Automatisations
             </h1>
 
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
               Préparez automatiquement les relances liées aux cotisations
               avant l&apos;échéance, le jour prévu et après retard.
             </p>
@@ -272,7 +272,7 @@ export default async function AutomationsPage({
 
           <Link
             href="/parametres/abonnement"
-            className="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 shadow-sm transition hover:bg-slate-50"
+            className="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800 shadow-sm transition hover:bg-slate-50 sm:w-auto"
           >
             Voir ma formule
           </Link>
@@ -350,13 +350,13 @@ export default async function AutomationsPage({
                   Règles de rappel
                 </h2>
 
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <p className="mt-2 text-sm leading-6 text-slate-700">
                   Cette fonctionnalité est incluse dans les formules
                   Pro et Entreprise.
                 </p>
               </div>
 
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-emerald-700">
+              <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-emerald-700">
                 Pro
               </span>
             </div>
@@ -379,7 +379,7 @@ export default async function AutomationsPage({
                     Activer les relances de cotisations
                   </span>
 
-                  <span className="mt-1 block text-xs leading-5 text-slate-600">
+                  <span className="mt-1 block text-xs leading-5 text-slate-700">
                     EWUKAI générera les rappels correspondant aux jours
                     sélectionnés lorsque le cycle automatique sera exécuté.
                   </span>
@@ -456,7 +456,7 @@ export default async function AutomationsPage({
                   Enregistrer les règles
                 </button>
               ) : (
-                <p className="rounded-2xl bg-slate-50 p-4 text-xs font-semibold leading-5 text-slate-600">
+                <p className="rounded-2xl bg-slate-50 p-4 text-xs font-semibold leading-5 text-slate-700">
                   Votre rôle permet de consulter cette configuration,
                   mais pas de la modifier.
                 </p>
@@ -468,7 +468,7 @@ export default async function AutomationsPage({
                 Exécution de contrôle
               </p>
 
-              <p className="mt-1 text-xs leading-5 text-slate-600">
+              <p className="mt-1 text-xs leading-5 text-slate-700">
                 Utilisez ce bouton pour exécuter immédiatement le moteur
                 sur les échéances du jour. L&apos;idempotence empêche de créer
                 deux fois la même relance.
@@ -481,7 +481,7 @@ export default async function AutomationsPage({
                 >
                   <button
                     type="submit"
-                    className="inline-flex rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800 transition hover:bg-slate-50"
+                    className="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800 transition hover:bg-slate-50 sm:w-auto"
                   >
                     Exécuter maintenant
                   </button>
@@ -512,7 +512,7 @@ export default async function AutomationsPage({
                 Dernières relances générées
               </h2>
 
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+              <p className="mt-2 text-sm leading-6 text-slate-700">
                 Jusqu&apos;aux 100 événements les plus récents.
               </p>
             </div>
@@ -523,7 +523,7 @@ export default async function AutomationsPage({
                   Aucune relance générée
                 </p>
 
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <p className="mt-2 text-sm leading-6 text-slate-700">
                   Activez les règles puis exécutez le moteur lorsqu&apos;une
                   échéance correspond à vos critères.
                 </p>
@@ -548,7 +548,7 @@ export default async function AutomationsPage({
         </section>
 
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-700">
             Dernière exécution
           </p>
 
@@ -606,7 +606,7 @@ function DayOption({
   disabled: boolean
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-3 text-sm font-bold text-slate-700">
+    <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-black text-slate-800">
       <input
         type="checkbox"
         name={name}
@@ -647,7 +647,7 @@ function ReminderItem({
                 'Membre'}
             </p>
 
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase text-slate-600">
+            <span className="whitespace-nowrap rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase text-slate-700">
               {formatReminderType(
                 reminder.reminder_type
               )}
@@ -672,7 +672,7 @@ function ReminderItem({
             {reminder.title}
           </p>
 
-          <p className="mt-1 text-xs leading-5 text-slate-600">
+          <p className="mt-1 text-xs leading-5 text-slate-700">
             {reminder.message}
           </p>
         </div>
@@ -684,7 +684,7 @@ function ReminderItem({
             )}
           </p>
 
-          <p className="mt-1 text-xs font-semibold text-slate-600">
+          <p className="mt-1 text-xs font-semibold text-slate-700">
             échéance{' '}
             {formatDate(
               reminder.due_date
@@ -693,7 +693,7 @@ function ReminderItem({
         </div>
       </div>
 
-      <p className="mt-3 text-[11px] font-semibold text-slate-600">
+      <p className="mt-3 text-[11px] font-semibold text-slate-700">
         Générée le{' '}
         {formatDateTime(
           reminder.generated_at
@@ -714,7 +714,7 @@ function MetricCard({
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-[11px] font-black uppercase tracking-wide text-slate-600">
+      <p className="text-[11px] font-black uppercase tracking-wide text-slate-700">
         {label}
       </p>
 
@@ -722,7 +722,7 @@ function MetricCard({
         {value}
       </p>
 
-      <p className="mt-1 text-xs font-semibold text-slate-600">
+      <p className="mt-1 text-xs font-semibold text-slate-700">
         {note}
       </p>
     </div>

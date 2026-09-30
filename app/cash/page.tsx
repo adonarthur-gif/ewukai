@@ -392,7 +392,7 @@ export default async function CashPage({
   // ==========================================================
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
 
@@ -408,7 +408,7 @@ export default async function CashPage({
               ESPACE MUTUELLE
             </p>
 
-            <h1 className="mt-1 text-3xl font-bold text-slate-900">
+            <h1 className="mt-1 text-3xl font-black text-slate-950">
               Trésorerie
             </h1>
 
@@ -429,7 +429,7 @@ export default async function CashPage({
 
               <Link
                 href="/contributions/collection"
-                className="rounded-xl bg-emerald-700 px-5 py-3 font-bold text-white transition hover:bg-emerald-800"
+                className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 font-black text-white transition hover:bg-emerald-800 sm:w-auto"
               >
                 Recouvrement
               </Link>
@@ -437,7 +437,7 @@ export default async function CashPage({
               {canManage && (
                 <Link
                   href="/cash/expenses/new"
-                  className="rounded-xl bg-red-700 px-5 py-3 font-bold text-white transition hover:bg-red-800"
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-red-700 px-5 py-3 font-black text-white transition hover:bg-red-800 sm:w-auto"
                 >
                   + Nouvelle dépense
                 </Link>
@@ -445,14 +445,14 @@ export default async function CashPage({
 
               <Link
                 href="/cash/expenses"
-                className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold text-slate-700 transition hover:bg-slate-100"
+                className="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 font-black text-slate-800 transition hover:bg-slate-100 sm:w-auto"
               >
                 Voir les dépenses
               </Link>
 
               <Link
                 href="/cash/accounts"
-                className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold text-slate-700 transition hover:bg-slate-100"
+                className="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 font-black text-slate-800 transition hover:bg-slate-100 sm:w-auto"
               >
                 Comptes de trésorerie
               </Link>
@@ -494,7 +494,7 @@ export default async function CashPage({
                   defaultValue={
                     selectedYear
                   }
-                  className="w-28 rounded-xl border bg-white px-3 py-2.5"
+                  className="w-28 rounded-xl border border-slate-300 bg-white px-3 py-2.5 font-semibold text-slate-900"
                 />
 
               </div>
@@ -541,7 +541,7 @@ export default async function CashPage({
                   defaultValue={
                     selectedPeriod
                   }
-                  className="rounded-xl border bg-white px-3 py-2.5"
+                  className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 font-semibold text-slate-900"
                 />
 
               </div>
@@ -592,7 +592,7 @@ export default async function CashPage({
 
               <div>
 
-                <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">
+                <p className="text-sm font-bold uppercase tracking-wide text-slate-300">
                   Solde de trésorerie enregistré
                 </p>
 
@@ -602,7 +602,7 @@ export default async function CashPage({
                   )}
                 </p>
 
-                <p className="mt-3 max-w-xl text-sm text-slate-600">
+                <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">
                   Solde calculé à partir
                   de toutes les entrées et
                   sorties comptabilisées
@@ -643,7 +643,7 @@ export default async function CashPage({
 
           <div>
 
-            <h2 className="text-xl font-bold text-slate-900">
+            <h2 className="text-xl font-black text-slate-950">
               Synthèse annuelle{' '}
               {selectedYear}
             </h2>
@@ -712,11 +712,11 @@ export default async function CashPage({
         {/* TABLEAU DES 12 MOIS */}
         {/* ================================================== */}
 
-        <section className="mt-8 overflow-hidden rounded-2xl border bg-white shadow-sm">
+        <section className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
           <div className="border-b px-6 py-5">
 
-            <h2 className="text-lg font-bold text-slate-900">
+            <h2 className="text-lg font-black text-slate-950">
               Évolution mensuelle —{' '}
               {selectedYear}
             </h2>
@@ -730,11 +730,11 @@ export default async function CashPage({
 
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overscroll-x-contain">
 
-            <table className="w-full text-left">
+            <table className="w-full min-w-[860px] text-left">
 
-              <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
+              <thead className="border-b border-slate-200 bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-700">
 
                 <tr>
 
@@ -874,7 +874,7 @@ export default async function CashPage({
 
           <div>
 
-            <h2 className="text-xl font-bold capitalize text-slate-900">
+            <h2 className="text-xl font-black capitalize text-slate-950">
               Situation de{' '}
               {formatPeriod(
                 selectedPeriod
@@ -921,9 +921,9 @@ export default async function CashPage({
               signed
             />
 
-            <div className="rounded-2xl border bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
 
-              <p className="text-sm text-slate-600">
+              <p className="text-sm font-semibold text-slate-700">
                 Nombre de mouvements
               </p>
 
@@ -943,7 +943,7 @@ export default async function CashPage({
         {/* JOURNAL DU MOIS */}
         {/* ================================================== */}
 
-        <section className="mt-7 overflow-hidden rounded-2xl border bg-white shadow-sm">
+        <section className="mt-7 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
           <div className="border-b px-6 py-5">
 
@@ -976,11 +976,11 @@ export default async function CashPage({
 
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overscroll-x-contain">
 
-              <table className="w-full text-left">
+              <table className="w-full min-w-[860px] text-left">
 
-                <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
+                <thead className="border-b border-slate-200 bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-700">
 
                   <tr>
 
@@ -1016,10 +1016,10 @@ export default async function CashPage({
                         key={
                           movement.id
                         }
-                        className="border-b last:border-0 hover:bg-slate-50"
+                        className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
                       >
 
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
+                        <td className="whitespace-nowrap px-5 py-4 text-sm font-medium text-slate-700">
 
                           <p className="font-semibold text-slate-800">
                             {formatAccountingDate(
@@ -1027,7 +1027,7 @@ export default async function CashPage({
                             )}
                           </p>
 
-                          <p className="mt-1 text-xs text-slate-600">
+                          <p className="mt-1 text-xs font-medium text-slate-700">
                             Saisi le{' '}
                             {formatDateTime(
                               movement.created_at
@@ -1045,7 +1045,7 @@ export default async function CashPage({
                           </p>
 
                           {movement.reference_type && (
-                            <p className="mt-1 text-xs text-slate-600">
+                            <p className="mt-1 text-xs font-medium text-slate-700">
                               Type :{' '}
                               {
                                 movement.reference_type
@@ -1055,7 +1055,7 @@ export default async function CashPage({
 
                         </td>
 
-                        <td className="px-5 py-4 text-sm text-slate-600">
+                        <td className="px-5 py-4 text-sm font-medium text-slate-700">
                           {categoryLabel(
                             movement.category
                           )}
@@ -1100,15 +1100,14 @@ export default async function CashPage({
         {/* RAPPEL */}
         {/* ================================================== */}
 
-        <section className="mt-7 rounded-2xl border bg-white p-6">
+        <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-6">
 
-          <h2 className="font-bold text-slate-900">
+          <h2 className="font-black text-slate-950">
             À propos du solde affiché
           </h2>
 
           <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600">
-            Le solde présenté par Afri
-            Club est un solde de
+            Le solde présenté par EWUKAI est un solde de
             trésorerie comptabilisé. Il
             correspond aux opérations
             enregistrées dans la
@@ -1151,7 +1150,7 @@ function DarkStat({
   return (
     <div>
 
-      <p className="text-xs uppercase tracking-wide text-slate-600">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">
         {label}
       </p>
 
@@ -1192,9 +1191,9 @@ function FinanceCard({
         : 'text-slate-900'
 
   return (
-    <div className="rounded-2xl border bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
 
-      <p className="text-sm text-slate-600">
+      <p className="text-sm font-semibold text-slate-700">
         {label}
       </p>
 

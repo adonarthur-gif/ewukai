@@ -72,7 +72,7 @@ export default async function ContributionsPage({
   ].includes(role)
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -81,7 +81,7 @@ export default async function ContributionsPage({
               ESPACE MUTUELLE
             </p>
 
-            <h1 className="mt-1 text-3xl font-bold">
+            <h1 className="mt-1 text-3xl font-bold text-slate-950">
               Cotisations
             </h1>
 
@@ -114,8 +114,8 @@ export default async function ContributionsPage({
 
         {!contributionTypes ||
         contributionTypes.length === 0 ? (
-          <section className="mt-8 rounded-2xl border bg-white p-12 text-center shadow-sm">
-            <h2 className="text-xl font-semibold">
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+            <h2 className="text-xl font-semibold text-slate-950">
               Aucune cotisation configurée
             </h2>
 
@@ -140,11 +140,11 @@ export default async function ContributionsPage({
               (item) => (
                 <article
                   key={item.id}
-                  className="rounded-2xl border bg-white p-6 shadow-sm"
+                  className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-lg font-semibold">
+                    <div className="min-w-0">
+                      <h2 className="text-lg font-semibold text-slate-950">
                         {item.name}
                       </h2>
 
@@ -161,8 +161,8 @@ export default async function ContributionsPage({
                     <span
                       className={
                         item.is_active
-                          ? 'rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700'
-                          : 'rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600'
+                          ? 'shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700'
+                          : 'shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700'
                       }
                     >
                       {item.is_active
@@ -171,7 +171,7 @@ export default async function ContributionsPage({
                     </span>
                   </div>
 
-                  <p className="mt-5 text-3xl font-bold text-slate-900">
+                  <p className="mt-5 text-3xl font-bold text-slate-950">
                     {formatMoney(
                       Number(item.amount)
                     )}
@@ -183,7 +183,7 @@ export default async function ContributionsPage({
                     </p>
                   )}
 
-                  <div className="mt-5 space-y-2 border-t pt-4 text-sm">
+                  <div className="mt-5 space-y-2 border-t border-slate-200 pt-4 text-sm">
                     <InfoLine
                       label="Obligatoire"
                       value={
@@ -236,12 +236,12 @@ function InfoLine({
   value: string
 }) {
   return (
-    <div className="flex justify-between gap-4">
+    <div className="flex items-start justify-between gap-4">
       <span className="text-slate-600">
         {label}
       </span>
 
-      <span className="font-medium">
+      <span className="min-w-0 text-right font-semibold text-slate-900">
         {value}
       </span>
     </div>

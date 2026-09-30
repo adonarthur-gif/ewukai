@@ -124,7 +124,7 @@ export default async function MembersPage({
   ].includes(role)
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-8">
 
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -134,7 +134,7 @@ export default async function MembersPage({
               ESPACE MUTUELLE
             </p>
 
-            <h1 className="mt-1 text-3xl font-bold">
+            <h1 className="mt-1 text-3xl font-bold text-slate-950">
               Membres
             </h1>
 
@@ -172,7 +172,7 @@ export default async function MembersPage({
             name="q"
             defaultValue={q}
             placeholder="Nom, prénom, téléphone ou matricule..."
-            className="rounded-lg border px-3 py-2"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-950 placeholder:text-slate-500"
           />
 
           <select
@@ -180,7 +180,7 @@ export default async function MembersPage({
             defaultValue={
               status ?? ''
             }
-            className="rounded-lg border bg-white px-3 py-2"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-950"
           >
             <option value="">
               Tous les statuts
@@ -220,7 +220,7 @@ export default async function MembersPage({
           {members.length === 0 ? (
             <div className="p-12 text-center">
 
-              <p className="text-lg font-semibold">
+              <p className="text-lg font-semibold text-slate-950">
                 Aucun membre trouvé
               </p>
 
@@ -235,7 +235,7 @@ export default async function MembersPage({
 
               <table className="w-full text-left">
 
-                <thead className="border-b bg-slate-50 text-sm text-slate-600">
+                <thead className="border-b bg-slate-50 text-sm font-semibold text-slate-700">
                   <tr>
 
                     <th className="px-5 py-4">
@@ -273,13 +273,13 @@ export default async function MembersPage({
                         className="border-b last:border-b-0"
                       >
 
-                        <td className="px-5 py-4 font-mono text-sm">
+                        <td className="px-5 py-4 font-mono text-sm font-semibold text-slate-900">
                           {
                             member.member_number
                           }
                         </td>
 
-                        <td className="px-5 py-4 font-medium">
+                        <td className="px-5 py-4 font-semibold text-slate-950">
                           {
                             member.last_name
                           }
@@ -392,7 +392,7 @@ function StatusBadge({
     }
 
   return (
-    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium">
+    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
       {
         labels[status] ??
         status
@@ -447,7 +447,7 @@ function PaginationLink({
   return (
     <Link
       href={`/members?${params.toString()}`}
-      className="rounded-lg border bg-white px-4 py-2 text-sm font-medium"
+      className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800"
     >
       {children}
     </Link>
