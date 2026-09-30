@@ -45,3 +45,8 @@ next-env.d.ts
 
 # Supabase CLI - fichiers locaux temporaires
 /supabase/.temp/
+.ewukai-backups/
+*.bak-before-safe-fix
+patch_app_navigation_safe.ps1
+patch_contraste_gestion_ewukai.ps1
+fix_automatisations_encoding.js
