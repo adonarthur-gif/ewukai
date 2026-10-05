@@ -2,6 +2,8 @@ import type {
   Metadata,
 } from 'next'
 
+import { Suspense } from 'react'
+
 import {
   Geist,
   Geist_Mono,
@@ -62,7 +64,16 @@ export default function RootLayout({
 
         <ServiceWorkerRegister />
 
-        <AppNavigationServer />
+        <Suspense
+          fallback={
+            <div
+              aria-hidden="true"
+              className="h-16 shrink-0 border-b border-slate-200 bg-white"
+            />
+          }
+        >
+          <AppNavigationServer />
+        </Suspense>
 
         <div className="min-h-0 flex-1">
           {children}
