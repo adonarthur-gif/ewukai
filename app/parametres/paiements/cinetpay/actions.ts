@@ -22,7 +22,7 @@ import {
 
 // ============================================================
 // EWUKAI
-// CONFIGURATION CINETPAY D'UNE ORGANISATION
+// CONFIGURATION CINETPAY AURORE D'UNE ORGANISATION
 // ============================================================
 
 const EDIT_ROLES =
@@ -38,6 +38,12 @@ const ALLOWED_CHANNELS =
     'MOBILE_MONEY',
     'CREDIT_CARD',
     'WALLET',
+  ])
+
+const ALLOWED_ENVIRONMENTS =
+  new Set([
+    'sandbox',
+    'production',
   ])
 
 // ============================================================
@@ -70,23 +76,24 @@ export async function saveCinetPayConfiguration(
     )
   }
 
-  const siteId =
-    getText(
-      formData,
-      'siteId'
-    )
-
   const apiKey =
     getText(
       formData,
       'apiKey'
     )
 
-  const secretKey =
+  const apiPassword =
     getText(
       formData,
-      'secretKey'
+      'apiPassword'
     )
+
+  const environment =
+    getText(
+      formData,
+      'environment'
+    )
+      .toLowerCase()
 
   const channels =
     getText(
@@ -100,11 +107,12 @@ export async function saveCinetPayConfiguration(
   // ==========================================================
 
   if (
-    !siteId ||
-    siteId.length > 200
+    !ALLOWED_ENVIRONMENTS.has(
+      environment
+    )
   ) {
     redirectError(
-      'Le SITE ID CinetPay est obligatoire.'
+      'L’environnement CinetPay sélectionné est invalide.'
     )
   }
 
@@ -120,7 +128,7 @@ export async function saveCinetPayConfiguration(
 
   if (
     apiKey.length > 1000 ||
-    secretKey.length > 1000
+    apiPassword.length > 1000
   ) {
     redirectError(
       'Les identifiants CinetPay sont invalides.'
@@ -129,9 +137,6 @@ export async function saveCinetPayConfiguration(
 
   // ==========================================================
   // CLIENT SERVEUR PRIVILEGIE
-  //
-  // Cette table n'est volontairement pas accessible
-  // directement aux utilisateurs authentifiés.
   // ==========================================================
 
   const admin =
@@ -155,7 +160,7 @@ export async function saveCinetPayConfiguration(
       .select(`
         id,
         api_key_encrypted,
-        secret_key_encrypted,
+        api_password_encrypted,
         credential_version
       `)
       .eq(
@@ -194,10 +199,10 @@ export async function saveCinetPayConfiguration(
   if (!existing) {
     if (
       !apiKey ||
-      !secretKey
+      !apiPassword
     ) {
       redirectError(
-        'L’API KEY et la SECRET KEY sont obligatoires lors de la première configuration.'
+        'L’API KEY et le mot de passe API sont obligatoires lors de la première configuration.'
       )
     }
 
@@ -206,10 +211,13 @@ export async function saveCinetPayConfiguration(
         apiKey
       )
 
-    const encryptedSecretKey =
+    const encryptedApiPassword =
       encryptPaymentCredential(
-        secretKey
+        apiPassword
       )
+
+    const currentUserId =
+      await getCurrentUserId()
 
     const {
       error:
@@ -227,13 +235,18 @@ export async function saveCinetPayConfiguration(
             'cinetpay',
 
           site_id:
-            siteId,
+            null,
 
           api_key_encrypted:
             encryptedApiKey,
 
+          api_password_encrypted:
+            encryptedApiPassword,
+
           secret_key_encrypted:
-            encryptedSecretKey,
+            null,
+
+          environment,
 
           channels,
 
@@ -244,14 +257,10 @@ export async function saveCinetPayConfiguration(
             1,
 
           created_by:
-            (
-              await getCurrentUserId()
-            ),
+            currentUserId,
 
           updated_by:
-            (
-              await getCurrentUserId()
-            ),
+            currentUserId,
         })
 
     if (
@@ -274,28 +283,33 @@ export async function saveCinetPayConfiguration(
     }
 
     finishSuccess(
-      'Compte CinetPay connecté.'
+      'Compte CinetPay Aurore connecté.'
     )
   }
 
   // ==========================================================
   // MODIFICATION
   //
-  // Une clé laissée vide conserve la valeur existante.
+  // Un identifiant laissé vide conserve sa valeur existante.
   // ==========================================================
 
+  const credentialsChanged =
+    Boolean(
+      apiKey ||
+      apiPassword
+    )
+
   const updateData: {
-    site_id: string
+    environment: string
     channels: string
     is_active: boolean
     updated_at: string
     updated_by: string | null
     credential_version: number
     api_key_encrypted?: string
-    secret_key_encrypted?: string
+    api_password_encrypted?: string
   } = {
-    site_id:
-      siteId,
+    environment,
 
     channels,
 
@@ -314,6 +328,11 @@ export async function saveCinetPayConfiguration(
         existing
           .credential_version ??
         1
+      ) +
+      (
+        credentialsChanged
+          ? 1
+          : 0
       ),
   }
 
@@ -325,11 +344,11 @@ export async function saveCinetPayConfiguration(
         )
   }
 
-  if (secretKey) {
+  if (apiPassword) {
     updateData
-      .secret_key_encrypted =
+      .api_password_encrypted =
         encryptPaymentCredential(
-          secretKey
+          apiPassword
         )
   }
 
@@ -373,7 +392,7 @@ export async function saveCinetPayConfiguration(
   }
 
   finishSuccess(
-    'Configuration CinetPay mise à jour.'
+    'Configuration CinetPay Aurore mise à jour.'
   )
 }
 

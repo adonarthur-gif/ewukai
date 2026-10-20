@@ -1,14 +1,21 @@
 import {
+  timingSafeEqual,
+} from 'node:crypto'
+
+import {
   NextResponse,
 } from 'next/server'
 
 import {
-  verifyCinetPayHmacWithSecret,
-  verifyCinetPayTransactionWithCredentials,
-} from '@/lib/payments/cinetpay'
+  hashCinetPayNotifyToken,
+} from '@/lib/payments/cinetpay-aurore'
 
 import {
-  getOrganizationCinetPayConfig,
+  verifyCinetPayAurorePayment,
+} from '@/lib/payments/cinetpay-aurore-status'
+
+import {
+  getOrganizationCinetPayAuroreConfig,
 } from '@/lib/payments/organization-cinetpay'
 
 import {
@@ -17,31 +24,18 @@ import {
 
 // ============================================================
 // EWUKAI
-// WEBHOOK CINETPAY - COTISATIONS DES MEMBRES
+// WEBHOOK CINETPAY AURORE - COTISATIONS MEMBRES
 //
-// IMPORTANT :
+// PRINCIPES DE SECURITE :
 //
-// Ce webhook est distinct du webhook utilisé pour
-// les abonnements SaaS EWUKAI.
-//
-// Le paiement n'est JAMAIS confirmé sur la seule base
-// des données POST reçues.
-//
-// Circuit :
-//
-// CinetPay
-//    ↓
-// transaction_id
-//    ↓
-// tentative membre
-//    ↓
-// compte CinetPay de la mutuelle
-//    ↓
-// HMAC
-//    ↓
-// vérification API CinetPay
-//    ↓
-// confirmation PostgreSQL
+// 1. la notification CinetPay est seulement un signal
+// 2. le notify_token doit correspondre à celui reçu
+//    lors de l'initialisation
+// 3. le statut reçu dans le webhook n'est jamais utilisé
+// 4. EWUKAI interroge directement CinetPay
+// 5. seule la réponse serveur-à-serveur peut confirmer
+//    le paiement
+// 6. la confirmation PostgreSQL reste atomique
 // ============================================================
 
 export const runtime =
@@ -58,11 +52,20 @@ export async function GET() {
   return NextResponse.json(
     {
       ok: true,
+
       service:
         'member-cinetpay-notify',
+
+      api:
+        'aurore',
     },
     {
       status: 200,
+
+      headers: {
+        'Cache-Control':
+          'no-store',
+      },
     }
   )
 }
@@ -75,15 +78,15 @@ export async function POST(
   request: Request
 ) {
   // ==========================================================
-  // 1. LIRE LE FORMULAIRE
+  // 1. LIRE LE JSON
   // ==========================================================
 
-  let formData:
-    FormData
+  let body:
+    unknown
 
   try {
-    formData =
-      await request.formData()
+    body =
+      await request.json()
   } catch {
     return jsonError(
       'invalid_payload',
@@ -91,25 +94,48 @@ export async function POST(
     )
   }
 
+  if (
+    !body ||
+    typeof body !==
+      'object'
+  ) {
+    return jsonError(
+      'invalid_payload',
+      400
+    )
+  }
+
+  const payload =
+    body as Record<
+      string,
+      unknown
+    >
+
   // ==========================================================
-  // 2. IDENTIFIANTS MINIMUM
+  // 2. IDENTIFIANTS DE LA NOTIFICATION
   // ==========================================================
 
-  const transactionId =
-    getFormString(
-      formData,
-      'cpm_trans_id'
+  const notifyToken =
+    getString(
+      payload,
+      'notify_token'
     )
 
-  const postedSiteId =
-    getFormString(
-      formData,
-      'cpm_site_id'
+  const merchantTransactionId =
+    getString(
+      payload,
+      'merchant_transaction_id'
+    )
+
+  const notificationTransactionId =
+    getString(
+      payload,
+      'transaction_id'
     )
 
   if (
-    !transactionId ||
-    !postedSiteId
+    !notifyToken ||
+    !merchantTransactionId
   ) {
     return jsonError(
       'missing_transaction',
@@ -118,12 +144,9 @@ export async function POST(
   }
 
   // ==========================================================
-  // 3. RETROUVER LA TENTATIVE
+  // 3. RETROUVER NOTRE TENTATIVE
   //
-  // On utilise uniquement transactionId pour retrouver
-  // notre propre enregistrement.
-  //
-  // Aucune donnée financière n'est encore acceptée ici.
+  // merchant_transaction_id est la référence créée par EWUKAI.
   // ==========================================================
 
   const admin =
@@ -131,7 +154,8 @@ export async function POST(
 
   const {
     data: attempt,
-    error: attemptError,
+    error:
+      attemptError,
   } =
     await admin
       .from(
@@ -145,8 +169,11 @@ export async function POST(
         payment_id,
         provider,
         provider_transaction_ref,
+        provider_transaction_id,
+        provider_notify_token_hash,
         expected_amount_xof,
         currency,
+        selected_payment_method,
         status
       `)
       .eq(
@@ -155,13 +182,13 @@ export async function POST(
       )
       .eq(
         'provider_transaction_ref',
-        transactionId
+        merchantTransactionId
       )
       .maybeSingle()
 
   if (attemptError) {
     console.error(
-      'EWUKAI - MEMBER CINETPAY ATTEMPT LOOKUP:',
+      'EWUKAI - CINETPAY AURORE ATTEMPT LOOKUP:',
       {
         code:
           attemptError.code,
@@ -180,9 +207,8 @@ export async function POST(
   // ==========================================================
   // TRANSACTION INCONNUE
   //
-  // Réponse 200 volontaire :
-  // inutile que CinetPay répète indéfiniment une notification
-  // qui ne correspond à aucune tentative membre.
+  // Réponse 200 volontaire pour ne pas provoquer
+  // des répétitions inutiles d'une référence inconnue.
   // ==========================================================
 
   if (!attempt) {
@@ -217,24 +243,107 @@ export async function POST(
   }
 
   // ==========================================================
-  // 4. CHARGER LE COMPTE CINETPAY DE LA MUTUELLE
+  // 4. VERIFIER LE NOTIFY TOKEN
+  //
+  // La base contient uniquement SHA-256 du token original.
+  // ==========================================================
+
+  const storedNotifyTokenHash =
+    cleanText(
+      attempt
+        .provider_notify_token_hash
+    )
+
+  if (
+    !storedNotifyTokenHash
+  ) {
+    console.warn(
+      'EWUKAI - CINETPAY AURORE NOTIFY TOKEN HASH MISSING'
+    )
+
+    return jsonError(
+      'notify_token_not_configured',
+      401
+    )
+  }
+
+  const receivedNotifyTokenHash =
+    hashCinetPayNotifyToken(
+      notifyToken
+    )
+
+  if (
+    !safeEqualHex(
+      receivedNotifyTokenHash,
+      storedNotifyTokenHash
+    )
+  ) {
+    console.warn(
+      'EWUKAI - CINETPAY AURORE INVALID NOTIFY TOKEN'
+    )
+
+    return jsonError(
+      'invalid_notify_token',
+      401
+    )
+  }
+
+  // ==========================================================
+  // 5. COHERENCE TRANSACTION ID DE LA NOTIFICATION
+  // ==========================================================
+
+  const storedTransactionId =
+    cleanText(
+      attempt
+        .provider_transaction_id
+    )
+
+  if (
+    storedTransactionId &&
+    notificationTransactionId &&
+    storedTransactionId !==
+      notificationTransactionId
+  ) {
+    await markAttemptAnomaly(
+      admin,
+      attempt.id,
+      'TRANSACTION_ID_MISMATCH',
+      null,
+      notificationTransactionId
+    )
+
+    return NextResponse.json(
+      {
+        ok: true,
+        anomaly: true,
+        reason:
+          'transaction_id_mismatch',
+      },
+      {
+        status: 200,
+      }
+    )
+  }
+
+  // ==========================================================
+  // 6. CHARGER LES IDENTIFIANTS AURORE DE L'ORGANISATION
   // ==========================================================
 
   let credentials:
     Awaited<
       ReturnType<
-        typeof getOrganizationCinetPayConfig
+        typeof getOrganizationCinetPayAuroreConfig
       >
     >
 
   try {
     credentials =
-      await getOrganizationCinetPayConfig(
+      await getOrganizationCinetPayAuroreConfig(
         attempt.organization_id
       )
   } catch (error) {
     console.error(
-      'EWUKAI - MEMBER CINETPAY ORGANIZATION CONFIG:',
+      'EWUKAI - CINETPAY AURORE ORGANIZATION CONFIG:',
       safeError(
         error
       )
@@ -247,93 +356,29 @@ export async function POST(
   }
 
   // ==========================================================
-  // 5. SITE ID
+  // 7. VERIFICATION CANONIQUE CHEZ CINETPAY
   //
-  // Le SITE ID reçu doit être celui du compte marchand
-  // de CETTE mutuelle.
-  // ==========================================================
-
-  if (
-    postedSiteId !==
-    credentials.siteId
-  ) {
-    console.warn(
-      'EWUKAI - MEMBER CINETPAY INVALID SITE'
-    )
-
-    return jsonError(
-      'invalid_site',
-      401
-    )
-  }
-
-  // ==========================================================
-  // 6. VERIFIER LE HMAC
-  // ==========================================================
-
-  let validHmac =
-    false
-
-  try {
-    validHmac =
-      verifyCinetPayHmacWithSecret({
-        formData,
-
-        receivedToken:
-          request.headers.get(
-            'x-token'
-          ),
-
-        secretKey:
-          credentials.secretKey,
-      })
-  } catch (error) {
-    console.error(
-      'EWUKAI - MEMBER CINETPAY HMAC:',
-      safeError(
-        error
-      )
-    )
-
-    return jsonError(
-      'payment_configuration_error',
-      500
-    )
-  }
-
-  if (!validHmac) {
-    console.warn(
-      'EWUKAI - MEMBER CINETPAY INVALID HMAC'
-    )
-
-    return jsonError(
-      'invalid_hmac',
-      401
-    )
-  }
-
-  // ==========================================================
-  // 7. VERIFICATION DIRECTE CHEZ CINETPAY
+  // GET /v1/payment/{merchant_transaction_id}
   //
-  // C'est cette réponse serveur-à-serveur qui fait foi.
+  // Aucun statut venant du webhook n'est utilisé.
   // ==========================================================
 
   let verification:
     Awaited<
       ReturnType<
-        typeof verifyCinetPayTransactionWithCredentials
+        typeof verifyCinetPayAurorePayment
       >
     >
 
   try {
     verification =
-      await verifyCinetPayTransactionWithCredentials(
-        transactionId,
+      await verifyCinetPayAurorePayment(
+        merchantTransactionId,
         credentials
       )
   } catch (error) {
     console.error(
-      'EWUKAI - MEMBER CINETPAY VERIFY:',
+      'EWUKAI - CINETPAY AURORE VERIFY:',
       safeError(
         error
       )
@@ -346,84 +391,154 @@ export async function POST(
   }
 
   // ==========================================================
-  // 8. DONNEES VERIFIEES
+  // 8. COHERENCE TRANSACTION ID CANONIQUE
   // ==========================================================
 
-  const providerStatus =
-    (
+  const verifiedTransactionId =
+    cleanText(
       verification
-        .data
-        ?.status ??
-      ''
+        .transactionId
     )
+
+  if (
+    storedTransactionId &&
+    verifiedTransactionId &&
+    storedTransactionId !==
+      verifiedTransactionId
+  ) {
+    await markAttemptAnomaly(
+      admin,
+      attempt.id,
+      'TRANSACTION_ID_MISMATCH',
+      verification
+        .paymentMethod,
+      verifiedTransactionId
+    )
+
+    return NextResponse.json(
+      {
+        ok: true,
+        anomaly: true,
+        reason:
+          'transaction_id_mismatch',
+      },
+      {
+        status: 200,
+      }
+    )
+  }
+
+  if (
+    notificationTransactionId &&
+    verifiedTransactionId &&
+    notificationTransactionId !==
+      verifiedTransactionId
+  ) {
+    await markAttemptAnomaly(
+      admin,
+      attempt.id,
+      'TRANSACTION_ID_MISMATCH',
+      verification
+        .paymentMethod,
+      verifiedTransactionId
+    )
+
+    return NextResponse.json(
+      {
+        ok: true,
+        anomaly: true,
+        reason:
+          'transaction_id_mismatch',
+      },
+      {
+        status: 200,
+      }
+    )
+  }
+
+  // ==========================================================
+  // 9. DONNEES CANONIQUES
+  // ==========================================================
+
+  const providerCode =
+    verification.code
+      .trim()
+
+  const providerStatus =
+    verification.status
       .trim()
       .toUpperCase()
 
   const paymentMethod =
-    cleanNullable(
+    cleanText(
       verification
-        .data
-        ?.payment_method
-    )
-
-  const operatorId =
-    cleanNullable(
-      verification
-        .data
-        ?.operator_id
+        .paymentMethod
     )
 
   const eventRef =
-    cleanNullable(
-      verification
-        .api_response_id
-    )
+    verifiedTransactionId ??
+    notificationTransactionId ??
+    null
 
   const now =
     new Date()
       .toISOString()
 
   // ==========================================================
-  // 9. PAIEMENT ACCEPTE
+  // 10. SUCCES
+  //
+  // Aurore :
+  // code 100 + status SUCCESS
+  //
+  // Le endpoint de statut Aurore observé ne renvoie pas
+  // le montant ni la devise.
+  //
+  // Le montant utilisé ci-dessous est donc le montant
+  // sécurisé déjà enregistré lors de l'initialisation
+  // authentifiée de CETTE référence.
+  //
+  // Le RPC PostgreSQL vérifiera encore :
+  // - montant attendu
+  // - devise XOF
+  // - solde restant
+  // - absence de double encaissement
   // ==========================================================
 
   if (
+    providerCode ===
+      '100' &&
     providerStatus ===
-    'ACCEPTED'
+      'SUCCESS'
   ) {
-    const amountXof =
-      parseXofAmount(
-        verification
-          .data
-          ?.amount
+    const expectedAmountXof =
+      Number(
+        attempt
+          .expected_amount_xof
       )
 
-    const currency =
-      (
-        verification
-          .data
-          ?.currency ??
+    const expectedCurrency =
+      String(
+        attempt.currency ??
         ''
       )
         .trim()
         .toUpperCase()
 
-    // ========================================================
-    // MONTANT INVALIDE
-    // ========================================================
-
     if (
-      amountXof ===
-      null
+      !Number.isSafeInteger(
+        expectedAmountXof
+      ) ||
+      expectedAmountXof <=
+        0 ||
+      expectedCurrency !==
+        'XOF'
     ) {
       await markAttemptAnomaly(
         admin,
         attempt.id,
         providerStatus,
         paymentMethod,
-        operatorId,
-        eventRef,
-        now
+        eventRef
       )
 
       return NextResponse.json(
@@ -431,70 +546,18 @@ export async function POST(
           ok: true,
           anomaly: true,
           reason:
-            'invalid_amount',
+            'invalid_expected_amount',
         },
         {
           status: 200,
         }
       )
     }
-
-    // ========================================================
-    // DEFENSE SUPPLEMENTAIRE AVANT LE RPC
-    //
-    // Le RPC vérifiera lui aussi montant + devise.
-    // ========================================================
-
-    if (
-      amountXof !==
-        Number(
-          attempt.expected_amount_xof
-        ) ||
-      currency !==
-        String(
-          attempt.currency
-        )
-          .trim()
-          .toUpperCase()
-    ) {
-      await markAttemptAnomaly(
-        admin,
-        attempt.id,
-        providerStatus,
-        paymentMethod,
-        operatorId,
-        eventRef,
-        now
-      )
-
-      return NextResponse.json(
-        {
-          ok: true,
-          anomaly: true,
-          reason:
-            'amount_or_currency_mismatch',
-        },
-        {
-          status: 200,
-        }
-      )
-    }
-
-    // ========================================================
-    // CONFIRMATION ATOMIQUE
-    //
-    // Le RPC crée :
-    // - payment
-    // - allocation
-    // - mise à jour obligation
-    // - ledger
-    // - reçu
-    //
-    // exactement une seule fois.
-    // ========================================================
 
     const {
-      data: confirmation,
+      data:
+        confirmation,
+
       error:
         confirmationError,
     } =
@@ -505,16 +568,16 @@ export async function POST(
             attempt.id,
 
           target_amount_xof:
-            amountXof,
+            expectedAmountXof,
 
           target_currency:
-            currency,
+            'XOF',
 
           target_payment_method:
             paymentMethod,
 
           target_operator_id:
-            operatorId,
+            verifiedTransactionId,
 
           target_event_ref:
             eventRef,
@@ -528,7 +591,7 @@ export async function POST(
       confirmationError
     ) {
       console.error(
-        'EWUKAI - MEMBER CINETPAY CONFIRM:',
+        'EWUKAI - CINETPAY AURORE CONFIRM:',
         {
           code:
             confirmationError.code,
@@ -547,6 +610,8 @@ export async function POST(
     return NextResponse.json(
       {
         ok: true,
+        status:
+          'confirmed',
         confirmation,
       },
       {
@@ -556,17 +621,19 @@ export async function POST(
   }
 
   // ==========================================================
-  // 10. PAIEMENT REFUSE / ANNULE
+  // 11. ECHEC FINAL
+  //
+  // Codes documentés comme finaux :
+  // 2005 = INSUFFICIENT_BALANCE
+  // 2010 = FAILED
   // ==========================================================
 
   if (
     [
-      'REFUSED',
-      'CANCELLED',
-      'CANCELED',
-      'FAILED',
+      '2005',
+      '2010',
     ].includes(
-      providerStatus
+      providerCode
     )
   ) {
     const {
@@ -582,13 +649,14 @@ export async function POST(
             'failed',
 
           provider_status:
-            providerStatus,
+            providerStatus ||
+            providerCode,
 
           provider_payment_method:
             paymentMethod,
 
           provider_operator_id:
-            operatorId,
+            verifiedTransactionId,
 
           provider_event_ref:
             eventRef,
@@ -611,7 +679,7 @@ export async function POST(
       failedUpdateError
     ) {
       console.error(
-        'EWUKAI - MEMBER CINETPAY FAILED UPDATE:',
+        'EWUKAI - CINETPAY AURORE FAILED UPDATE:',
         {
           code:
             failedUpdateError.code,
@@ -630,7 +698,8 @@ export async function POST(
     return NextResponse.json(
       {
         ok: true,
-        status: 'failed',
+        status:
+          'failed',
       },
       {
         status: 200,
@@ -639,7 +708,13 @@ export async function POST(
   }
 
   // ==========================================================
-  // 11. EN ATTENTE
+  // 12. AUTRES STATUTS
+  //
+  // INITIATED / PENDING / EXPIRED / OTP...
+  //
+  // On ne confirme rien.
+  // On conserve la tentative en attente car CinetPay
+  // peut encore renvoyer un nouvel état.
   // ==========================================================
 
   const {
@@ -656,14 +731,14 @@ export async function POST(
 
         provider_status:
           providerStatus ||
-          verification.message ||
+          providerCode ||
           'PENDING',
 
         provider_payment_method:
           paymentMethod,
 
         provider_operator_id:
-          operatorId,
+          verifiedTransactionId,
 
         provider_event_ref:
           eventRef,
@@ -683,7 +758,7 @@ export async function POST(
     pendingUpdateError
   ) {
     console.error(
-      'EWUKAI - MEMBER CINETPAY PENDING UPDATE:',
+      'EWUKAI - CINETPAY AURORE PENDING UPDATE:',
       {
         code:
           pendingUpdateError.code,
@@ -702,7 +777,15 @@ export async function POST(
   return NextResponse.json(
     {
       ok: true,
-      status: 'pending',
+
+      status:
+        'pending',
+
+      provider_code:
+        providerCode,
+
+      provider_status:
+        providerStatus,
     },
     {
       status: 200,
@@ -730,17 +813,14 @@ async function markAttemptAnomaly(
     | string
     | null,
 
-  operatorId:
-    | string
-    | null,
-
   eventRef:
     | string
-    | null,
-
-  now:
-    string
+    | null
 ) {
+  const now =
+    new Date()
+      .toISOString()
+
   const {
     error,
   } =
@@ -758,9 +838,6 @@ async function markAttemptAnomaly(
         provider_payment_method:
           paymentMethod,
 
-        provider_operator_id:
-          operatorId,
-
         provider_event_ref:
           eventRef,
 
@@ -777,7 +854,7 @@ async function markAttemptAnomaly(
 
   if (error) {
     console.error(
-      'EWUKAI - MEMBER CINETPAY ANOMALY:',
+      'EWUKAI - CINETPAY AURORE ANOMALY:',
       {
         code:
           error.code,
@@ -790,20 +867,23 @@ async function markAttemptAnomaly(
 }
 
 // ============================================================
-// FORM DATA
+// LIRE UNE CHAINE DU JSON
 // ============================================================
 
-function getFormString(
-  formData:
-    FormData,
+function getString(
+  payload:
+    Record<
+      string,
+      unknown
+    >,
 
   key:
     string
 ) {
   const value =
-    formData.get(
+    payload[
       key
-    )
+    ]
 
   if (
     typeof value !==
@@ -820,10 +900,10 @@ function getFormString(
 }
 
 // ============================================================
-// NULLABLE STRING
+// TEXTE NULLABLE
 // ============================================================
 
-function cleanNullable(
+function cleanText(
   value:
     | string
     | null
@@ -837,34 +917,55 @@ function cleanNullable(
 }
 
 // ============================================================
-// MONTANT XOF
+// COMPARAISON CONSTANT-TIME DES HASH
 // ============================================================
 
-function parseXofAmount(
-  value:
-    | string
-    | number
-    | null
-    | undefined
+function safeEqualHex(
+  left:
+    string,
+
+  right:
+    string
 ) {
-  const amount =
-    typeof value ===
-    'number'
-      ? value
-      : Number(
-          value
-        )
+  const normalizedLeft =
+    left
+      .trim()
+      .toLowerCase()
+
+  const normalizedRight =
+    right
+      .trim()
+      .toLowerCase()
 
   if (
-    !Number.isSafeInteger(
-      amount
-    ) ||
-    amount <= 0
+    !/^[0-9a-f]{64}$/
+      .test(
+        normalizedLeft
+      ) ||
+    !/^[0-9a-f]{64}$/
+      .test(
+        normalizedRight
+      )
   ) {
-    return null
+    return false
   }
 
-  return amount
+  const leftBuffer =
+    Buffer.from(
+      normalizedLeft,
+      'hex'
+    )
+
+  const rightBuffer =
+    Buffer.from(
+      normalizedRight,
+      'hex'
+    )
+
+  return timingSafeEqual(
+    leftBuffer,
+    rightBuffer
+  )
 }
 
 // ============================================================
@@ -885,6 +986,11 @@ function jsonError(
     },
     {
       status,
+
+      headers: {
+        'Cache-Control':
+          'no-store',
+      },
     }
   )
 }
@@ -892,7 +998,7 @@ function jsonError(
 // ============================================================
 // SAFE ERROR
 //
-// Evite d'afficher accidentellement des secrets.
+// Ne jamais journaliser les identifiants ou tokens.
 // ============================================================
 
 function safeError(

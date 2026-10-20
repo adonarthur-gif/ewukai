@@ -1,4 +1,5 @@
 import Link from 'next/link'
+
 import {
   redirect,
 } from 'next/navigation'
@@ -15,7 +16,7 @@ import {
 
 // ============================================================
 // EWUKAI
-// PARAMETRES CINETPAY
+// PARAMETRES CINETPAY AURORE
 // ============================================================
 
 type PageProps = {
@@ -34,7 +35,7 @@ type CinetPayStatus = {
 
   active: boolean
 
-  site_id:
+  environment:
     | string
     | null
 
@@ -171,8 +172,8 @@ export default async function CinetPaySettingsPage({
         active:
           false,
 
-        site_id:
-          null,
+        environment:
+          'sandbox',
 
         channels:
           null,
@@ -214,7 +215,7 @@ export default async function CinetPaySettingsPage({
 
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
             Connectez le compte marchand
-            CinetPay de votre organisation.
+            CinetPay Aurore de votre organisation.
             Les cotisations payées en ligne
             utiliseront ce compte marchand.
           </p>
@@ -264,7 +265,7 @@ export default async function CinetPaySettingsPage({
               </p>
 
               <h2 className="mt-2 text-xl font-black text-slate-950">
-                CinetPay
+                CinetPay Aurore
               </h2>
 
             </div>
@@ -280,33 +281,36 @@ export default async function CinetPaySettingsPage({
 
           </div>
 
-          {status.configured && (
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
 
-              <StatusInfo
-                label="SITE ID"
-                value={
-                  status.site_id ||
-                  '—'
-                }
-              />
+            <StatusInfo
+              label="Environnement"
+              value={
+                formatEnvironment(
+                  status.environment
+                )
+              }
+            />
 
-              <StatusInfo
-                label="Canaux"
-                value={
-                  formatChannels(
-                    status.channels
-                  )
-                }
-              />
+            <StatusInfo
+              label="Canaux"
+              value={
+                formatChannels(
+                  status.channels
+                )
+              }
+            />
 
-              <StatusInfo
-                label="Identifiants sensibles"
-                value="••••••••••••"
-              />
+            <StatusInfo
+              label="Identifiants"
+              value={
+                status.configured
+                  ? 'API KEY + API PASSWORD configurés'
+                  : 'Non configurés'
+              }
+            />
 
-            </div>
-          )}
+          </div>
 
           {status.configured &&
             canEdit && (
@@ -393,30 +397,42 @@ export default async function CinetPaySettingsPage({
               className="space-y-6 p-6"
             >
 
-              {/* SITE ID */}
+              {/* ENVIRONNEMENT */}
 
               <div>
 
                 <label
-                  htmlFor="siteId"
+                  htmlFor="environment"
                   className="text-sm font-black text-slate-800"
                 >
-                  SITE ID
+                  Environnement
                 </label>
 
-                <input
-                  id="siteId"
-                  name="siteId"
-                  type="text"
-                  required
-                  maxLength={200}
+                <select
+                  id="environment"
+                  name="environment"
                   defaultValue={
-                    status.site_id ??
-                    ''
+                    status.environment ??
+                    'sandbox'
                   }
-                  autoComplete="off"
                   className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                />
+                >
+
+                  <option value="sandbox">
+                    Sandbox — Tests
+                  </option>
+
+                  <option value="production">
+                    Production — Paiements réels
+                  </option>
+
+                </select>
+
+                <p className="mt-2 text-xs leading-5 text-slate-500">
+                  Utilisez Sandbox tant que
+                  CinetPay n’a pas validé votre
+                  mise en production.
+                </p>
 
               </div>
 
@@ -443,7 +459,7 @@ export default async function CinetPaySettingsPage({
                   placeholder={
                     status.configured
                       ? 'Laisser vide pour conserver la clé actuelle'
-                      : 'Saisissez votre API KEY'
+                      : 'Saisissez votre API KEY CinetPay'
                   }
                   className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                 />
@@ -458,20 +474,20 @@ export default async function CinetPaySettingsPage({
 
               </div>
 
-              {/* SECRET KEY */}
+              {/* API PASSWORD */}
 
               <div>
 
                 <label
-                  htmlFor="secretKey"
+                  htmlFor="apiPassword"
                   className="text-sm font-black text-slate-800"
                 >
-                  SECRET KEY
+                  Mot de passe API
                 </label>
 
                 <input
-                  id="secretKey"
-                  name="secretKey"
+                  id="apiPassword"
+                  name="apiPassword"
                   type="password"
                   maxLength={1000}
                   required={
@@ -480,11 +496,19 @@ export default async function CinetPaySettingsPage({
                   autoComplete="new-password"
                   placeholder={
                     status.configured
-                      ? 'Laisser vide pour conserver la clé actuelle'
-                      : 'Saisissez votre SECRET KEY'
+                      ? 'Laisser vide pour conserver le mot de passe actuel'
+                      : 'Saisissez votre mot de passe API CinetPay'
                   }
                   className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                 />
+
+                {status.configured && (
+                  <p className="mt-2 text-xs text-slate-500">
+                    Le mot de passe actuel reste
+                    inchangé si ce champ est
+                    laissé vide.
+                  </p>
+                )}
 
               </div>
 
@@ -538,11 +562,30 @@ export default async function CinetPaySettingsPage({
                 </p>
 
                 <p className="mt-2 text-sm leading-6 text-amber-800">
-                  L’API KEY et la SECRET KEY
-                  sont chiffrées côté serveur
+                  L’API KEY et le mot de passe
+                  API sont chiffrés côté serveur
                   avant leur enregistrement.
-                  Elles ne seront jamais
-                  réaffichées dans cette page.
+                  Ils ne seront jamais
+                  réaffichés dans cette page.
+                </p>
+
+              </div>
+
+              {/* AURORE */}
+
+              <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+
+                <p className="font-black text-blue-950">
+                  CinetPay Aurore
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-blue-800">
+                  EWUKAI utilisera ces identifiants
+                  pour obtenir automatiquement
+                  un jeton d’accès temporaire
+                  auprès de CinetPay.
+                  Aucun jeton d’accès n’est
+                  enregistré dans cette page.
                 </p>
 
               </div>
@@ -625,6 +668,31 @@ function StatusInfo({
 
     </div>
   )
+}
+
+// ============================================================
+// ENVIRONNEMENT
+// ============================================================
+
+function formatEnvironment(
+  value:
+    | string
+    | null
+) {
+  switch (
+    value
+      ?.trim()
+      .toLowerCase()
+  ) {
+    case 'production':
+      return 'Production'
+
+    case 'sandbox':
+      return 'Sandbox'
+
+    default:
+      return 'Sandbox'
+  }
 }
 
 // ============================================================

@@ -9,14 +9,25 @@ import {
 
 // ============================================================
 // EWUKAI
-// RETOUR NAVIGATEUR CINETPAY - COTISATION MEMBRE
+// RETOUR NAVIGATEUR CINETPAY AURORE
 //
 // IMPORTANT :
-// cette route ne confirme JAMAIS un paiement.
+// CETTE ROUTE NE CONFIRME JAMAIS UN PAIEMENT.
 //
-// La confirmation financière est faite uniquement par :
+// La confirmation financière est effectuée uniquement
+// par le webhook sécurisé :
+//
 // /api/payments/cinetpay/member-notify
+//
+// qui vérifie ensuite la transaction directement
+// auprès de l'API CinetPay Aurore.
 // ============================================================
+
+export const runtime =
+  'nodejs'
+
+export const dynamic =
+  'force-dynamic'
 
 // ============================================================
 // GET
@@ -25,61 +36,117 @@ import {
 export async function GET(
   request: NextRequest
 ) {
-  const transactionId =
-    normalizeText(
-      request.nextUrl
-        .searchParams
-        .get(
-          'transaction_id'
-        ) ??
-        request.nextUrl
-          .searchParams
-          .get(
-            'cpm_trans_id'
-          )
+  const merchantTransactionId =
+    getMerchantTransactionIdFromUrl(
+      request
     )
 
   return handleReturn(
     request,
-    transactionId
+    merchantTransactionId
   )
 }
 
 // ============================================================
 // POST
+//
+// On accepte également POST par prudence,
+// mais aucune donnée financière reçue ici n'est utilisée.
 // ============================================================
 
 export async function POST(
   request: NextRequest
 ) {
-  let transactionId:
-    | string
-    | null =
-      null
+  let merchantTransactionId =
+    getMerchantTransactionIdFromUrl(
+      request
+    )
+
+  // ==========================================================
+  // SI LA REFERENCE EST DEJA DANS L'URL
+  // ==========================================================
+
+  if (
+    merchantTransactionId
+  ) {
+    return handleReturn(
+      request,
+      merchantTransactionId
+    )
+  }
+
+  // ==========================================================
+  // ESSAYER JSON
+  // ==========================================================
 
   try {
-    const formData =
-      await request.formData()
+    const contentType =
+      request.headers
+        .get(
+          'content-type'
+        )
+        ?.toLowerCase() ||
+      ''
 
-    transactionId =
-      normalizeText(
+    if (
+      contentType.includes(
+        'application/json'
+      )
+    ) {
+      const payload =
+        await request.json()
+
+      if (
+        payload &&
+        typeof payload ===
+          'object'
+      ) {
+        const record =
+          payload as Record<
+            string,
+            unknown
+          >
+
+        merchantTransactionId =
+          getRecordString(
+            record,
+            'merchant_transaction_id'
+          ) ??
+          getRecordString(
+            record,
+            'transaction_id'
+          )
+      }
+    } else {
+      // ======================================================
+      // ESSAYER FORM DATA
+      // ======================================================
+
+      const formData =
+        await request.formData()
+
+      merchantTransactionId =
+        getFormString(
+          formData,
+          'merchant_transaction_id'
+        ) ??
         getFormString(
           formData,
           'transaction_id'
         ) ??
-          getFormString(
-            formData,
-            'cpm_trans_id'
-          )
-      )
+        getFormString(
+          formData,
+          'cpm_trans_id'
+        )
+    }
   } catch {
-    transactionId =
+    merchantTransactionId =
       null
   }
 
   return handleReturn(
     request,
-    transactionId
+    merchantTransactionId
   )
 }
 
@@ -89,7 +156,8 @@ export async function POST(
 
 async function handleReturn(
   request: NextRequest,
-  transactionId:
+
+  merchantTransactionId:
     | string
     | null
 ) {
@@ -98,9 +166,13 @@ async function handleReturn(
 
   // ==========================================================
   // AUCUNE REFERENCE
+  //
+  // Aucun paiement n'est considéré comme confirmé.
   // ==========================================================
 
-  if (!transactionId) {
+  if (
+    !merchantTransactionId
+  ) {
     return NextResponse.redirect(
       new URL(
         '/my-space?payment=returned',
@@ -110,14 +182,16 @@ async function handleReturn(
   }
 
   // ==========================================================
-  // RECHERCHER LA TENTATIVE
+  // RECHERCHER NOTRE TENTATIVE
   // ==========================================================
 
   const admin =
     createAdminClient()
 
   const {
-    data: attempt,
+    data:
+      attempt,
+
     error,
   } =
     await admin
@@ -137,12 +211,12 @@ async function handleReturn(
       )
       .eq(
         'provider_transaction_ref',
-        transactionId
+        merchantTransactionId
       )
       .maybeSingle()
 
   // ==========================================================
-  // TRANSACTION INCONNUE
+  // REFERENCE INCONNUE
   // ==========================================================
 
   if (
@@ -151,7 +225,7 @@ async function handleReturn(
   ) {
     if (error) {
       console.error(
-        'EWUKAI - MEMBER CINETPAY RETURN:',
+        'EWUKAI - CINETPAY AURORE MEMBER RETURN:',
         {
           code:
             error.code,
@@ -171,12 +245,13 @@ async function handleReturn(
   }
 
   // ==========================================================
-  // RETOUR VERS L'ECHEANCE
+  // RETOUR VERS LA COTISATION
   //
   // IMPORTANT :
-  // le statut affiché sera relu depuis la base.
-  // On ne considère pas ce retour navigateur comme
-  // une preuve de paiement.
+  // le statut sera relu depuis Supabase.
+  //
+  // On ne considère jamais le retour navigateur
+  // comme une preuve de paiement.
   // ==========================================================
 
   const destination =
@@ -201,8 +276,63 @@ async function handleReturn(
       attempt.organization_id
     )
 
+  // ==========================================================
+  // INFORMATION D'AFFICHAGE UNIQUEMENT
+  //
+  // Ce paramètre n'a aucune valeur financière.
+  // ==========================================================
+
+  const result =
+    normalizeText(
+      request.nextUrl
+        .searchParams
+        .get(
+          'result'
+        )
+    )
+
+  if (
+    result ===
+      'success' ||
+    result ===
+      'failed'
+  ) {
+    destination
+      .searchParams
+      .set(
+        'result',
+        result
+      )
+  }
+
   return NextResponse.redirect(
     destination
+  )
+}
+
+// ============================================================
+// REFERENCE DEPUIS L'URL
+// ============================================================
+
+function getMerchantTransactionIdFromUrl(
+  request: NextRequest
+) {
+  return normalizeText(
+    request.nextUrl
+      .searchParams
+      .get(
+        'merchant_transaction_id'
+      ) ??
+    request.nextUrl
+      .searchParams
+      .get(
+        'transaction_id'
+      ) ??
+    request.nextUrl
+      .searchParams
+      .get(
+        'cpm_trans_id'
+      )
   )
 }
 
@@ -212,6 +342,7 @@ async function handleReturn(
 
 function getFormString(
   formData: FormData,
+
   key: string
 ) {
   const value =
@@ -221,7 +352,36 @@ function getFormString(
 
   return typeof value ===
     'string'
-    ? value
+    ? normalizeText(
+        value
+      )
+    : null
+}
+
+// ============================================================
+// JSON
+// ============================================================
+
+function getRecordString(
+  record:
+    Record<
+      string,
+      unknown
+    >,
+
+  key:
+    string
+) {
+  const value =
+    record[
+      key
+    ]
+
+  return typeof value ===
+    'string'
+    ? normalizeText(
+        value
+      )
     : null
 }
 
