@@ -482,6 +482,9 @@ export async function initializeCinetPayAurorePayment(
             client_last_name:
               clientLastName,
 
+            channel:
+              'PUSH',
+
             direct_pay:
               false,
 

@@ -3,6 +3,7 @@ import {
 } from 'node:crypto'
 
 import {
+  after,
   NextResponse,
 } from 'next/server'
 
@@ -15,12 +16,17 @@ import {
 } from '@/lib/payments/cinetpay-aurore-status'
 
 import {
-  getOrganizationCinetPayAuroreConfig,
-} from '@/lib/payments/organization-cinetpay'
+  getPlatformCinetPayAuroreConfig,
+} from '@/lib/payments/platform-cinetpay'
+
+import {
+  processOrganizationPayout,
+} from '@/lib/payments/process-organization-payout'
 
 import {
   createAdminClient,
 } from '@/lib/supabase/admin'
+
 
 // ============================================================
 // EWUKAI
@@ -36,6 +42,10 @@ import {
 // 5. seule la réponse serveur-à-serveur peut confirmer
 //    le paiement
 // 6. la confirmation PostgreSQL reste atomique
+// 7. après confirmation, le reversement est lancé
+//    automatiquement côté serveur
+// 8. le reversement n'empêche jamais CinetPay de recevoir
+//    rapidement la réponse HTTP du webhook
 // ============================================================
 
 export const runtime =
@@ -44,11 +54,13 @@ export const runtime =
 export const dynamic =
   'force-dynamic'
 
+
 // ============================================================
 // TEST DE DISPONIBILITE
 // ============================================================
 
 export async function GET() {
+
   return NextResponse.json(
     {
       ok: true,
@@ -70,6 +82,7 @@ export async function GET() {
   )
 }
 
+
 // ============================================================
 // NOTIFICATION CINETPAY
 // ============================================================
@@ -77,6 +90,7 @@ export async function GET() {
 export async function POST(
   request: Request
 ) {
+
   // ==========================================================
   // 1. LIRE LE JSON
   // ==========================================================
@@ -84,32 +98,40 @@ export async function POST(
   let body:
     unknown
 
+
   try {
+
     body =
       await request.json()
+
   } catch {
+
     return jsonError(
       'invalid_payload',
       400
     )
   }
+
 
   if (
     !body ||
     typeof body !==
       'object'
   ) {
+
     return jsonError(
       'invalid_payload',
       400
     )
   }
 
+
   const payload =
     body as Record<
       string,
       unknown
     >
+
 
   // ==========================================================
   // 2. IDENTIFIANTS DE LA NOTIFICATION
@@ -121,11 +143,13 @@ export async function POST(
       'notify_token'
     )
 
+
   const merchantTransactionId =
     getString(
       payload,
       'merchant_transaction_id'
     )
+
 
   const notificationTransactionId =
     getString(
@@ -133,15 +157,18 @@ export async function POST(
       'transaction_id'
     )
 
+
   if (
     !notifyToken ||
     !merchantTransactionId
   ) {
+
     return jsonError(
       'missing_transaction',
       400
     )
   }
+
 
   // ==========================================================
   // 3. RETROUVER NOTRE TENTATIVE
@@ -152,8 +179,11 @@ export async function POST(
   const admin =
     createAdminClient()
 
+
   const {
-    data: attempt,
+    data:
+      attempt,
+
     error:
       attemptError,
   } =
@@ -186,7 +216,9 @@ export async function POST(
       )
       .maybeSingle()
 
+
   if (attemptError) {
+
     console.error(
       'EWUKAI - CINETPAY AURORE ATTEMPT LOOKUP:',
       {
@@ -198,11 +230,13 @@ export async function POST(
       }
     )
 
+
     return jsonError(
       'database_error',
       500
     )
   }
+
 
   // ==========================================================
   // TRANSACTION INCONNUE
@@ -212,9 +246,11 @@ export async function POST(
   // ==========================================================
 
   if (!attempt) {
+
     return NextResponse.json(
       {
         ok: true,
+
         ignored: true,
       },
       {
@@ -223,17 +259,36 @@ export async function POST(
     )
   }
 
+
   // ==========================================================
   // IDEMPOTENCE
+  //
+  // Si le paiement est déjà confirmé, nous ne recréons
+  // évidemment pas le paiement.
+  //
+  // En revanche, si payment_id est présent, nous programmons
+  // à nouveau la reprise du reversement correspondant.
+  //
+  // Cela permet de récupérer automatiquement un payout resté
+  // pending/processing après une interruption précédente.
   // ==========================================================
 
   if (
     attempt.status ===
     'confirmed'
   ) {
+
+    scheduleOrganizationPayoutProcessing(
+      cleanText(
+        attempt.payment_id
+      )
+    )
+
+
     return NextResponse.json(
       {
         ok: true,
+
         idempotent: true,
       },
       {
@@ -241,6 +296,7 @@ export async function POST(
       }
     )
   }
+
 
   // ==========================================================
   // 4. VERIFIER LE NOTIFY TOKEN
@@ -254,12 +310,15 @@ export async function POST(
         .provider_notify_token_hash
     )
 
+
   if (
     !storedNotifyTokenHash
   ) {
+
     console.warn(
       'EWUKAI - CINETPAY AURORE NOTIFY TOKEN HASH MISSING'
     )
+
 
     return jsonError(
       'notify_token_not_configured',
@@ -267,10 +326,12 @@ export async function POST(
     )
   }
 
+
   const receivedNotifyTokenHash =
     hashCinetPayNotifyToken(
       notifyToken
     )
+
 
   if (
     !safeEqualHex(
@@ -278,15 +339,18 @@ export async function POST(
       storedNotifyTokenHash
     )
   ) {
+
     console.warn(
       'EWUKAI - CINETPAY AURORE INVALID NOTIFY TOKEN'
     )
+
 
     return jsonError(
       'invalid_notify_token',
       401
     )
   }
+
 
   // ==========================================================
   // 5. COHERENCE TRANSACTION ID DE LA NOTIFICATION
@@ -298,12 +362,14 @@ export async function POST(
         .provider_transaction_id
     )
 
+
   if (
     storedTransactionId &&
     notificationTransactionId &&
     storedTransactionId !==
       notificationTransactionId
   ) {
+
     await markAttemptAnomaly(
       admin,
       attempt.id,
@@ -312,10 +378,13 @@ export async function POST(
       notificationTransactionId
     )
 
+
     return NextResponse.json(
       {
         ok: true,
+
         anomaly: true,
+
         reason:
           'transaction_id_mismatch',
       },
@@ -325,23 +394,26 @@ export async function POST(
     )
   }
 
+
   // ==========================================================
-  // 6. CHARGER LES IDENTIFIANTS AURORE DE L'ORGANISATION
+  // 6. CHARGER LES IDENTIFIANTS AURORE CENTRAUX EWUKAI
   // ==========================================================
 
   let credentials:
     Awaited<
       ReturnType<
-        typeof getOrganizationCinetPayAuroreConfig
+        typeof getPlatformCinetPayAuroreConfig
       >
     >
 
+
   try {
+
     credentials =
-      await getOrganizationCinetPayAuroreConfig(
-        attempt.organization_id
-      )
+      await getPlatformCinetPayAuroreConfig()
+
   } catch (error) {
+
     console.error(
       'EWUKAI - CINETPAY AURORE ORGANIZATION CONFIG:',
       safeError(
@@ -349,11 +421,13 @@ export async function POST(
       )
     )
 
+
     return jsonError(
       'payment_configuration_error',
       500
     )
   }
+
 
   // ==========================================================
   // 7. VERIFICATION CANONIQUE CHEZ CINETPAY
@@ -370,13 +444,17 @@ export async function POST(
       >
     >
 
+
   try {
+
     verification =
       await verifyCinetPayAurorePayment(
         merchantTransactionId,
         credentials
       )
+
   } catch (error) {
+
     console.error(
       'EWUKAI - CINETPAY AURORE VERIFY:',
       safeError(
@@ -384,11 +462,13 @@ export async function POST(
       )
     )
 
+
     return jsonError(
       'provider_verification_failed',
       502
     )
   }
+
 
   // ==========================================================
   // 8. COHERENCE TRANSACTION ID CANONIQUE
@@ -400,12 +480,14 @@ export async function POST(
         .transactionId
     )
 
+
   if (
     storedTransactionId &&
     verifiedTransactionId &&
     storedTransactionId !==
       verifiedTransactionId
   ) {
+
     await markAttemptAnomaly(
       admin,
       attempt.id,
@@ -415,10 +497,13 @@ export async function POST(
       verifiedTransactionId
     )
 
+
     return NextResponse.json(
       {
         ok: true,
+
         anomaly: true,
+
         reason:
           'transaction_id_mismatch',
       },
@@ -427,6 +512,7 @@ export async function POST(
       }
     )
   }
+
 
   if (
     notificationTransactionId &&
@@ -434,6 +520,7 @@ export async function POST(
     notificationTransactionId !==
       verifiedTransactionId
   ) {
+
     await markAttemptAnomaly(
       admin,
       attempt.id,
@@ -443,10 +530,13 @@ export async function POST(
       verifiedTransactionId
     )
 
+
     return NextResponse.json(
       {
         ok: true,
+
         anomaly: true,
+
         reason:
           'transaction_id_mismatch',
       },
@@ -455,6 +545,7 @@ export async function POST(
       }
     )
   }
+
 
   // ==========================================================
   // 9. DONNEES CANONIQUES
@@ -464,10 +555,12 @@ export async function POST(
     verification.code
       .trim()
 
+
   const providerStatus =
     verification.status
       .trim()
       .toUpperCase()
+
 
   const paymentMethod =
     cleanText(
@@ -475,19 +568,23 @@ export async function POST(
         .paymentMethod
     )
 
+
   const eventRef =
     verifiedTransactionId ??
     notificationTransactionId ??
     null
 
+
   const now =
     new Date()
       .toISOString()
+
 
   // ==========================================================
   // 10. SUCCES
   //
   // Aurore :
+  //
   // code 100 + status SUCCESS
   //
   // Le endpoint de statut Aurore observé ne renvoie pas
@@ -498,10 +595,15 @@ export async function POST(
   // authentifiée de CETTE référence.
   //
   // Le RPC PostgreSQL vérifiera encore :
+  //
   // - montant attendu
   // - devise XOF
   // - solde restant
   // - absence de double encaissement
+  //
+  // Le trigger PostgreSQL créé précédemment ajoutera ensuite
+  // automatiquement organization_payouts = pending lorsqu'un
+  // compte principal de reversement existe.
   // ==========================================================
 
   if (
@@ -510,11 +612,13 @@ export async function POST(
     providerStatus ===
       'SUCCESS'
   ) {
+
     const expectedAmountXof =
       Number(
         attempt
           .expected_amount_xof
       )
+
 
     const expectedCurrency =
       String(
@@ -523,6 +627,7 @@ export async function POST(
       )
         .trim()
         .toUpperCase()
+
 
     if (
       !Number.isSafeInteger(
@@ -533,6 +638,7 @@ export async function POST(
       expectedCurrency !==
         'XOF'
     ) {
+
       await markAttemptAnomaly(
         admin,
         attempt.id,
@@ -541,10 +647,13 @@ export async function POST(
         eventRef
       )
 
+
       return NextResponse.json(
         {
           ok: true,
+
           anomaly: true,
+
           reason:
             'invalid_expected_amount',
         },
@@ -553,6 +662,7 @@ export async function POST(
         }
       )
     }
+
 
     const {
       data:
@@ -587,9 +697,11 @@ export async function POST(
         }
       )
 
+
     if (
       confirmationError
     ) {
+
       console.error(
         'EWUKAI - CINETPAY AURORE CONFIRM:',
         {
@@ -601,17 +713,60 @@ export async function POST(
         }
       )
 
+
       return jsonError(
         'confirmation_failed',
         500
       )
     }
 
+
+    // ========================================================
+    // 10.1 RECUPERER PAYMENT_ID RETOURNE PAR LE RPC
+    //
+    // confirm_cinetpay_member_payment() retourne notamment :
+    //
+    // {
+    //   success: true,
+    //   attempt_id: ...,
+    //   payment_id: ...,
+    //   receipt_number: ...
+    // }
+    //
+    // payment_id permet de retrouver sans ambiguïté
+    // organization_payouts créé par le trigger PostgreSQL.
+    // ========================================================
+
+    const confirmedPaymentId =
+      extractConfirmationPaymentId(
+        confirmation
+      )
+
+
+    // ========================================================
+    // 10.2 PROGRAMMER LE REVERSEMENT AUTOMATIQUE
+    //
+    // after() permet de répondre à CinetPay immédiatement.
+    //
+    // La recherche du payout et l'appel Transfer sont effectués
+    // ensuite côté serveur.
+    //
+    // Une erreur de reversement ne remet jamais en cause
+    // l'encaissement membre déjà confirmé.
+    // ========================================================
+
+    scheduleOrganizationPayoutProcessing(
+      confirmedPaymentId
+    )
+
+
     return NextResponse.json(
       {
         ok: true,
+
         status:
           'confirmed',
+
         confirmation,
       },
       {
@@ -620,10 +775,12 @@ export async function POST(
     )
   }
 
+
   // ==========================================================
   // 11. ECHEC FINAL
   //
   // Codes documentés comme finaux :
+  //
   // 2005 = INSUFFICIENT_BALANCE
   // 2010 = FAILED
   // ==========================================================
@@ -636,6 +793,7 @@ export async function POST(
       providerCode
     )
   ) {
+
     const {
       error:
         failedUpdateError,
@@ -675,9 +833,11 @@ export async function POST(
           attempt.id
         )
 
+
     if (
       failedUpdateError
     ) {
+
       console.error(
         'EWUKAI - CINETPAY AURORE FAILED UPDATE:',
         {
@@ -689,15 +849,18 @@ export async function POST(
         }
       )
 
+
       return jsonError(
         'database_error',
         500
       )
     }
 
+
     return NextResponse.json(
       {
         ok: true,
+
         status:
           'failed',
       },
@@ -707,12 +870,14 @@ export async function POST(
     )
   }
 
+
   // ==========================================================
   // 12. AUTRES STATUTS
   //
   // INITIATED / PENDING / EXPIRED / OTP...
   //
   // On ne confirme rien.
+  //
   // On conserve la tentative en attente car CinetPay
   // peut encore renvoyer un nouvel état.
   // ==========================================================
@@ -754,9 +919,11 @@ export async function POST(
         attempt.id
       )
 
+
   if (
     pendingUpdateError
   ) {
+
     console.error(
       'EWUKAI - CINETPAY AURORE PENDING UPDATE:',
       {
@@ -768,11 +935,13 @@ export async function POST(
       }
     )
 
+
     return jsonError(
       'database_error',
       500
     )
   }
+
 
   return NextResponse.json(
     {
@@ -792,6 +961,265 @@ export async function POST(
     }
   )
 }
+
+
+// ============================================================
+// PROGRAMMER LE TRAITEMENT DU REVERSEMENT
+//
+// Cette fonction ne bloque pas la réponse du webhook.
+//
+// Flux :
+//
+// payment_id
+//    ↓
+// organization_payouts.payment_id
+//    ↓
+// payout.id
+//    ↓
+// processOrganizationPayout(payout.id)
+//
+// Si aucune ligne payout n'existe, cela peut simplement signifier
+// que l'organisation n'a pas encore de compte principal de
+// reversement configuré.
+//
+// Dans ce cas le paiement du membre reste parfaitement confirmé.
+// ============================================================
+
+function scheduleOrganizationPayoutProcessing(
+  paymentIdValue:
+    | string
+    | null
+    | undefined
+) {
+
+  const paymentId =
+    cleanText(
+      paymentIdValue
+    )
+
+
+  if (!paymentId) {
+
+    console.warn(
+      'EWUKAI - PAYOUT SCHEDULE: PAYMENT ID MISSING'
+    )
+
+    return
+  }
+
+
+  after(
+    async () => {
+
+      const admin =
+        createAdminClient()
+
+
+      // ======================================================
+      // RETROUVER LE PAYOUT CREE PAR LE TRIGGER POSTGRESQL
+      // ======================================================
+
+      const {
+        data:
+          payout,
+
+        error:
+          payoutLookupError,
+      } =
+        await admin
+          .from(
+            'organization_payouts'
+          )
+          .select(`
+            id,
+            status
+          `)
+          .eq(
+            'payment_id',
+            paymentId
+          )
+          .maybeSingle()
+
+
+      if (
+        payoutLookupError
+      ) {
+
+        console.error(
+          'EWUKAI - PAYOUT LOOKUP AFTER MEMBER PAYMENT:',
+          {
+            code:
+              payoutLookupError.code,
+
+            message:
+              payoutLookupError.message,
+          }
+        )
+
+        return
+      }
+
+
+      // ======================================================
+      // PAS DE PAYOUT
+      //
+      // Cas possible :
+      // aucune destination principale de reversement configurée.
+      //
+      // Ne jamais annuler le paiement membre pour cette raison.
+      // ======================================================
+
+      if (!payout) {
+
+        console.warn(
+          'EWUKAI - PAYOUT NOT CREATED FOR CONFIRMED PAYMENT:',
+          {
+            paymentId,
+          }
+        )
+
+        return
+      }
+
+
+      // ======================================================
+      // TRAITEMENT AUTOMATIQUE
+      //
+      // processOrganizationPayout() est lui-même idempotent :
+      //
+      // pending     -> prend le payout et crée le transfert
+      // processing  -> vérifie l'existant sans double transfert
+      // transferred -> ne fait rien
+      // failed      -> ne réémet pas automatiquement
+      // ======================================================
+
+      try {
+
+        const result =
+          await processOrganizationPayout(
+            payout.id
+          )
+
+
+        console.info(
+          'EWUKAI - AUTOMATIC PAYOUT:',
+          {
+            payoutId:
+              result.payoutId,
+
+            status:
+              result.status,
+
+            idempotent:
+              result.idempotent,
+
+            providerStatus:
+              result.providerStatus,
+          }
+        )
+
+      } catch (error) {
+
+        // ====================================================
+        // IMPORTANT :
+        //
+        // L'encaissement du membre est déjà confirmé.
+        //
+        // Une erreur Transfer ne doit donc jamais provoquer
+        // une annulation du paiement membre.
+        //
+        // Le payout reste traçable dans organization_payouts
+        // pour réconciliation ultérieure.
+        // ====================================================
+
+        console.error(
+          'EWUKAI - AUTOMATIC PAYOUT PROCESSING:',
+          safeError(
+            error
+          )
+        )
+      }
+    }
+  )
+}
+
+
+// ============================================================
+// EXTRAIRE PAYMENT_ID DU RESULTAT RPC
+//
+// Supporte :
+//
+// { payment_id: "..." }
+//
+// et par sécurité :
+//
+// [ { payment_id: "..." } ]
+// ============================================================
+
+function extractConfirmationPaymentId(
+  confirmation:
+    unknown
+) {
+
+  if (
+    Array.isArray(
+      confirmation
+    )
+  ) {
+
+    if (
+      confirmation.length ===
+      0
+    ) {
+
+      return null
+    }
+
+
+    return extractConfirmationPaymentId(
+      confirmation[0]
+    )
+  }
+
+
+  if (
+    !confirmation ||
+    typeof confirmation !==
+      'object'
+  ) {
+
+    return null
+  }
+
+
+  const record =
+    confirmation as Record<
+      string,
+      unknown
+    >
+
+
+  const paymentId =
+    record.payment_id
+
+
+  if (
+    typeof paymentId !==
+    'string'
+  ) {
+
+    return null
+  }
+
+
+  const normalized =
+    paymentId.trim()
+
+
+  return normalized ||
+    null
+}
+
 
 // ============================================================
 // MARQUER UNE ANOMALIE
@@ -817,9 +1245,11 @@ async function markAttemptAnomaly(
     | string
     | null
 ) {
+
   const now =
     new Date()
       .toISOString()
+
 
   const {
     error,
@@ -852,7 +1282,9 @@ async function markAttemptAnomaly(
         attemptId
       )
 
+
   if (error) {
+
     console.error(
       'EWUKAI - CINETPAY AURORE ANOMALY:',
       {
@@ -865,6 +1297,7 @@ async function markAttemptAnomaly(
     )
   }
 }
+
 
 // ============================================================
 // LIRE UNE CHAINE DU JSON
@@ -880,24 +1313,30 @@ function getString(
   key:
     string
 ) {
+
   const value =
     payload[
       key
     ]
 
+
   if (
     typeof value !==
-    'string'
+      'string'
   ) {
+
     return null
   }
+
 
   const normalized =
     value.trim()
 
+
   return normalized ||
     null
 }
+
 
 // ============================================================
 // TEXTE NULLABLE
@@ -909,12 +1348,15 @@ function cleanText(
     | null
     | undefined
 ) {
+
   const normalized =
     value?.trim()
+
 
   return normalized ||
     null
 }
+
 
 // ============================================================
 // COMPARAISON CONSTANT-TIME DES HASH
@@ -927,15 +1369,18 @@ function safeEqualHex(
   right:
     string
 ) {
+
   const normalizedLeft =
     left
       .trim()
       .toLowerCase()
 
+
   const normalizedRight =
     right
       .trim()
       .toLowerCase()
+
 
   if (
     !/^[0-9a-f]{64}$/
@@ -947,8 +1392,10 @@ function safeEqualHex(
         normalizedRight
       )
   ) {
+
     return false
   }
+
 
   const leftBuffer =
     Buffer.from(
@@ -956,17 +1403,20 @@ function safeEqualHex(
       'hex'
     )
 
+
   const rightBuffer =
     Buffer.from(
       normalizedRight,
       'hex'
     )
 
+
   return timingSafeEqual(
     leftBuffer,
     rightBuffer
   )
 }
+
 
 // ============================================================
 // JSON ERROR
@@ -979,9 +1429,11 @@ function jsonError(
   status:
     number
 ) {
+
   return NextResponse.json(
     {
       ok: false,
+
       error,
     },
     {
@@ -995,6 +1447,7 @@ function jsonError(
   )
 }
 
+
 // ============================================================
 // SAFE ERROR
 //
@@ -1005,10 +1458,12 @@ function safeError(
   error:
     unknown
 ) {
+
   if (
     error instanceof
     Error
   ) {
+
     return {
       name:
         error.name,
@@ -1017,6 +1472,7 @@ function safeError(
         error.message,
     }
   }
+
 
   return {
     message:

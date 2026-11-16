@@ -8,28 +8,27 @@ import {
 import {
   createPaymentMethod,
   deletePaymentMethod,
+  setPrimaryPayoutMethod,
   togglePaymentMethod,
+  updatePaymentMethodAccount,
 } from './actions'
 
 // ============================================================
 // EWUKAI
 // PARAMETRES DES MOYENS DE PAIEMENT
 //
-// Cette page gère deux choses distinctes :
+// Cette page gère uniquement les moyens de paiement
+// et comptes de réception propres à la mutuelle :
 //
-// 1. Les coordonnées de paiement de la mutuelle
-//    - Wave
-//    - Orange Money
-//    - MTN MoMo
-//    - Moov Money
-//    - banque
-//    - espèces
+// - Wave
+// - Orange Money
+// - MTN MoMo
+// - Moov Money
+// - banque
+// - espèces
 //
-// 2. Le prestataire de paiement en ligne
-//    - CinetPay
-//
-// Les identifiants sensibles CinetPay ne sont jamais lus
-// directement dans cette page.
+// Les identifiants techniques CinetPay sont gérés
+// exclusivement par l'administration EWUKAI.
 // ============================================================
 
 // ============================================================
@@ -43,29 +42,6 @@ type PageProps = {
   }>
 }
 
-type CinetPayStatus = {
-  configured: boolean
-  provider: string | null
-  active: boolean
-  site_id: string | null
-  channels: string | null
-  updated_at: string | null
-}
-
-type RpcError = {
-  code?: string
-  message?: string
-}
-
-type RpcClient = {
-  rpc: (
-    functionName: string,
-    args?: Record<string, unknown>
-  ) => Promise<{
-    data: unknown
-    error: RpcError | null
-  }>
-}
 
 // ============================================================
 // PAGE
@@ -145,6 +121,9 @@ export default async function PaymentMethodsPage({
         is_active,
         is_visible_to_members,
         accepts_remote_payment,
+        is_payout_destination,
+        is_primary_payout,
+        payout_verified_at,
         display_order
       `)
       .eq(
@@ -177,52 +156,6 @@ export default async function PaymentMethodsPage({
     )
   }
 
-  // ==========================================================
-  // STATUT CINETPAY
-  //
-  // La RPC ne renvoie aucune API KEY ni SECRET KEY.
-  // ==========================================================
-
-  const rpcClient =
-    supabase as unknown as
-      RpcClient
-
-  const {
-    data: cinetPayRaw,
-    error: cinetPayError,
-  } =
-    await rpcClient.rpc(
-      'get_organization_cinetpay_status',
-      {
-        target_organization_id:
-          organizationId,
-      }
-    )
-
-  if (cinetPayError) {
-    console.error(
-      'EWUKAI - CinetPay status:',
-      {
-        code:
-          cinetPayError.code,
-
-        message:
-          cinetPayError.message,
-      }
-    )
-  }
-
-  const cinetPay =
-    (
-      cinetPayRaw ?? {
-        configured: false,
-        provider: 'cinetpay',
-        active: false,
-        site_id: null,
-        channels: null,
-        updated_at: null,
-      }
-    ) as CinetPayStatus
 
   // ==========================================================
   // RENDU
@@ -284,154 +217,6 @@ export default async function PaymentMethodsPage({
           </div>
         )}
 
-        {/* ================================================== */}
-        {/* CINETPAY */}
-        {/* ================================================== */}
-
-        <section className="mt-7 overflow-hidden rounded-3xl border border-emerald-200 bg-white shadow-sm">
-
-          <div className="bg-gradient-to-br from-emerald-50 via-white to-slate-50 p-6 sm:p-8">
-
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-
-              {/* ============================================ */}
-              {/* PRESENTATION */}
-              {/* ============================================ */}
-
-              <div className="flex min-w-0 items-start gap-4">
-
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-700 text-lg font-black text-white shadow-sm">
-                  CP
-                </div>
-
-                <div className="min-w-0">
-
-                  <div className="flex flex-wrap items-center gap-3">
-
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
-                      Paiement en ligne
-                    </p>
-
-                    <CinetPayBadge
-                      configured={
-                        cinetPay.configured
-                      }
-                      active={
-                        cinetPay.active
-                      }
-                    />
-
-                  </div>
-
-                  <h2 className="mt-2 text-xl font-black text-slate-950 sm:text-2xl">
-                    Compte marchand CinetPay
-                  </h2>
-
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                    Connectez le compte marchand
-                    CinetPay de votre mutuelle pour
-                    permettre aux membres de payer
-                    leurs cotisations en ligne.
-                  </p>
-
-                  {/* ======================================== */}
-                  {/* OPERATEURS */}
-                  {/* ======================================== */}
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-
-                    <ProviderPill>
-                      Wave
-                    </ProviderPill>
-
-                    <ProviderPill>
-                      Orange Money
-                    </ProviderPill>
-
-                    <ProviderPill>
-                      MTN MoMo
-                    </ProviderPill>
-
-                    <ProviderPill>
-                      Moov Money
-                    </ProviderPill>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              {/* ============================================ */}
-              {/* ACTION */}
-              {/* ============================================ */}
-
-              <div className="shrink-0">
-
-                <Link
-                  href="/parametres/paiements/cinetpay"
-                  className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-700 px-5 py-3.5 text-sm font-black text-white shadow-sm transition hover:bg-emerald-800 lg:w-auto"
-                >
-                  {cinetPay.configured
-                    ? 'Gérer CinetPay →'
-                    : 'Connecter CinetPay →'}
-                </Link>
-
-              </div>
-
-            </div>
-
-            {/* ============================================== */}
-            {/* INFORMATIONS SI CONFIGURE */}
-            {/* ============================================== */}
-
-            {cinetPay.configured && (
-              <div className="mt-6 grid gap-3 border-t border-emerald-100 pt-5 sm:grid-cols-3">
-
-                <CinetPayInfo
-                  label="SITE ID"
-                  value={
-                    cinetPay.site_id ||
-                    '—'
-                  }
-                />
-
-                <CinetPayInfo
-                  label="Canaux"
-                  value={
-                    formatCinetPayChannels(
-                      cinetPay.channels
-                    )
-                  }
-                />
-
-                <CinetPayInfo
-                  label="Identifiants"
-                  value="Protégés et chiffrés"
-                />
-
-              </div>
-            )}
-
-          </div>
-
-          {/* ================================================ */}
-          {/* INFORMATION IMPORTANTE */}
-          {/* ================================================ */}
-
-          <div className="border-t border-slate-100 bg-white px-6 py-4 sm:px-8">
-
-            <p className="text-xs leading-5 text-slate-500">
-              CinetPay est distinct des coordonnées
-              Wave, Orange Money, MTN MoMo ou
-              bancaires enregistrées ci-dessous.
-              Il sert au paiement automatisé depuis
-              l&apos;espace membre.
-            </p>
-
-          </div>
-
-        </section>
 
         {/* ================================================== */}
         {/* MOYENS EXISTANTS */}
@@ -551,6 +336,57 @@ export default async function PaymentMethodsPage({
                     {/* BADGES */}
                     {/* ====================================== */}
 
+                    {[
+                      'wave',
+                      'orange_money',
+                      'mtn_momo',
+                      'moov_money',
+                    ].includes(method.provider) && (
+                      <details className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <summary className="cursor-pointer text-sm font-black text-slate-700">
+                          Modifier les coordonnées
+                        </summary>
+
+                        <form
+                          action={updatePaymentMethodAccount}
+                          className="mt-4 grid gap-3"
+                        >
+                          <input
+                            type="hidden"
+                            name="id"
+                            value={method.id}
+                          />
+
+                          <input
+                            type="text"
+                            name="accountName"
+                            defaultValue={method.account_name ?? ''}
+                            placeholder="Nom du bénéficiaire"
+                            required
+                            className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+                          />
+
+                          <input
+                            type="text"
+                            name="accountNumber"
+                            defaultValue={method.account_number ?? ''}
+                            placeholder="Numéro Mobile Money"
+                            required
+                            className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+                          />
+
+                          <div>
+                            <button
+                              type="submit"
+                              className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-black text-white transition hover:opacity-90"
+                            >
+                              Enregistrer les coordonnées
+                            </button>
+                          </div>
+                        </form>
+                      </details>
+                    )}
+
                     <div className="mt-4 flex flex-wrap gap-2">
 
                       <SmallBadge
@@ -573,6 +409,33 @@ export default async function PaymentMethodsPage({
                         inactiveLabel="Information seulement"
                       />
 
+                      {[
+                        'wave',
+                        'orange_money',
+                        'mtn_momo',
+                        'moov_money',
+                      ].includes(
+                        method.provider
+                      ) && (
+                        <SmallBadge
+                          active={
+                            Boolean(
+                              method.is_payout_destination
+                            )
+                          }
+                          activeLabel="Compte de reversement"
+                          inactiveLabel="Reversement non activé"
+                        />
+                      )}
+
+                      {Boolean(
+                        method.is_primary_payout
+                      ) && (
+                        <span className="rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black text-amber-800">
+                          ★ Compte principal
+                        </span>
+                      )}
+
                     </div>
 
                     {/* ====================================== */}
@@ -580,6 +443,40 @@ export default async function PaymentMethodsPage({
                     {/* ====================================== */}
 
                     <div className="mt-5 flex flex-wrap gap-2">
+
+                      {[
+                        'wave',
+                        'orange_money',
+                        'mtn_momo',
+                        'moov_money',
+                      ].includes(
+                        method.provider
+                      ) &&
+                      method.is_active &&
+                      !method.is_primary_payout &&
+                      method.account_name &&
+                      method.account_number && (
+                        <form
+                          action={
+                            setPrimaryPayoutMethod
+                          }
+                        >
+                          <input
+                            type="hidden"
+                            name="id"
+                            value={
+                              method.id
+                            }
+                          />
+
+                          <button
+                            type="submit"
+                            className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800 transition hover:bg-amber-100"
+                          >
+                            Définir comme compte principal
+                          </button>
+                        </form>
+                      )}
 
                       <form
                         action={
@@ -767,6 +664,18 @@ export default async function PaymentMethodsPage({
                 defaultChecked
               />
 
+              <CheckBox
+                name="isPayoutDestination"
+                label="Compte de reversement"
+                description="Autoriser EWUKAI à reverser les fonds sur ce compte Mobile Money."
+              />
+
+              <CheckBox
+                name="isPrimaryPayout"
+                label="Compte principal de reversement"
+                description="Utiliser ce compte Mobile Money en priorité pour les reversements de la mutuelle."
+              />
+
             </div>
 
             {/* ============================================== */}
@@ -804,12 +713,6 @@ export default async function PaymentMethodsPage({
             Orange Money, MTN MoMo ou Moov Money.
           </p>
 
-          <p className="mt-2 text-sm leading-6 text-amber-800">
-            Les identifiants API CinetPay doivent
-            uniquement être renseignés depuis
-            l&apos;espace sécurisé « Compte
-            CinetPay » prévu à cet effet.
-          </p>
 
         </div>
 
@@ -819,109 +722,6 @@ export default async function PaymentMethodsPage({
   )
 }
 
-// ============================================================
-// CINETPAY BADGE
-// ============================================================
-
-function CinetPayBadge({
-  configured,
-  active,
-}: {
-  configured: boolean
-  active: boolean
-}) {
-  if (!configured) {
-    return (
-      <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black text-slate-600">
-        Non configuré
-      </span>
-    )
-  }
-
-  if (!active) {
-    return (
-      <span className="rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black text-amber-700">
-        Désactivé
-      </span>
-    )
-  }
-
-  return (
-    <span className="rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-black text-emerald-700">
-      Actif
-    </span>
-  )
-}
-
-// ============================================================
-// CINETPAY INFO
-// ============================================================
-
-function CinetPayInfo({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
-  return (
-    <div className="rounded-2xl border border-slate-100 bg-white p-4">
-
-      <p className="text-[11px] font-black uppercase tracking-wide text-slate-400">
-        {label}
-      </p>
-
-      <p className="mt-1 break-words text-sm font-black text-slate-800">
-        {value}
-      </p>
-
-    </div>
-  )
-}
-
-// ============================================================
-// CINETPAY CHANNELS
-// ============================================================
-
-function formatCinetPayChannels(
-  value:
-    | string
-    | null
-) {
-  switch (value) {
-    case 'MOBILE_MONEY':
-      return 'Mobile Money'
-
-    case 'CREDIT_CARD':
-      return 'Carte bancaire'
-
-    case 'WALLET':
-      return 'Wallet'
-
-    case 'ALL':
-      return 'Tous les moyens'
-
-    default:
-      return value ||
-        '—'
-  }
-}
-
-// ============================================================
-// PROVIDER PILL
-// ============================================================
-
-function ProviderPill({
-  children,
-}: {
-  children: string
-}) {
-  return (
-    <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200">
-      {children}
-    </span>
-  )
-}
 
 // ============================================================
 // PETIT BADGE

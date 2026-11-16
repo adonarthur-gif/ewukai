@@ -30,6 +30,18 @@ export type CinetPayInitializationInput = {
   returnUrl: string
   metadata?: string | null
   invoiceData?: Record<string, string>
+
+  customer?: {
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    address: string
+    city: string
+    country: string
+    state: string
+    zipCode: string
+  }
 }
 
 export type CinetPayInitializationResult = {
@@ -155,6 +167,37 @@ export async function initializeCinetPayPaymentWithCredentials(
 
             lang:
               'FR',
+
+...(input.customer
+  ? {
+      customer_name:
+        input.customer.firstName,
+
+      customer_surname:
+        input.customer.lastName,
+
+      customer_email:
+        input.customer.email,
+
+      customer_phone_number:
+        input.customer.phoneNumber,
+
+      customer_address:
+        input.customer.address,
+
+      customer_city:
+        input.customer.city,
+
+      customer_country:
+        input.customer.country,
+
+      customer_state:
+        input.customer.state,
+
+      customer_zip_code:
+        input.customer.zipCode,
+    }
+  : {}),
 
             metadata:
               input.metadata ??

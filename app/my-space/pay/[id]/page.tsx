@@ -6,10 +6,15 @@ import {
 } from 'next/navigation'
 
 import {
+  getPlatformCinetPayCheckoutConfig,
+} from '@/lib/payments/platform-cinetpay'
+
+import {
   createClient,
 } from '@/lib/supabase/server'
 
 import {
+  prepareMemberCardPayment,
   prepareMemberPayment,
 } from './actions'
 
@@ -24,7 +29,7 @@ import MemberPaymentAttemptStatus
 // - le membre ne décide jamais du montant
 // - le montant restant vient de la base
 // - les espèces ne sont jamais auto-confirmées
-// - CinetPay utilise le compte marchand de la mutuelle
+// - CinetPay utilise le compte marchand central EWUKAI
 // - le retour navigateur ne confirme jamais le paiement
 // - seule la notification CinetPay vérifiée confirme le paiement
 // ============================================================
@@ -313,6 +318,49 @@ export default async function MemberPaymentPage({
       '/login/membre'
     )
   }
+
+  // ==========================================================
+  // UTILISATEUR AUTHENTIFIE
+  //
+  // Utilisé uniquement pour préremplir les coordonnées du
+  // formulaire carte. Ces valeurs restent modifiables et ne
+  // sont jamais réécrites automatiquement dans le profil.
+  // ==========================================================
+
+  const {
+    data:
+      userData,
+
+    error:
+      userError,
+  } =
+    await supabase.auth
+      .getUser()
+
+  if (userError) {
+    console.error(
+      'EWUKAI - MEMBER PAYMENT USER:',
+      {
+        message:
+          userError.message,
+      }
+    )
+  }
+
+  const authUser =
+    userData?.user
+
+  const cardEmail =
+    authUser
+      ?.email
+      ?.trim() ||
+    ''
+
+  const cardPhone =
+    authUser
+      ?.phone
+      ?.trim() ||
+    ''
 
   // ==========================================================
   // ESPACES MEMBRE
@@ -658,6 +706,33 @@ export default async function MemberPaymentPage({
       )
 
   // ==========================================================
+  // CARTE BANCAIRE - DISPONIBILITE CENTRALE EWUKAI
+  // ==========================================================
+
+  let cardPaymentAvailable =
+    false
+
+  try {
+    await getPlatformCinetPayCheckoutConfig()
+
+    cardPaymentAvailable =
+      true
+  } catch {
+    cardPaymentAvailable =
+      false
+  }
+
+  const cardAmountSupported =
+    Number.isSafeInteger(
+      remainingAmount
+    ) &&
+    remainingAmount >
+      0 &&
+    remainingAmount %
+      5 ===
+      0
+
+  // ==========================================================
   // COULEUR
   // ==========================================================
 
@@ -677,6 +752,17 @@ export default async function MemberPaymentPage({
 
   const memberLabel =
     getMemberName(
+      member
+    )
+
+  const {
+    firstName:
+      cardFirstName,
+
+    lastName:
+      cardLastName,
+  } =
+    getMemberFirstLast(
       member
     )
 
@@ -956,9 +1042,10 @@ export default async function MemberPaymentPage({
           </h2>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            Vous serez redirigé vers le
-            guichet sécurisé CinetPay de
-            votre mutuelle.
+            Les paiements en ligne sont traités
+            par le compte CinetPay central sécurisé
+            d&apos;EWUKAI. Votre mutuelle ne gère
+            aucun identifiant CinetPay.
           </p>
 
           {/* ================================================ */}
@@ -989,134 +1076,382 @@ export default async function MemberPaymentPage({
           </div>
 
           {/* ================================================ */}
-          {/* AUCUN MOYEN EN LIGNE */}
+          {/* MOBILE MONEY */}
           {/* ================================================ */}
 
-          {onlinePaymentMethods
-            .length ===
-          0 ? (
-            <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6">
+          <div className="mt-8">
 
-              <p className="font-black text-slate-800">
-                Paiement en ligne indisponible
-              </p>
+            <div className="flex items-center justify-between gap-4">
 
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                Votre mutuelle n&apos;a
-                actuellement aucun moyen
-                Mobile Money activé pour le
-                paiement en ligne.
-              </p>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-700">
+                  Mobile Money
+                </p>
+
+                <h3 className="mt-1 text-lg font-black text-slate-900">
+                  Wave, Orange Money, MTN MoMo ou Moov Money
+                </h3>
+              </div>
 
             </div>
-          ) : (
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
 
-              {onlinePaymentMethods
-                .map(
-                  (
-                    method
-                  ) => (
-                    <form
-                      key={
-                        method.id
-                      }
-                      action={
-                        prepareMemberPayment
-                      }
-                      className="rounded-2xl border border-slate-200 p-5 transition hover:border-slate-300 hover:shadow-sm"
-                    >
+            {onlinePaymentMethods
+              .length ===
+            0 ? (
+              <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6">
 
-                      <input
-                        type="hidden"
-                        name="obligationId"
-                        value={
-                          obligation.id
+                <p className="font-black text-slate-800">
+                  Mobile Money indisponible
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Votre mutuelle n&apos;a actuellement
+                  aucun moyen Mobile Money activé pour
+                  le paiement en ligne.
+                </p>
+
+              </div>
+            ) : (
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+
+                {onlinePaymentMethods
+                  .map(
+                    (
+                      method
+                    ) => (
+                      <form
+                        key={
+                          method.id
                         }
-                      />
-
-                      <input
-                        type="hidden"
-                        name="organizationId"
-                        value={
-                          organization.id
+                        action={
+                          prepareMemberPayment
                         }
-                      />
+                        className="rounded-2xl border border-slate-200 p-5 transition hover:border-slate-300 hover:shadow-sm"
+                      >
 
-                      <input
-                        type="hidden"
-                        name="paymentMethod"
-                        value={
-                          method.provider
-                        }
-                      />
+                        <input
+                          type="hidden"
+                          name="obligationId"
+                          value={
+                            obligation.id
+                          }
+                        />
 
-                      <div className="flex items-start justify-between gap-4">
+                        <input
+                          type="hidden"
+                          name="organizationId"
+                          value={
+                            organization.id
+                          }
+                        />
 
-                        <div>
-
-                          <p className="text-xs font-black uppercase tracking-wide text-slate-400">
-                            Mobile Money
-                          </p>
-
-                          <h3 className="mt-1 text-lg font-black text-slate-900">
-                            {method.label ||
-                              providerLabel(
-                                method.provider
-                              )}
-                          </h3>
-
-                        </div>
-
-                        <ProviderBadge
-                          provider={
+                        <input
+                          type="hidden"
+                          name="paymentMethod"
+                          value={
                             method.provider
                           }
                         />
 
-                      </div>
+                        <div className="flex items-start justify-between gap-4">
 
-                      <p className="mt-4 text-sm leading-6 text-slate-500">
-                        Montant à régler :
-                      </p>
+                          <div>
 
-                      <p className="mt-1 text-xl font-black text-slate-950">
-                        {formatMoney(
-                          remainingAmount
-                        )}
-                      </p>
+                            <p className="text-xs font-black uppercase tracking-wide text-slate-400">
+                              Mobile Money
+                            </p>
 
-                      {method
-                        .instructions && (
-                        <p className="mt-3 text-xs leading-5 text-slate-500">
-                          {
-                            method
-                              .instructions
-                          }
+                            <h3 className="mt-1 text-lg font-black text-slate-900">
+                              {method.label ||
+                                providerLabel(
+                                  method.provider
+                                )}
+                            </h3>
+
+                          </div>
+
+                          <ProviderBadge
+                            provider={
+                              method.provider
+                            }
+                          />
+
+                        </div>
+
+                        <p className="mt-4 text-sm leading-6 text-slate-500">
+                          Montant à régler :
                         </p>
-                      )}
 
-                      <button
-                        type="submit"
-                        className="mt-5 inline-flex w-full items-center justify-center rounded-xl px-5 py-3 text-sm font-black text-white shadow-sm transition hover:opacity-90"
-                        style={{
-                          backgroundColor:
-                            primaryColor,
-                        }}
-                      >
-                        Continuer avec{' '}
-                        {providerLabel(
-                          method.provider
+                        <p className="mt-1 text-xl font-black text-slate-950">
+                          {formatMoney(
+                            remainingAmount
+                          )}
+                        </p>
+
+                        {method
+                          .instructions && (
+                          <p className="mt-3 text-xs leading-5 text-slate-500">
+                            {
+                              method
+                                .instructions
+                            }
+                          </p>
                         )}
-                        {' →'}
-                      </button>
 
-                    </form>
-                  )
-                )}
+                        <button
+                          type="submit"
+                          className="mt-5 inline-flex w-full items-center justify-center rounded-xl px-5 py-3 text-sm font-black text-white shadow-sm transition hover:opacity-90"
+                          style={{
+                            backgroundColor:
+                              primaryColor,
+                          }}
+                        >
+                          Continuer avec{' '}
+                          {providerLabel(
+                            method.provider
+                          )}
+                          {' →'}
+                        </button>
+
+                      </form>
+                    )
+                  )}
+
+              </div>
+            )}
+
+          </div>
+
+          {/* ================================================ */}
+          {/* CARTE BANCAIRE VISA / MASTERCARD */}
+          {/* ================================================ */}
+
+          <div className="mt-8 border-t border-slate-100 pt-8">
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+
+              <div>
+
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-blue-700">
+                  Carte bancaire
+                </p>
+
+                <h3 className="mt-1 text-lg font-black text-slate-900">
+                  Visa / Mastercard
+                </h3>
+
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                  Le paiement par carte passe par
+                  CinetPay Checkout. EWUKAI ne vous
+                  demande jamais le numéro de carte,
+                  le CVV ou la date d&apos;expiration.
+                </p>
+
+              </div>
+
+              {cardPaymentAvailable ? (
+                <span className="inline-flex w-fit rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black text-emerald-800">
+                  Disponible
+                </span>
+              ) : (
+                <span className="inline-flex w-fit rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-600">
+                  Non activé
+                </span>
+              )}
 
             </div>
-          )}
+
+            {!cardPaymentAvailable ? (
+              <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
+
+                <p className="font-black text-slate-800">
+                  Visa / Mastercard n&apos;est pas encore activé
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Les paiements Mobile Money restent disponibles
+                  normalement lorsque votre mutuelle les autorise.
+                </p>
+
+              </div>
+            ) : !cardAmountSupported ? (
+              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+
+                <p className="font-black text-amber-900">
+                  Paiement carte temporairement indisponible pour ce montant
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-amber-800">
+                  Le montant Checkout doit respecter les contraintes
+                  techniques CinetPay. Utilisez un moyen Mobile Money
+                  pour cette échéance.
+                </p>
+
+              </div>
+            ) : (
+              <details className="mt-4 overflow-hidden rounded-2xl border border-blue-200 bg-blue-50">
+
+                <summary className="cursor-pointer list-none px-5 py-4 font-black text-blue-950">
+                  Payer {formatMoney(
+                    remainingAmount
+                  )} par Visa / Mastercard
+                </summary>
+
+                <form
+                  action={
+                    prepareMemberCardPayment
+                  }
+                  className="border-t border-blue-200 bg-white p-5 sm:p-6"
+                >
+
+                  <input
+                    type="hidden"
+                    name="obligationId"
+                    value={
+                      obligation.id
+                    }
+                  />
+
+                  <input
+                    type="hidden"
+                    name="organizationId"
+                    value={
+                      organization.id
+                    }
+                  />
+
+                  <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
+
+                    <p className="font-black text-blue-950">
+                      Coordonnées de facturation
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-blue-800">
+                      Les informations connues par EWUKAI sont
+                      préremplies. Vous pouvez les modifier pour
+                      cette transaction. Ces modifications ne
+                      changent pas votre profil membre.
+                    </p>
+
+                  </div>
+
+                  <div className="mt-5 grid gap-5 sm:grid-cols-2">
+
+                    <CardField
+                      label="Prénom"
+                      name="cardFirstName"
+                      defaultValue={
+                        cardFirstName
+                      }
+                      autoComplete="given-name"
+                      required
+                    />
+
+                    <CardField
+                      label="Nom"
+                      name="cardLastName"
+                      defaultValue={
+                        cardLastName
+                      }
+                      autoComplete="family-name"
+                      required
+                    />
+
+                    <CardField
+                      label="E-mail"
+                      name="cardEmail"
+                      type="email"
+                      defaultValue={
+                        cardEmail
+                      }
+                      autoComplete="email"
+                      required
+                    />
+
+                    <CardField
+                      label="Téléphone"
+                      name="cardPhone"
+                      type="tel"
+                      defaultValue={
+                        cardPhone
+                      }
+                      placeholder="+225 ..."
+                      autoComplete="tel"
+                      required
+                    />
+
+                    <CardField
+                      label="Adresse"
+                      name="cardAddress"
+                      defaultValue=""
+                      placeholder="Quartier, rue, résidence..."
+                      autoComplete="street-address"
+                      required
+                    />
+
+                    <CardField
+                      label="Ville"
+                      name="cardCity"
+                      defaultValue=""
+                      placeholder="Abidjan"
+                      autoComplete="address-level2"
+                      required
+                    />
+
+                    <CardField
+                      label="Pays"
+                      name="cardCountry"
+                      defaultValue="CI"
+                      placeholder="CI"
+                      maxLength={2}
+                      autoComplete="country"
+                      required
+                    />
+
+                    <CardField
+                      label="Région / État"
+                      name="cardState"
+                      defaultValue=""
+                      placeholder="Région ou district"
+                      autoComplete="address-level1"
+                      required
+                    />
+
+                    <CardField
+                      label="Code postal / ZIP"
+                      name="cardZipCode"
+                      defaultValue=""
+                      placeholder="Code postal"
+                      autoComplete="postal-code"
+                      required
+                    />
+
+                  </div>
+
+                  <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+
+                    <p className="text-xs leading-5 text-slate-600">
+                      Après validation, vous serez redirigé vers
+                      le guichet sécurisé CinetPay pour saisir
+                      les informations de votre carte bancaire.
+                      EWUKAI ne stocke pas ces données bancaires.
+                    </p>
+
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-blue-800"
+                  >
+                    Continuer vers Visa / Mastercard →
+                  </button>
+
+                </form>
+
+              </details>
+            )}
+
+          </div>
 
         </section>
 
@@ -1343,6 +1678,65 @@ function getRemainingAmount(
 }
 
 // ============================================================
+// PRENOM / NOM MEMBRE POUR LE FORMULAIRE CARTE
+// ============================================================
+
+function getMemberFirstLast(
+  member: MemberData
+) {
+  let firstName =
+    member.first_name
+      ?.trim() ||
+    ''
+
+  let lastName =
+    member.last_name
+      ?.trim() ||
+    ''
+
+  const fullName =
+    member.full_name
+      ?.trim() ||
+    ''
+
+  if (
+    (!firstName ||
+      !lastName) &&
+    fullName
+  ) {
+    const parts =
+      fullName
+        .split(/\s+/)
+        .filter(Boolean)
+
+    if (
+      !firstName &&
+      parts.length >
+        0
+    ) {
+      firstName =
+        parts[0]
+    }
+
+    if (
+      !lastName &&
+      parts.length >
+        1
+    ) {
+      lastName =
+        parts
+          .slice(1)
+          .join(' ')
+    }
+  }
+
+  return {
+    firstName,
+    lastName,
+  }
+}
+
+// ============================================================
 // NOM MEMBRE
 // ============================================================
 
@@ -1469,6 +1863,73 @@ function ObligationStatusBadge({
     <span className="inline-flex rounded-full bg-amber-100 px-3 py-1.5 text-xs font-black text-amber-700">
       À payer
     </span>
+  )
+}
+
+// ============================================================
+// CHAMP FORMULAIRE CARTE
+// ============================================================
+
+function CardField({
+  label,
+  name,
+  defaultValue,
+  type = 'text',
+  placeholder,
+  required = false,
+  maxLength,
+  autoComplete,
+}: {
+  label: string
+  name: string
+  defaultValue: string
+  type?: string
+  placeholder?: string
+  required?: boolean
+  maxLength?: number
+  autoComplete?: string
+}) {
+  return (
+    <div>
+
+      <label
+        htmlFor={
+          name
+        }
+        className="mb-2 block text-xs font-black uppercase tracking-wide text-slate-500"
+      >
+        {label}
+      </label>
+
+      <input
+        id={
+          name
+        }
+        name={
+          name
+        }
+        type={
+          type
+        }
+        defaultValue={
+          defaultValue
+        }
+        placeholder={
+          placeholder
+        }
+        required={
+          required
+        }
+        maxLength={
+          maxLength
+        }
+        autoComplete={
+          autoComplete
+        }
+        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+      />
+
+    </div>
   )
 }
 

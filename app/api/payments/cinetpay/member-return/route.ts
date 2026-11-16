@@ -110,11 +110,19 @@ export async function POST(
         merchantTransactionId =
           getRecordString(
             record,
+            'r'
+          ) ??
+          getRecordString(
+            record,
             'merchant_transaction_id'
           ) ??
           getRecordString(
             record,
             'transaction_id'
+          ) ??
+          getRecordString(
+            record,
+            'cpm_trans_id'
           )
       }
     } else {
@@ -126,6 +134,10 @@ export async function POST(
         await request.formData()
 
       merchantTransactionId =
+        getFormString(
+          formData,
+          'r'
+        ) ??
         getFormString(
           formData,
           'merchant_transaction_id'
@@ -312,12 +324,20 @@ async function handleReturn(
 
 // ============================================================
 // REFERENCE DEPUIS L'URL
+//
+// "r" est prioritaire car il est volontairement court
+// pour respecter la limite de longueur des URLs CinetPay.
 // ============================================================
 
 function getMerchantTransactionIdFromUrl(
   request: NextRequest
 ) {
   return normalizeText(
+    request.nextUrl
+      .searchParams
+      .get(
+        'r'
+      ) ??
     request.nextUrl
       .searchParams
       .get(
